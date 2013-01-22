@@ -22,6 +22,8 @@ public class TransactionalFileInputStream   extends FileInputStream implements S
 		int returnValue = super.read(readByte,0, 1);
 		if (returnValue!=-1)
 			pointer+=returnValue;
+		else 
+			return -1;
 		return readByte[0];
 	}
 	
