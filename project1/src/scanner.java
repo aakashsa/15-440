@@ -33,6 +33,7 @@ public class scanner {
 		    	    System.out.print(myArr.toString());
 		    	    System.out.println("\n ");
 		    	    i++;
+		    	    System.out.println("nikhil's change");
 		    	}
 		    }
 }
