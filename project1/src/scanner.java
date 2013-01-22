@@ -18,7 +18,7 @@ public class scanner {
 	        	Scanner sc2 = null;
 		    	sc2 = new Scanner(System.in);
 		    	while (sc2.hasNextLine()) {
-		    	
+		    		myArr.clear();
 	    	    	System.out.print("\n Line  : " +i +"\n");
 
 		    	    Scanner s2 = new Scanner(sc2.nextLine());
@@ -29,6 +29,9 @@ public class scanner {
 		    	        myArr.add(s);
 		            	System.out.print(myArr.get(myArr.size()-1));
 		    	    }
+		    	    System.out.println("myArray : ");
+		    	    System.out.print(myArr.toString());
+		    	    System.out.println("\n ");
 		    	    i++;
 		    	}
 		    }
