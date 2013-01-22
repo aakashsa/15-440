@@ -10,32 +10,30 @@ public class scanner {
 	 * @param args
 	 */
 		    public static void main(String[] args) throws IOException {
+		    	
+	        	System.out.print("\n Reading Lines \n");
 
-		        Scanner s = null;
+	            ArrayList<String> myArr = new ArrayList<String>();
+	            int i =0;
+	        	Scanner sc2 = null;
+		    	sc2 = new Scanner(System.in);
+		    	while (sc2.hasNextLine()) {
+		    	
+	    	    	System.out.print("\n Line  : " +i +"\n");
 
-		        try {
-		        	System.out.print("\n Reading Lines \n");
-			           
-		            s = new Scanner(System.in);
-		            	
-		            ArrayList<String> myArr = new ArrayList<String>();
-		            
-		            while (s.hasNextLine()) {
-		            	
-		            	System.out.print("\n Read Word :  \n");
-		            	myArr.add(s.next());
+		    	    Scanner s2 = new Scanner(sc2.nextLine());
+		    	    boolean b;
+		    	    while (b = s2.hasNext()) {
+		    	    	System.out.print("\n Read Word :  \n");
+		    	        String s = s2.next();
+		    	        myArr.add(s);
 		            	System.out.print(myArr.get(myArr.size()-1));
-		            }
-		            
-		            
-		        } finally {
-		            if (s != null) {
-		                s.close();
-		            }
-		        }
+		    	    }
+		    	    i++;
+		    	}
 		    }
 }
 		
+
+
 	
-
-
