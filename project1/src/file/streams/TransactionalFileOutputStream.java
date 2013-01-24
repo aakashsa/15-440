@@ -16,10 +16,9 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 	
 	public TransactionalFileOutputStream(String fileString, boolean b) {
 		try {
-			this.fileObject = new RandomAccessFile(fileString, "w");
+			this.fileObject = new RandomAccessFile(fileString, "rw");
 			this.fileString = fileString;
 			pointer = 0;
-
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -29,20 +28,55 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 
 	
 	@Override
-	public void write(int b) throws IOException {
-		// TODO Auto-generated method stub
-		byte lowByte = (byte)(b & 0xFF);
-		this.write(lowByte);
+	public void write(int b){
+		try {
+			this.fileObject = new RandomAccessFile(fileString, "rw");
+			fileObject.seek(pointer);
+			byte lowByte = (byte)(b & 0xFF);
+			fileObject.write(lowByte);
+			pointer = fileObject.getFilePointer();
+			fileObject.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 	}
 
 	public void write(byte[] b) throws IOException {
-		
+		try {
+			this.fileObject = new RandomAccessFile(fileString, "rw");
+			fileObject.seek(pointer);
+			fileObject.write(b);
+			pointer = fileObject.getFilePointer();
+			fileObject.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
 	public void write(byte[] b,int off,int len) throws IOException {
-		
-
+		try {
+			this.fileObject = new RandomAccessFile(fileString, "w");
+			fileObject.seek(pointer);
+			fileObject.write(b,off,len);
+			pointer = fileObject.getFilePointer();
+			fileObject.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}	
 	
 

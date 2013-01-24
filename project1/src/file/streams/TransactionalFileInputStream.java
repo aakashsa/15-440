@@ -38,7 +38,7 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 	public int read(byte[] b,int off,int len) throws IOException {
 		this.fileStream = new FileInputStream(filePath);
 		fileStream.skip(pointer);
-		int returnValue = super.read(b,off, len);
+		int returnValue = fileStream.read(b,off, len);
 		if (returnValue!=-1)
 			pointer+=returnValue;
 		fileStream.close();
@@ -49,7 +49,7 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 	public int read(byte[] b) throws IOException {
 		this.fileStream = new FileInputStream(filePath);
 		fileStream.skip(pointer);
-		int returnValue = super.read(b);
+		int returnValue = fileStream.read(b);
 		if (returnValue!=-1)
 			pointer+=returnValue;
 		fileStream.close();
