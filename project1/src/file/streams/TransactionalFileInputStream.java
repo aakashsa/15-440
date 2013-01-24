@@ -22,6 +22,8 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 
 	@Override
 	public int read() throws IOException {
+		System.out.println(" Calling function 1 ");
+
 		this.fileStream = new FileInputStream(filePath);
 		
 		fileStream.skip(pointer);
@@ -36,6 +38,8 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 	}
 	
 	public int read(byte[] b,int off,int len) throws IOException {
+		System.out.println(" Calling function 2 ");
+
 		this.fileStream = new FileInputStream(filePath);
 		fileStream.skip(pointer);
 		int returnValue = fileStream.read(b,off, len);
@@ -47,6 +51,8 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 	
 	 
 	public int read(byte[] b) throws IOException {
+		System.out.println(" Calling function 3 ");
+
 		this.fileStream = new FileInputStream(filePath);
 		fileStream.skip(pointer);
 		int returnValue = fileStream.read(b);

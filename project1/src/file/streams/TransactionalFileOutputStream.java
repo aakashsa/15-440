@@ -29,6 +29,8 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 	
 	@Override
 	public void write(int b){
+		System.out.println(" Calling function 4 ");
+
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");
 			fileObject.seek(pointer);
@@ -47,6 +49,8 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 	}
 
 	public void write(byte[] b) throws IOException {
+		System.out.println(" Calling function 5 ");
+
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");
 			fileObject.seek(pointer);
@@ -64,8 +68,9 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 	}
 
 	public void write(byte[] b,int off,int len) throws IOException {
+		System.out.println(" Calling function 6 ");
 		try {
-			this.fileObject = new RandomAccessFile(fileString, "w");
+			this.fileObject = new RandomAccessFile(fileString, "rw");
 			fileObject.seek(pointer);
 			fileObject.write(b,off,len);
 			pointer = fileObject.getFilePointer();

@@ -36,12 +36,15 @@ public class GrepProcess implements MigratableProcess
 
 	public void run()
 	{
+		System.out.println("Running Grep Processes \n");
 		PrintStream out = new PrintStream(outFile);
 		DataInputStream in = new DataInputStream(inFile);
 
 		try {
 			while (!suspending) {
+
 				String line = in.readLine();
+				System.out.println("Line : " + line + " \n");
 
 				if (line == null) break;
 				
