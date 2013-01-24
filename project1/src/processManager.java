@@ -2,6 +2,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -20,15 +22,17 @@ public class processManager {
 			System.out.println(" Starting Slave \n");
 			// Slave Case
 			Socket echoSocket = null;
-	        PrintWriter out = null;
-	        BufferedReader in = null;
+			ObjectOutputStream out = null;
+	        ObjectInputStream in = null;
 
 	        try {
 	        	
-	            echoSocket = new Socket("Aakashs-MacBook-Pro.local", 4444);
-	            out = new PrintWriter(echoSocket.getOutputStream(), true);
-	            in = new BufferedReader(new InputStreamReader(
-	                                        echoSocket.getInputStream()));
+	            echoSocket = new Socket("localhost", 8000);
+	    		System.out.println(" Before Loop 1 \n");
+	            out = new ObjectOutputStream(echoSocket.getOutputStream());
+	            out.flush();
+	    		System.out.println(" Before Loop 2 \n");
+
 	        } catch (UnknownHostException e) {
 	            System.err.println("Don't know about host: Aakashs-MacBook-Pro.local.");
 	            System.exit(1);
@@ -42,10 +46,13 @@ public class processManager {
 	                                   new InputStreamReader(System.in));
 		String userInput;
 
+		System.out.println(" Before Loop\n");
 		try {
-			while ((userInput = stdIn.readLine()) != null) {
-			    out.println(userInput);
-			    System.out.println("echo: " + in.readLine());
+			while (!(userInput = stdIn.readLine()).equals("quit")) {
+				System.out.println(" Writing String 1\n");
+			    out.writeObject(new String(userInput));
+	//		    out.flush();
+				System.out.println(" Writing String 2\n");
 			}
 			
 			
@@ -67,7 +74,7 @@ public class processManager {
 			//Master Case
 			ServerSocket serverSocket = null;
 			try {
-			    serverSocket = new ServerSocket(4444);
+			    serverSocket = new ServerSocket(8000);
 			} 
 			catch (IOException e) {
 			    System.out.println("Could not listen on port: 4444");
@@ -89,9 +96,9 @@ public class processManager {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			BufferedReader in = null;
+			ObjectInputStream in = null;
 			try {
-				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				in = new ObjectInputStream(clientSocket.getInputStream());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -100,9 +107,13 @@ public class processManager {
 
 			// initiate conversation with client
 			try {
-				while ((inputLine = in.readLine()) != null) {   
-				    out.println(inputLine);
-				    break;
+				try {
+					while (!(inputLine = (String) in.readObject()).equals("Done")) { 
+						System.out.println(" Read Line "+ inputLine +" \n ");
+					}
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
