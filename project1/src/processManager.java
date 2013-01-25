@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import processes.GrepProcess;
-
+import interfaces.MigratableProcess;
 public class processManager {
 
 	/**
@@ -91,9 +91,17 @@ public class processManager {
 				            hello[0] = myArr.get(0);
 				            hello[1] = myArr.get(1);
 				            hello[2] = myArr.get(2);
-				            
-						 t = new Thread ((Runnable) strCtor.newInstance((Object) hello) );
+				            MigratableProcess a = (MigratableProcess) strCtor.newInstance((Object) hello);
+						 t = new Thread (a);
+						 long id = t.getId();
 						 t.start();
+						 Thread.sleep(5 *10);
+						 a.suspend(); 
+						 Thread.sleep(100);
+						 t = new Thread (a);
+						 t.start();
+						 Thread.sleep(5 *10);
+						 a.suspend(); 	
 					} catch (IllegalArgumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -104,6 +112,9 @@ public class processManager {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
