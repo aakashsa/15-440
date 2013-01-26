@@ -45,16 +45,16 @@ public class GrepProcess implements MigratableProcess
 			while (!suspending) {
 
 				//String line = in.readLine();
-				//System.out.println("Line :" + i + " \n");
+				System.out.println("Line :" + i + " \n");
 			
-				try {
-					System.out.println("Sleeping");
-					Thread.sleep(5*1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				break;
+//				try {
+//					System.out.println("Sleeping");
+//					Thread.sleep(5*1000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				break;
 //				if (line == null) break;
 //				
 //				if (line.contains(query)) {
