@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import processes.GrepProcess;
+
 import interfaces.MigratableProcess;
 public class processManager {
 
@@ -97,11 +97,11 @@ public class processManager {
 						 t.start();
 						 Thread.sleep(5 *10);
 						 a.suspend(); 
-						 Thread.sleep(100);
-						 t = new Thread (a);
-						 t.start();
-						 Thread.sleep(5 *10);
-						 a.suspend(); 	
+						 //Thread.sleep(100);
+						 //t = new Thread (a);
+						 //t.start();
+						 //Thread.sleep(5 *10);
+						 //a.suspend(); 	
 					} catch (IllegalArgumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

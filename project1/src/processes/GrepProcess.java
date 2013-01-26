@@ -40,7 +40,7 @@ public class GrepProcess implements MigratableProcess
 		System.out.println("Running Grep Processes \n");
 		PrintStream out = new PrintStream(outFile);
 		DataInputStream in = new DataInputStream(inFile);
-
+		System.out.println("suspending var here is: " + suspending + "\n");
 		//try {
 			while (!suspending) {
 
@@ -73,8 +73,10 @@ public class GrepProcess implements MigratableProcess
 
 	public void suspend()
 	{
+		System.out.println("suspending var in beginning of suspend: " + suspending + "\n");
 		suspending = true;
 		System.out.println("Hi From Suspend\n");
+		System.out.println("suspending var after changing it: " + suspending + "\n");
 		while (suspending);
 	}
 
