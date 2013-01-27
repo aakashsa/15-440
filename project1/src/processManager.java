@@ -15,6 +15,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import processes.ThreadProcess;
+
 import interfaces.MigratableProcess;
 
 public class processManager {
