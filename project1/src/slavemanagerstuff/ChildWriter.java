@@ -1,4 +1,4 @@
-package manager.child;
+package slavemanagerstuff;
 
 public class ChildWriter implements Runnable {
 

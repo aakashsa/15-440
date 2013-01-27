@@ -1,8 +1,8 @@
 package processes;
 
 import interfaces.MigratableProcess;
-import file.streams.TransactionalFileInputStream;
-import file.streams.TransactionalFileOutputStream;
+import filestreams.TransactionalFileInputStream;
+import filestreams.TransactionalFileOutputStream;
 
 
 import java.io.PrintStream;
