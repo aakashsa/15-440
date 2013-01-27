@@ -42,10 +42,19 @@ public class GrepProcess implements MigratableProcess
 		DataInputStream in = new DataInputStream(inFile);
 		System.out.println("suspending var here is: " + suspending + "\n");
 		//try {
+		int i = 0;
 			while (!suspending) {
 
 				//String line = in.readLine();
-				System.out.println("Line :" + i + " \n");
+				
+				try {
+					Thread.sleep(15*1000);
+					System.out.println("Grep still running. i: " + i);
+					i++;
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			
 //				try {
 //					System.out.println("Sleeping");

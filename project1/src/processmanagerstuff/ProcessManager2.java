@@ -56,6 +56,7 @@ public class ProcessManager2 implements Runnable {
 			} catch (UnknownHostException e) {
 				System.out.println("Unknown host: " + hostname);
 			} catch (IOException e) {
+				e.printStackTrace();
 				System.out.println("Error in IO for host: " + hostname);
 			}
 			
@@ -64,6 +65,10 @@ public class ProcessManager2 implements Runnable {
 			if (clientSocket != null && out != null && in != null) {
 				
 			}
+			System.out.println("after if statement");
+			Thread pm = new Thread(new ProcessManager2());
+			pm.start();
+			System.out.println("after starting child");
 		}
 		else {
 			//    ******************* Master
@@ -115,11 +120,11 @@ public class ProcessManager2 implements Runnable {
 							.println("Invalid commant: quit does not take any arguments!");
 					} else {
 						System.out.println("Quitting...");
-						Thread.currentThread().interrupt();
-						return;
+						System.exit(-1);
 					}
 				} else {
 					// need to start a new process; parse arguments
+					cliArgs.clear();
 					while (sc2.hasNext()) {
 						cliArgs.add(sc2.next());
 					}
@@ -133,7 +138,8 @@ public class ProcessManager2 implements Runnable {
 					Thread processThread = null;
 					
 					try {
-						Class<?> processClass = Class.forName(name);
+						Class<?> processClass = Class.forName("processes.GrepProcess");
+						System.out.println("Process class: " + processClass.toString());
 						Class[] ctorArgs = new Class[1];
 						ctorArgs[0] = String[].class;
 						ctor = processClass.getConstructor(ctorArgs);
@@ -150,10 +156,13 @@ public class ProcessManager2 implements Runnable {
 						processThread.start();
 						
 					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
 						System.out.println("ERROR: Process " + name + " is not supported!");
 					} catch (NoSuchMethodException e) {
+						e.printStackTrace();
 						System.out.println("ERROR: Process " + name + " is a weird process!");
 					} catch (Exception e) {
+						e.printStackTrace();
 						System.out.println("ERROR: trouble starting process: " + name);
 					}
 				}
