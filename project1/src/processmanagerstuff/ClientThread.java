@@ -40,9 +40,10 @@ public class ClientThread implements Runnable {
 		System.out.println("Spawned a New Thread for Connection");
 		while(true){
 		try {
-			MigratableProcess p = (MigratableProcess) in.readObject();
-			System.out.println("Received Process = " + p.toString());
-			
+			MigratableProcess process = (MigratableProcess) in.readObject();
+			System.out.println("Received Process = " + process.toString());
+	
+			out.writeObject((Object) process);
 //			ConcurrentHashMap<Long, ThreadProcess> allProcesses = (ConcurrentHashMap<Long, ThreadProcess>) in.readObject();
 //			System.out.println("Received allProces Printing :");
 //			for (Long k : allProcesses.keySet()) {

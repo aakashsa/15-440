@@ -13,6 +13,7 @@ import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 import processes.ThreadProcess;
+import slavemanagerstuff.ChildReader;
 import slavemanagerstuff.ChildWriter;
 
 
@@ -21,6 +22,9 @@ import slavemanagerstuff.ChildWriter;
  * @author nikhiltibrewal
  *
  */
+
+//processes.GrepProcess hey input.txt output.txt
+
 public class ProcessManager2 implements Runnable {
 	
 	public static ConcurrentHashMap<Long, ThreadProcess> allProcesses = new ConcurrentHashMap();
@@ -108,6 +112,11 @@ public class ProcessManager2 implements Runnable {
 		
 		if(isSlave)//Child Writer
 			new Thread(new ChildWriter(out)).start();
+		
+		if(isSlave)//Child Reader
+			new Thread(new ChildReader(in)).start();
+		
+		
 		
 		
 		while (sc.hasNextLine()) {
