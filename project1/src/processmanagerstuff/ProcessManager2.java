@@ -13,6 +13,7 @@ import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 import processes.ThreadProcess;
+import slavemanagerstuff.ChildWriter;
 
 
 /**
@@ -23,7 +24,16 @@ import processes.ThreadProcess;
 public class ProcessManager2 implements Runnable {
 	
 	public static ConcurrentHashMap<Long, ThreadProcess> allProcesses = new ConcurrentHashMap();
+	private static ObjectOutputStream out = null; //Slave output stream
+	private static ObjectInputStream in = null; //Slave input stream
+	private static Socket clientSocket = null; //Client socket
+	private boolean isSlave ;
 	
+	public ProcessManager2(boolean isSlave) {
+		this.isSlave = isSlave;
+		// TODO Auto-generated constructor stub
+	}
+
 	public static void main(String[] args) {
 		
 		int port = 4444; //Default port
@@ -44,15 +54,13 @@ public class ProcessManager2 implements Runnable {
 				port = Integer.valueOf(args[2]).intValue();
 			}
 			
-			ObjectOutputStream out = null; //Slave output stream
-			ObjectInputStream in = null; //Slave input stream
-			Socket clientSocket = null; //Client socket
 			
 			try {
 				clientSocket = new Socket(hostname, port);
 				in = new ObjectInputStream(clientSocket.getInputStream());
 				out = new ObjectOutputStream(clientSocket.getOutputStream());
 				out.flush();
+				//out.writeObject((Object)new String("HEY !\n"));
 			} catch (UnknownHostException e) {
 				System.out.println("Unknown host: " + hostname);
 			} catch (IOException e) {
@@ -66,7 +74,7 @@ public class ProcessManager2 implements Runnable {
 				
 			}
 			System.out.println("after if statement");
-			Thread pm = new Thread(new ProcessManager2());
+			Thread pm = new Thread(new ProcessManager2(true));
 			pm.start();
 			System.out.println("after starting child");
 		}
@@ -85,7 +93,7 @@ public class ProcessManager2 implements Runnable {
 			MasterServer server = new MasterServer(port);
 			Thread serverThread = new Thread(server);
 			serverThread.start();
-			Thread pm = new Thread(new ProcessManager2());
+			Thread pm = new Thread(new ProcessManager2(false));
 			pm.start();
 		}
 	}
@@ -97,6 +105,10 @@ public class ProcessManager2 implements Runnable {
 		ArrayList<String> cliArgs = new ArrayList<String>(); //cli arguments to processes
 		
 		Scanner sc = new Scanner(System.in);
+		
+		if(isSlave)//Child Writer
+			new Thread(new ChildWriter(out)).start();
+		
 		
 		while (sc.hasNextLine()) {
 			Scanner sc2 = new Scanner(sc.nextLine());
@@ -167,6 +179,9 @@ public class ProcessManager2 implements Runnable {
 					}
 				}
 			}
+			
+			
+			
 		}
 	}
 }
