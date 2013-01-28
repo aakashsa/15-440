@@ -40,7 +40,7 @@ public class GrepProcess implements MigratableProcess
 		System.out.println("Running Grep Processes \n");
 		PrintStream out = new PrintStream(outFile);
 		DataInputStream in = new DataInputStream(inFile);
-		System.out.println("suspending var here is: " + suspending + "\n");
+		//System.out.println("suspending var here is: " + suspending + "\n");
 		//try {
 		int i = 0;
 			while (!suspending) {
@@ -49,7 +49,7 @@ public class GrepProcess implements MigratableProcess
 				
 				try {
 					Thread.sleep(15*1000);
-					System.out.println("Grep still running. i: " + i);
+					//System.out.println("Grep still running. i: " + i);
 					i++;
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -89,10 +89,10 @@ public class GrepProcess implements MigratableProcess
 
 	public void suspend()
 	{
-		System.out.println("suspending var in beginning of suspend: " + suspending + "\n");
+		//System.out.println("suspending var in beginning of suspend: " + suspending + "\n");
 		suspending = true;
 		System.out.println("Hi From Suspend\n");
-		System.out.println("suspending var after changing it: " + suspending + "\n");
+		//System.out.println("suspending var after changing it: " + suspending + "\n");
 		while (suspending);
 	}
 
