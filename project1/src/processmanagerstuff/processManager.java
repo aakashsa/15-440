@@ -209,7 +209,7 @@ public class processManager {
 							}
 						}
 
-						//processes.GrepProcess hey src/input.txt src/output.txt
+						//processes.GrepProcess hey input.txt output.txt
 					} catch (IllegalArgumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

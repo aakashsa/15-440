@@ -16,7 +16,7 @@ public class MasterServer implements Runnable {
 	private static int port;
 	private static int maxClientsCount = 500;
 	private static final ArrayList<ClientThread> clientThreads = new ArrayList<ClientThread>();
-
+	public static int clientNumbers = 1;
 	
 	public MasterServer(int port) {
 		this.port = port;
@@ -38,6 +38,7 @@ public class MasterServer implements Runnable {
 
 		while (true) {
 			try {
+				System.out.println("Listening in Master Server");
 				clientSocket = serverSocket.accept();
 				if (clientThreads.size()== maxClientsCount) {
 			          System.out.println("Server Busy");
@@ -47,8 +48,9 @@ public class MasterServer implements Runnable {
 					clientThreads.add(new ClientThread(clientSocket));	
 					new Thread(clientThreads.get(clientThreads.size()-1)).start();
 			    }
-			}
-			// need to spawn a new thread for each client thread
+				clientNumbers++;
+			}			
+			 // need to spawn a new thread for each client thread
 			 catch (IOException e) {
 				System.out.println("Accept failed: " + port);
 				System.exit(-1);

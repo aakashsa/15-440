@@ -9,22 +9,23 @@ import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
 import processes.ThreadProcess;
+import slavemanagerstuff.ChildWriter;
 
 public class ClientThread implements Runnable {
 
 	private ObjectOutputStream out ;
 	private ObjectInputStream in ;
-	
-	public ClientThread () {
-		
-		
-	}
+	private int id = -1;
+	private String filePath = null;
+	private int numProcess ;
 	
 	public ClientThread(Socket clientSocket) {
+		System.out.println("Client Thread");
 		try {
 			out = new ObjectOutputStream(clientSocket.getOutputStream());
 			in = new ObjectInputStream(clientSocket.getInputStream());
 			out.flush();
+			out.writeObject((Object) new Integer(MasterServer.clientNumbers));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -37,13 +38,23 @@ public class ClientThread implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		System.out.println("Spawned a New Thread for Connection");
-		while(true){
+
+		//System.out.println("Spawned a New Thread for Connection");
 		try {
-			MigratableProcess process = (MigratableProcess) in.readObject();
-			System.out.println("Received Process = " + process.toString());
-	
-			out.writeObject((Object) process);
+			while(true){
+				//				out.writeObject((Object) new String("src/myObject.data"));
+				HeaderPacket header = (HeaderPacket) in.readObject();
+				this.id = header.getId();
+				this.filePath = header.getFilePath();
+				this.numProcess  = header.getNumProcess();
+				System.out.println("Client Number " + id  + " Wrote " + numProcess + " to file " + filePath);
+				LoadBalancer.list.add(header);
+				if (LoadBalancer.list.size() == MasterServer.clientNumbers)
+					new Thread(new LoadBalancer(out,in)).start();
+
+				
+				
+//			out.writeObject((Object) process);
 //			ConcurrentHashMap<Long, ThreadProcess> allProcesses = (ConcurrentHashMap<Long, ThreadProcess>) in.readObject();
 //			System.out.println("Received allProces Printing :");
 //			for (Long k : allProcesses.keySet()) {
@@ -51,14 +62,15 @@ public class ClientThread implements Runnable {
 //				System.out.println(tp.getProcess().toString());
 //				
 //			}
-			System.out.println("Done Printing");
-		} catch (IOException e) {
+			}
+		}
+		catch (IOException e) {
 			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			//e.printStackTrace();
 		}
 	}
 

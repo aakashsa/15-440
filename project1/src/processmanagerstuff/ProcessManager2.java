@@ -32,6 +32,10 @@ public class ProcessManager2 implements Runnable {
 	private static ObjectInputStream in = null; //Slave input stream
 	private static Socket clientSocket = null; //Client socket
 	private boolean isSlave ;
+	private static int id = -1;
+	private Thread ChildWriter;	
+	private Thread ChildReader;
+
 	
 	public ProcessManager2(boolean isSlave) {
 		this.isSlave = isSlave;
@@ -64,13 +68,19 @@ public class ProcessManager2 implements Runnable {
 				in = new ObjectInputStream(clientSocket.getInputStream());
 				out = new ObjectOutputStream(clientSocket.getOutputStream());
 				out.flush();
+
+				id = (Integer) in.readObject();
+				System.out.println(" Recieved id " + id + " Back");
 				//out.writeObject((Object)new String("HEY !\n"));
 			} catch (UnknownHostException e) {
 				System.out.println("Unknown host: " + hostname);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("Error in IO for host: " + hostname);
-			}
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 			
 			// If everything was initialized properly, we need to spawn two threads
 			// for reading from server, and writing to server every 5 seconds
@@ -101,7 +111,9 @@ public class ProcessManager2 implements Runnable {
 			pm.start();
 		}
 	}
-
+	
+	
+	
 	@Override
 	public void run() {
 		// Keep scanning for input from standard in for new processes
@@ -110,13 +122,17 @@ public class ProcessManager2 implements Runnable {
 		
 		Scanner sc = new Scanner(System.in);
 		
-		if(isSlave)//Child Writer
-			new Thread(new ChildWriter(out)).start();
-		
-		if(isSlave)//Child Reader
-			new Thread(new ChildReader(in)).start();
-		
-		
+		//Child Writer
+		if(isSlave){
+			ChildWriter = new Thread(new ChildWriter(in,out,id));
+			ChildWriter.start();
+		}	
+		//Child Reader
+		if(isSlave){
+			ChildReader = new Thread(new ChildReader(in,id));
+			ChildReader.start();
+		}	
+//		
 		
 		
 		while (sc.hasNextLine()) {
@@ -149,9 +165,7 @@ public class ProcessManager2 implements Runnable {
 					while (sc2.hasNext()) {
 						cliArgs.add(sc2.next());
 					}
-					System.out
-						.println("Starting new process: name: "
-							+ name + ", arguments: " + cliArgs.toString());
+					//System.out.println("Starting new process: name: "+ name + ", arguments: " + cliArgs.toString());
 
 					// Now need to parse process and run it in a new thread
 					
