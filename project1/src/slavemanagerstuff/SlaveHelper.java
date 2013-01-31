@@ -137,6 +137,7 @@ public class SlaveHelper implements Runnable {
 									processThread.start();
 								}
 							}
+							filePaths = null;
 						}
 
 					} else {
