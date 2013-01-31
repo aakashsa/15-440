@@ -15,8 +15,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import processes.ThreadProcess;
 
 import slavemanagerstuff.SlaveHelper;
+
+//processes.GP hi input.txt output.txt
 
 public class ProcessManager3 {
 	// For both Master and Slave
@@ -28,7 +31,7 @@ public class ProcessManager3 {
 	public static ConcurrentHashMap<Integer, String> allProcesses = new ConcurrentHashMap<Integer, String>();
 
 	// Only for Slave
-	public static ConcurrentHashMap<Integer, MigratableProcess> runningProcesses = new ConcurrentHashMap<Integer, MigratableProcess>();
+	public static ConcurrentHashMap<Integer, ThreadProcess> runningProcesses = new ConcurrentHashMap<Integer, ThreadProcess>();
 
 	/**
 	 * @param args
@@ -129,8 +132,8 @@ public class ProcessManager3 {
 								.println("Invalid command: ps does not take any arguments!");
 					} else {
 						for (Integer k : runningProcesses.keySet()) {
-							MigratableProcess proc = runningProcesses.get(k);
-							System.out.println(proc.toString());
+							ThreadProcess tp = runningProcesses.get(k);
+							System.out.println(tp.getProcess().toString());
 						}
 					}
 				} else if (name.equals("quit")) {
@@ -157,7 +160,7 @@ public class ProcessManager3 {
 
 						try {
 							Class<?> processClass = Class
-									.forName("processes.GrepProcess");
+									.forName(name);
 							System.out.println("Process class: "
 									+ processClass.toString());
 							Class<?>[] ctorArgs = new Class[1];
