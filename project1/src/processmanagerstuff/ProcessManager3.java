@@ -5,8 +5,10 @@ import interfaces.MigratableProcess;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
-import processes.ThreadProcess;
 import slavemanagerstuff.SlaveHelper;
 
 public class ProcessManager3 {
@@ -28,11 +29,6 @@ public class ProcessManager3 {
 
 	// Only for Slave
 	public static ConcurrentHashMap<Integer, MigratableProcess> runningProcesses = new ConcurrentHashMap<Integer, MigratableProcess>();
-
-	
-	public ProcessManager3(boolean isSlave) {
-		// TODO Auto-generated constructor stub
-	}
 
 	/**
 	 * @param args
@@ -61,40 +57,42 @@ public class ProcessManager3 {
 			} else {
 				port = Integer.valueOf(args[2]).intValue();
 			}
-
-			ObjectOutputStream out = null; // Slave output stream
+			OutputStream output = null;
+			InputStream input = null;
+			ObjectOutputStream out = null;
 			ObjectInputStream in = null; // Slave input stream
 			Socket clientSocket = null; // Client socket
 			try {
 				clientSocket = new Socket(hostname, port);
-				in = new ObjectInputStream(clientSocket.getInputStream());
-				out = new ObjectOutputStream(clientSocket.getOutputStream());
+				output = clientSocket.getOutputStream();
+				input = clientSocket.getInputStream();
+				System.out.println("Getting Input Stream Slave PM 68");
+				out = new ObjectOutputStream(output);
 				out.flush();
+				in = new ObjectInputStream(input);
+				
 				id = (Integer) in.readObject();
 				System.out.println(" Recieved id " + id + " Back");
-				// out.writeObject((Object)new String("HEY !\n"));
+
 			} catch (UnknownHostException e) {
 				System.out.println("Unknown host: " + hostname);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("Error in IO for host: " + hostname);
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 			// If everything was initialized properly, we need to spawn two
 			// threads
 			// for reading from server, and writing to server every 5 seconds
-			if (clientSocket != null && out != null && in != null) {
-
-			}
-			System.out.println("after if statement");
-			//Child Reader
-			
-			Thread slaveThread = new Thread(new SlaveHelper(in,out,id));
-			slaveThread.start();
-				
+			if (clientSocket != null && output != null && input != null) {
+				Thread slaveThread = new Thread(new SlaveHelper(input, output, id, clientSocket, out, in));
+				slaveThread.start();
+			} else {
+				System.out.println("ERROR: Client wasn't able to open socket or streams!");
+				System.exit(-1);
+			}			
 		} else {
 			isSlave = false;
 			// ******************* Master
@@ -112,11 +110,10 @@ public class ProcessManager3 {
 			MasterServer server = new MasterServer(port);
 			Thread serverThread = new Thread(server);
 			serverThread.start();
-
 		}
-		ArrayList<String> cliArgs = new ArrayList<String>(); // cli arguments to
-																// processes
-
+		
+		//cli arguments to processes
+		ArrayList<String> cliArgs = new ArrayList<String>();
 		Scanner sc = new Scanner(System.in);
 
 		while (sc.hasNextLine()) {
@@ -131,7 +128,7 @@ public class ProcessManager3 {
 						System.out
 								.println("Invalid command: ps does not take any arguments!");
 					} else {
-						for (Integer k : allProcesses.keySet()) {
+						for (Integer k : runningProcesses.keySet()) {
 							MigratableProcess proc = runningProcesses.get(k);
 							System.out.println(proc.toString());
 						}
@@ -156,15 +153,14 @@ public class ProcessManager3 {
 
 						// Now need to parse process and run it in a new thread
 
-						Constructor ctor = null;
-						Thread processThread = null;
+						Constructor<?> ctor = null;
 
 						try {
 							Class<?> processClass = Class
 									.forName("processes.GrepProcess");
 							System.out.println("Process class: "
 									+ processClass.toString());
-							Class[] ctorArgs = new Class[1];
+							Class<?>[] ctorArgs = new Class[1];
 							ctorArgs[0] = String[].class;
 							ctor = processClass.getConstructor(ctorArgs);
 
@@ -184,12 +180,13 @@ public class ProcessManager3 {
 								processFile.createNewFile();
 							}
 
-							// System.out.println("Writing the following : ");
 							FileOutputStream f_out = new FileOutputStream(
 									processFile, false);
 							ObjectOutputStream oos = new ObjectOutputStream(
 									f_out);
 							oos.writeObject((Object) process);
+							oos.flush();
+							oos.close();
 							allProcesses.put(numProcesses, filePath);
 							numProcesses++;
 							System.out.println("Done Writing Process \n");
@@ -207,11 +204,11 @@ public class ProcessManager3 {
 									.println("ERROR: trouble starting process: "
 											+ name);
 						}
+					} else {
+						System.out.println("ERROR: Command not supported by slave PM");
 					}
 				}
 			}
-
 		}
 	}
-
 }

@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import processes.ThreadProcess;
 import slavemanagerstuff.SlaveHelper;
-import slavemanagerstuff.ChildWriter;
 
 
 /**
@@ -123,10 +122,10 @@ public class ProcessManager2 implements Runnable {
 		Scanner sc = new Scanner(System.in);
 		
 		//Child Writer
-		if(isSlave){
+		/*if(isSlave){
 			ChildWriter = new Thread(new ChildWriter(in,out,id));
 			ChildWriter.start();
-		}	
+		}*/	
 		
 //		
 		

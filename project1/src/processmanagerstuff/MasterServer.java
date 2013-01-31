@@ -1,32 +1,26 @@
 package processmanagerstuff;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.omg.CORBA.portable.OutputStream;
-
-import processes.ThreadProcess;
-import slavemanagerstuff.ChildWriter;
-import sun.misc.Cleaner;
 
 public class MasterServer implements Runnable {
 
-	private static int port;
+	private int port;
 	private static int maxClientsCount = 500;
-	private static final ArrayList<ClientThread> clientThreads = new ArrayList<ClientThread>();
-	public static ArrayList<Socket> clientSocketList = new ArrayList<Socket>();
+	//private static final ArrayList<ClientThread> clientThreads = new ArrayList<ClientThread>();
+	public static ArrayList<ObjectOutputStream> clientOutputStreamList = new ArrayList<ObjectOutputStream>();
 	public static int clientNumbers = 1;
 
 	public MasterServer(int port) {
 		this.port = port;
-		LoadBalancer lb = new LoadBalancer(clientSocketList);
+		LoadBalancer lb = new LoadBalancer(clientOutputStreamList);
 		(new Thread(lb)).start();
 	}
 
@@ -34,8 +28,6 @@ public class MasterServer implements Runnable {
 	public void run() {
 		ServerSocket serverSocket = null;
 		Socket clientSocket = null;
-		ObjectOutputStream out = null;
-		ObjectInputStream in = null;
 
 		try {
 			serverSocket = new ServerSocket(port);
@@ -46,22 +38,28 @@ public class MasterServer implements Runnable {
 
 		while (true) {
 			try {
-				System.out.println("Listening in Master Server");
+				System.out.println("Listening in Master Server, clientsocket: " + clientSocket);
 				clientSocket = serverSocket.accept();
-
-				if (clientThreads.size() == maxClientsCount) {
+				OutputStream output = clientSocket.getOutputStream();
+				InputStream input = clientSocket.getInputStream();
+				ObjectOutputStream out = new ObjectOutputStream(output);
+				ObjectInputStream in = new ObjectInputStream(input);
+				
+				if (clientOutputStreamList.size() == maxClientsCount) {
 					PrintWriter os = new PrintWriter(
-							clientSocket.getOutputStream(), true);
+							output, true);
 					os.print("Server Busy Try Later \n");
+					os.flush();
+					os.close();
 					clientSocket.close();
 				} else {
-					clientSocketList.add(clientSocket);
-					clientThreads.add(new ClientThread(clientSocket,clientNumbers));
-					new Thread(clientThreads.get(clientThreads.size() - 1))
-							.start();
-			
+					System.out.println("accepted connection, spawning client thread...");
+					clientOutputStreamList.add(out);
+					ClientThread ct = new ClientThread(output, input, clientNumbers, out, in);
+					//clientThreads.add(ct);
+					new Thread(ct).start();
+					clientNumbers++;
 				}
-				clientNumbers++;
 			}
 			// need to spawn a new thread for each client thread
 			catch (IOException e) {
@@ -70,9 +68,4 @@ public class MasterServer implements Runnable {
 			}
 		}
 	}
-
-	private ConcurrentHashMap<Long, ThreadProcess> getAllMasterProcesses() {
-		return ProcessManager2.allProcesses;
-	}
-
 }
