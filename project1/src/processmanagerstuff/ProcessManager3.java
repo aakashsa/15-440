@@ -145,8 +145,7 @@ public class ProcessManager3 {
 						System.out
 								.println("Invalid command: ps does not take any arguments!");
 					} else {
-						for (Integer k : runningProcesses.keySet()) {
-							ThreadProcess tp = runningProcesses.get(k);
+						for (ThreadProcess tp : runningProcesses.values()) {
 							System.out.println(tp.getProcess().toString());
 						}
 					}
