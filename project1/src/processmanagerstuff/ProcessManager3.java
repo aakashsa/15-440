@@ -10,17 +10,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import processes.ThreadProcess;
+import java.net.InetAddress;
 
 import slavemanagerstuff.SlaveHelper;
 
 //processes.GP hi input.txt output.txt
-
+//processes.GrepProcess hi input.txt output.txt
+//processes.GrepProcess hi input.txt output.txt
+//processes.ZipProcess input.txt output.txt 
 public class ProcessManager3 {
 	// For both Master and Slave
 	private static boolean isSlave;
@@ -32,6 +36,7 @@ public class ProcessManager3 {
 
 	// Only for Slave
 	public static ConcurrentHashMap<Integer, ThreadProcess> runningProcesses = new ConcurrentHashMap<Integer, ThreadProcess>();
+	public static String fileDirectory = "/afs/andrew.cmu.edu/usr5/aakashsa/public/";
 
 	/**
 	 * @param args
@@ -73,7 +78,7 @@ public class ProcessManager3 {
 				out = new ObjectOutputStream(output);
 				out.flush();
 				in = new ObjectInputStream(input);
-				
+
 				id = (Integer) in.readObject();
 				System.out.println(" Recieved id " + id + " Back");
 
@@ -90,12 +95,14 @@ public class ProcessManager3 {
 			// threads
 			// for reading from server, and writing to server every 5 seconds
 			if (clientSocket != null && output != null && input != null) {
-				Thread slaveThread = new Thread(new SlaveHelper(input, output, id, clientSocket, out, in));
+				Thread slaveThread = new Thread(new SlaveHelper(input, output,
+						id, clientSocket, out, in));
 				slaveThread.start();
 			} else {
-				System.out.println("ERROR: Client wasn't able to open socket or streams!");
+				System.out
+						.println("ERROR: Client wasn't able to open socket or streams!");
 				System.exit(-1);
-			}			
+			}
 		} else {
 			isSlave = false;
 			// ******************* Master
@@ -108,14 +115,21 @@ public class ProcessManager3 {
 			} else {
 				port = Integer.valueOf(args[0]).intValue();
 			}
+			try {
+				String localhostname = InetAddress.getLocalHost().getHostName();
+				System.out.println("Local Host Address is : " + localhostname);
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			// Spawn a master server thread
 			MasterServer server = new MasterServer(port);
 			Thread serverThread = new Thread(server);
 			serverThread.start();
 		}
-		
-		//cli arguments to processes
+
+		// cli arguments to processes
 		ArrayList<String> cliArgs = new ArrayList<String>();
 		Scanner sc = new Scanner(System.in);
 
@@ -159,8 +173,7 @@ public class ProcessManager3 {
 						Constructor<?> ctor = null;
 
 						try {
-							Class<?> processClass = Class
-									.forName(name);
+							Class<?> processClass = Class.forName(name);
 							System.out.println("Process class: "
 									+ processClass.toString());
 							Class<?>[] ctorArgs = new Class[1];
@@ -175,9 +188,8 @@ public class ProcessManager3 {
 							MigratableProcess process = (MigratableProcess) ctor
 									.newInstance((Object) processArgs);
 
-							String filePath = "/tmp/master"
-									+ numProcesses + ".dat";
-							
+							String filePath = fileDirectory + numProcesses + ".dat";
+
 							File processFile = new File(filePath);
 							if (!processFile.exists()) {
 								processFile.createNewFile();
@@ -208,7 +220,8 @@ public class ProcessManager3 {
 											+ name);
 						}
 					} else {
-						System.out.println("ERROR: Command not supported by slave PM");
+						System.out
+								.println("ERROR: Command not supported by slave PM");
 					}
 				}
 			}

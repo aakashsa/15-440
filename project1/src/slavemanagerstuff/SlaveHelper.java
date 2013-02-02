@@ -74,7 +74,7 @@ public class SlaveHelper implements Runnable {
 								ProcessManager3.runningProcesses.remove(k);
 								iter++;
 								// Writing Suspended Processes to Disk
-								String filePath = "/tmp/" + iter + id + k
+								String filePath = ProcessManager3.fileDirectory + iter + id + k
 										+ ".dat";
 
 								File processFile = new File(filePath);
