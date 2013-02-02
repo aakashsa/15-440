@@ -64,6 +64,11 @@ public class ClientThread implements Runnable {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			
+			System.out.println(" Removing Stream " );
+			MasterServer.clientOutputStreamList.remove(out);
+			System.out.println(" Removed Stream " );
+			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

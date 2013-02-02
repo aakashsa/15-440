@@ -63,7 +63,17 @@ public class LoadBalancer implements Runnable {
 	 * Uses the existing processFilePaths to fill up the loadBalancedFilePaths hash map
 	 */
 	private void balanceLoad() {
+		
 		int numClients = clientOutputStreamList.size();
+		
+		System.out.println(" Length of Output Stream List in Balance Load before waiting " + numClients);
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		int i = 0;
 		
 		for (int processId : processFilePaths.keySet()) {

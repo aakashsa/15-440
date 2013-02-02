@@ -125,7 +125,7 @@ public class ProcessManager3 {
 
 			// Scan the first word for process name or a different command
 			if (sc2.hasNext()) {
-				String name = sc2.next();
+				String name = sc2.next().trim();
 				if (name.equals("ps")) {
 					if (sc2.hasNext()) {
 						System.out
