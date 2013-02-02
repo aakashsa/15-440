@@ -76,8 +76,7 @@ public class LoadBalancer implements Runnable {
 		
 		int i = 0;
 		
-		for (int processId : processFilePaths.keySet()) {
-			String filePath = processFilePaths.get(processId);
+		for (String filePath : processFilePaths.values()) {
 			String currentPath = loadBalancedFilePaths.get(i % numClients);
 			String finalPath = currentPath == null || currentPath.length() == 0 ? filePath : currentPath + "," + filePath;
 			loadBalancedFilePaths.put(i % numClients, finalPath);

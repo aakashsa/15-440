@@ -150,6 +150,8 @@ public class SlaveHelper implements Runnable {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.out.println("Master Died");
+			System.exit(-1);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
