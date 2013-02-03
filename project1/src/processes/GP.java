@@ -20,6 +20,7 @@ public class GP implements MigratableProcess
 	private TransactionalFileInputStream  inFile;
 	private TransactionalFileOutputStream outFile;
 	private String query;
+	private String[] args;
 
 	private volatile boolean suspending;
 
@@ -33,6 +34,7 @@ public class GP implements MigratableProcess
 		query = args[0];
 		inFile = new TransactionalFileInputStream(args[1]);
 		outFile = new TransactionalFileOutputStream(args[2], false);
+		this.args = args;
 	}
 
 	public void run()
@@ -62,15 +64,23 @@ public class GP implements MigratableProcess
 		} catch (IOException e) {
 			System.out.println ("GrepProcess: Error: " + e);
 		}
-
-
 		suspending = false;
+		System.out.println("Process \"" + this.toString() + "\" was terminated");
 	}
 
 	public void suspend()
 	{
 		suspending = true;
 		while (suspending);
+	}
+	
+	@Override
+	public String toString() {
+		String result = this.getClass().getSimpleName();
+		for(String arg : args) {
+			result = result + " " + arg;
+		}
+		return result;
 	}
 
 }

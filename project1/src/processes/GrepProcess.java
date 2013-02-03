@@ -13,12 +13,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.Thread;
 import java.lang.InterruptedException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class GrepProcess implements MigratableProcess
 {
 	private TransactionalFileInputStream  inFile;
 	private TransactionalFileOutputStream outFile;
 	private String query;
+	private String[] arguments;
 
 	private volatile boolean suspending;
 
@@ -33,7 +36,7 @@ public class GrepProcess implements MigratableProcess
 		query = args[0];
 		inFile = new TransactionalFileInputStream(args[1]);
 		outFile = new TransactionalFileOutputStream(args[2], false);
-		
+		arguments = args;
 	}
 
 	public void run()
@@ -94,6 +97,15 @@ public class GrepProcess implements MigratableProcess
 		System.out.println("Suspending Grep\n");
 		//System.out.println("suspending var after changing it: " + suspending + "\n");
 		while (suspending);
+	}
+	
+	public String toString() {
+		String result = "GrepProcess";
+		for (String arg : arguments) {
+			result = result + " " + arg;
+		}
+		return result;
+		
 	}
 
 }

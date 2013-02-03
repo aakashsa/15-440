@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import processes.ThreadProcess;
-import java.net.InetAddress;
 
 import slavemanagerstuff.SlaveHelper;
 
@@ -39,91 +38,118 @@ public class ProcessManager3 {
 	public static String fileDirectory = "/tmp/";//"/afs/andrew.cmu.edu/usr5/aakashsa/public/";
 
 	/**
+	 * The main routine. It does the following:
+	 * - Parse command line arguments to decide whether to run Master or Slave
+	 * - If slave, create socket, and spawn a helper thread to do the client job
+	 * - If master, spawn a thread for listening to more clients
+	 * - Once either master or slave are done, this thread starts accepting
+	 *   command line options to run processes for Master, and for commands like
+	 *   quit and ps for slave.
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
 		int port = 4444; // Default port
 		String hostname = "localhost"; // Default hostname for client
-		// *******************Store connections to all clients
+
 		if (args.length < 1) {
-			System.out
-					.println("ERROR: Need at least one argument.\nUsage for Master PM: java ProcessManager <portNumber>\nUsage for Slave PM: java ProcessManager -c <hostname> <portNumber>");
+			System.out.println("ERROR: Need at least one argument.");
+			System.out.println("Usage for Master PM: java ProcessManager <portNumber>");
+			System.out.println("Usage for Slave PM: java ProcessManager -c <hostname> <portNumber>");
 			return;
 		}
 		if (args[0].equals("-c")) {
+			
+			//Check if slave has been supplied with proper arguments
+			if (args.length <= 1) {
+				System.out.println("ERROR: Usage for Slave PM: java ProcessManager -c <hostname> <portNumber>");
+				return;
+			} else if (args.length > 3) {
+				System.out.println("ERROR: Extra arguments supplied! Usage for Slave PM: java ProcessManager -c <hostname> <portNumber>");
+				return;
+			}
+			//Slave is supplied with either 2 or 3 arguments
 			isSlave = true;
-			// ******************* Slave
 			System.out.println("Slave PM");
 			hostname = args[1]; // Hostname for the client
-			if (args.length < 3) {
-				System.out
-						.println("Usage: java ProcessManager -c <hostname> <portNumber>\n"
-								+ "Now using port number: "
-								+ port
-								+ " and hostname: " + hostname);
-			} else {
-				port = Integer.valueOf(args[2]).intValue();
+			
+			if (args.length == 3) {
+				try {
+					port = Integer.valueOf(args[2]).intValue();
+					if (port < 1024 || port > 49151) {
+						System.out.println("ERROR: Port number must range from 1024 - 49151 (including)");
+						return;
+					}
+				} catch (Exception e) {
+					System.out.println("ERROR: Port number must be an integer!");
+				}
 			}
+			
+			System.out.println("Connecting to Master on port number: " + port + " and hostname: " + hostname + " ... ");
 			OutputStream output = null;
 			InputStream input = null;
-			ObjectOutputStream out = null;
-			ObjectInputStream in = null; // Slave input stream
-			Socket clientSocket = null; // Client socket
+			ObjectOutputStream out = null; //Slave output stream
+			ObjectInputStream in = null; //Slave input stream
+			Socket clientSocket = null; //Client socket
 			try {
 				clientSocket = new Socket(hostname, port);
 				output = clientSocket.getOutputStream();
 				input = clientSocket.getInputStream();
-				System.out.println("Getting Input Stream Slave PM 68");
 				out = new ObjectOutputStream(output);
 				out.flush();
 				in = new ObjectInputStream(input);
 
 				id = (Integer) in.readObject();
-				System.out.println(" Recieved id " + id + " Back");
+				System.out.println("Connected to Master!");
+				System.out.println(" Recieved id " + id + " Back (process manager)");
 
 			} catch (UnknownHostException e) {
-				System.out.println("Unknown host: " + hostname + ". Please check the hostname with the Master!");
+				System.out.println("ERROR: Unknown host: " + hostname + ". Please check the hostname with the Master!");
 			} catch (IOException e) {
-				e.printStackTrace();
-				System.out.println("Error in IO for host: " + hostname + ". Make sure the Master is running!");
+				System.out.println("ERROR: IO error for host: " + hostname + ". Make sure the Master is running!");
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				System.out.println("ERROR: Couldn't find class of searlized object!");
 			}
 
-			// If everything was initialized properly, we need to spawn two
-			// threads
-			// for reading from server, and writing to server every 5 seconds
+			// If everything was initialized properly, we need to spawn a thread
+			// for reading from server, and writing to server
 			if (clientSocket != null && output != null && input != null) {
-				Thread slaveThread = new Thread(new SlaveHelper(input, output,
-						id, clientSocket, out, in));
+				Thread slaveThread = new Thread(new SlaveHelper(id, clientSocket, out, in));
 				slaveThread.start();
 			} else {
-				System.out
-						.println("ERROR: Client wasn't able to open socket or streams!");
+				System.out.println("ERROR: Client wasn't able to open socket or streams! Quitting...");
 				System.exit(-1);
 			}
 		} else {
 			isSlave = false;
-			// ******************* Master
 			System.out.println("Master PM");
-			// Scan for a user preferred port number; if none provided, go to
-			// default
-			if (args.length < 1) {
-				System.out.println("Usage: java ProcessManager <portNumber>\n"
-						+ "Now using port number=" + port);
-			} else {
-				port = Integer.valueOf(args[0]).intValue();
+
+			//Check if master has been supplied with proper arguments
+			if (args.length > 1) {
+				System.out.println("ERROR: Extra arguments supplied. Usage for Master PM: java ProcessManager <portNumber>");
+			}
+			
+			// Scan for a user preferred port number; if none provided, go to default
+			if (args.length == 1) {
+				try {
+					port = Integer.valueOf(args[0]).intValue();
+					if (port < 1024 || port > 49151) {
+						System.out.println("ERROR: Port number must range from 1024 - 49151 (including)");
+						return;
+					}
+				} catch (Exception e) {
+					System.out.println("ERROR: Port number must be an integer!");
+					return;
+				}
 			}
 			try {
-				String localhostname = InetAddress.getLocalHost().getHostName();
-				System.out.println("Local Host Address is : " + localhostname);
+				hostname = InetAddress.getLocalHost().getHostName();
+				System.out.println("Master running on port number: " + port + " and hostname: " + hostname);
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("ERROR: Master couldn't get own hostname");
 			}
 
-			// Spawn a master server thread
+			// Spawn a master server thread to listen for slaves
 			MasterServer server = new MasterServer(port);
 			Thread serverThread = new Thread(server);
 			serverThread.start();
@@ -139,42 +165,36 @@ public class ProcessManager3 {
 
 			// Scan the first word for process name or a different command
 			if (sc2.hasNext()) {
-				String name = sc2.next().trim();
+				String name = sc2.next().trim(); //trim any white spaces around command
 				if (name.equals("ps")) {
 					if (sc2.hasNext()) {
-						System.out
-								.println("Invalid command: ps does not take any arguments!");
+						System.out.println("Invalid command: ps does not take any arguments!");
 					} else {
+						if (runningProcesses.size() == 0)
+							System.out.println("No running process");
 						for (ThreadProcess tp : runningProcesses.values()) {
 							System.out.println(tp.getProcess().toString());
 						}
 					}
 				} else if (name.equals("quit")) {
 					if (sc2.hasNext()) {
-						System.out
-								.println("Invalid commant: quit does not take any arguments!");
+						System.out.println("Invalid commant: quit does not take any arguments!");
 					} else {
 						System.out.println("Quitting...");
 						System.exit(-1);
 					}
 				} else {
 					if (!isSlave) {
-						// need to start a new process; parse arguments
+						// Parse arguments to a new process
 						cliArgs.clear();
 						while (sc2.hasNext()) {
 							cliArgs.add(sc2.next());
 						}
-						// System.out.println("Starting new process: name: "+
-						// name + ", arguments: " + cliArgs.toString());
 
-						// Now need to parse process and run it in a new thread
-
+						// Parse process and run it in a new thread
 						Constructor<?> ctor = null;
-
 						try {
 							Class<?> processClass = Class.forName(name);
-							System.out.println("Process class: "
-									+ processClass.toString());
 							Class<?>[] ctorArgs = new Class[1];
 							ctorArgs[0] = String[].class;
 							ctor = processClass.getConstructor(ctorArgs);
@@ -184,9 +204,9 @@ public class ProcessManager3 {
 							for (int i = 0; i < cliArgs.size(); i++)
 								processArgs[i] = cliArgs.get(i);
 
-							MigratableProcess process = (MigratableProcess) ctor
-									.newInstance((Object) processArgs);
+							MigratableProcess process = (MigratableProcess) ctor.newInstance((Object) processArgs);
 
+							//Write process to file on disk
 							String filePath = fileDirectory + numProcesses + ".dat";
 
 							File processFile = new File(filePath);
@@ -194,33 +214,28 @@ public class ProcessManager3 {
 								processFile.createNewFile();
 							}
 
-							FileOutputStream f_out = new FileOutputStream(
-									processFile, false);
-							ObjectOutputStream oos = new ObjectOutputStream(
-									f_out);
+							FileOutputStream f_out = new FileOutputStream(processFile, false);
+							ObjectOutputStream oos = new ObjectOutputStream(f_out);
 							oos.writeObject((Object) process);
 							oos.flush();
 							oos.close();
+							
+							//Add new process to all processes collection
 							allProcesses.put(numProcesses, filePath);
 							numProcesses++;
-							System.out.println("Done Writing Process \n");
+							System.out.println("Done Writing Process (process manager)");
 						} catch (ClassNotFoundException e) {
 							e.printStackTrace();
-							System.out.println("ERROR: Process " + name
-									+ " is not supported!");
+							System.out.println("ERROR: Process " + name + " is not supported!");
 						} catch (NoSuchMethodException e) {
 							e.printStackTrace();
-							System.out.println("ERROR: Process " + name
-									+ " is a weird process!");
+							System.out.println("ERROR: Couldn't parse process: " + name);
 						} catch (Exception e) {
 							e.printStackTrace();
-							System.out
-									.println("ERROR: trouble starting process: "
-											+ name);
+							System.out.println("ERROR: Trouble starting process: " + name);
 						}
 					} else {
-						System.out
-								.println("ERROR: Command not supported by slave PM");
+						System.out.println("ERROR: Command not supported by slave PM");
 					}
 				}
 			}

@@ -6,10 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 import processes.ThreadProcess;
@@ -21,17 +19,12 @@ public class SlaveHelper implements Runnable {
 	private ObjectOutputStream out = null;
 	private int id = -1;
 
-	public SlaveHelper(InputStream input, OutputStream output, int id,
-			Socket clientSocket, ObjectOutputStream out, ObjectInputStream in) {
+	public SlaveHelper(int id, Socket clientSocket, ObjectOutputStream out, ObjectInputStream in) {
 		System.out.println("Slave Helper Spawned");
-		// this.out = out;
-		// this.in = in;
 		try {
-			this.out = out;// new ObjectOutputStream(output);
+			this.out = out;
 			this.out.flush();
-			System.out.println("before opening input stream in slave helper");
-			this.in = in;// new ObjectInputStream(input);
-			System.out.println("after opening input stream in slave helper");
+			this.in = in;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -45,7 +38,7 @@ public class SlaveHelper implements Runnable {
 			String[] filePaths = null;
 			while (true) {
 				System.out.println("Reading in Slave Helper");
-				// Reads for messages from Load Balancer
+				// Read for messages from Load Balancer
 				Object read = in.readObject();
 
 				String command = (String) read;
@@ -55,9 +48,8 @@ public class SlaveHelper implements Runnable {
 						System.out.println("Got start ");
 						String allFilePaths = new String();
 						// Start Case : Suspend all Processes and serialize to
-						// File
-						// and send back the File Paths
-						System.out.println(" Length of RUnning Processes " + ProcessManager3.runningProcesses.keySet().size());
+						// file and send back the File Paths
+						System.out.println(" Length of running processes " + ProcessManager3.runningProcesses.keySet().size());
 						for (int k : ProcessManager3.runningProcesses.keySet()) {
 							
 							ThreadProcess tp = ProcessManager3.runningProcesses
@@ -74,23 +66,21 @@ public class SlaveHelper implements Runnable {
 								ProcessManager3.runningProcesses.remove(k);
 								iter++;
 								// Writing Suspended Processes to Disk
-								String filePath = ProcessManager3.fileDirectory + iter + id + k
-										+ ".dat";
+								String filePath = ProcessManager3.fileDirectory + iter + id + k + ".dat";
 
 								File processFile = new File(filePath);
 								if (!processFile.exists()) {
 									processFile.createNewFile();
 								}
 
-								// System.out.println("Writing the following : ");
-								FileOutputStream f_out = new FileOutputStream(
-										processFile, false);
-								ObjectOutputStream oos = new ObjectOutputStream(
-										f_out);
+								//Write process to file
+								FileOutputStream f_out = new FileOutputStream(processFile, false);
+								ObjectOutputStream oos = new ObjectOutputStream(f_out);
 								oos.writeObject((Object) process);
 								oos.flush();
 								oos.close();
-								// Sending Back File Path
+
+								// Append all file paths with comma
 								filePath += "\t" + k;
 								if (allFilePaths.length() == 0) {
 									allFilePaths = filePath;
@@ -98,20 +88,17 @@ public class SlaveHelper implements Runnable {
 									allFilePaths += "," + filePath;
 								}
 							}
-							System.out.println("Wrote to Disk, and all filepaths: "
-									+ allFilePaths);
+							System.out.println("Wrote to Disk, and all filepaths: "+ allFilePaths);
 						}
-						
-						out.writeObject(allFilePaths);// allFilePaths);
+						//Send all file paths to load balancer
+						out.writeObject(allFilePaths);
 						out.flush();
-						System.out
-								.println("Sent all filepaths to client thread.");
+						System.out.println("Sent all filepaths to client thread. (slave helper)");
 
 					} else if (command.equals("__DONE__")) {
 						System.out.println("Got Done ");
 						// Done Case : Read process from file and spawn new
-						// Threads
-						// for each Process
+						// threads for each process
 						if (filePaths != null) {
 							for (String path : filePaths) {
 								if (path.length() > 0) {
@@ -120,23 +107,19 @@ public class SlaveHelper implements Runnable {
 									path = filePathContents[0];
 									int processNumber = Integer
 											.parseInt(filePathContents[1]);
-									FileInputStream f_in = new FileInputStream(
-											path);
-									ObjectInputStream oin = new ObjectInputStream(
-											f_in);
-									MigratableProcess process = (MigratableProcess) oin
-											.readObject();
+									FileInputStream f_in = new FileInputStream(path);
+									ObjectInputStream oin = new ObjectInputStream(f_in);
+									MigratableProcess process = (MigratableProcess) oin.readObject();
 									oin.close();
 									Thread processThread = new Thread(process);
-									ThreadProcess tp = new ThreadProcess(
-											processThread, process);
-									System.out.println("Adding PRocess to Running Process "+ processNumber);
-									// Add to all processes collection
-									ProcessManager3.runningProcesses.put(
-											processNumber, tp);
+									ThreadProcess tp = new ThreadProcess(processThread, process);
+									System.out.println("Adding process to running processes list "+ processNumber);
+									// Add to running processes collection
+									ProcessManager3.runningProcesses.put(processNumber, tp);
 									processThread.start();
 								}
 							}
+							//Reset file paths
 							filePaths = null;
 						}
 
@@ -150,12 +133,11 @@ public class SlaveHelper implements Runnable {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Master Died");
+			System.out.println("Master PM died. Quitting...");
 			System.exit(-1);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

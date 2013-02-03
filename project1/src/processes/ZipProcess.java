@@ -84,6 +84,7 @@ public class ZipProcess implements MigratableProcess, Serializable {
 			e.printStackTrace();
 		}
 		suspending = false;
+		System.out.println("Process \"" + this.toString() + "\" was terminated");
 	}
 
 	@Override
@@ -96,6 +97,10 @@ public class ZipProcess implements MigratableProcess, Serializable {
 	}
 
 	public String toString() {
-		return " ZipProcess " + arguments.toString();
+		String result = this.getClass().getSimpleName();
+		for (String arg : arguments) {
+			result = result + " " + arg;
+		}
+		return result;
 	}
 }
