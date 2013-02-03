@@ -66,13 +66,7 @@ public class LoadBalancer implements Runnable {
 		
 		int numClients = clientOutputStreamList.size();
 		
-		System.out.println(" Length of Output Stream List in Balance Load before waiting " + numClients);
-		try {
-			Thread.sleep(4000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println(" Length of Output Stream List in Balance Load: " + numClients);
 		
 		int i = 0;
 		

@@ -36,7 +36,7 @@ public class ProcessManager3 {
 
 	// Only for Slave
 	public static ConcurrentHashMap<Integer, ThreadProcess> runningProcesses = new ConcurrentHashMap<Integer, ThreadProcess>();
-	public static String fileDirectory = "/afs/andrew.cmu.edu/usr5/aakashsa/public/";
+	public static String fileDirectory = "/tmp/";//"/afs/andrew.cmu.edu/usr5/aakashsa/public/";
 
 	/**
 	 * @param args
@@ -83,10 +83,10 @@ public class ProcessManager3 {
 				System.out.println(" Recieved id " + id + " Back");
 
 			} catch (UnknownHostException e) {
-				System.out.println("Unknown host: " + hostname);
+				System.out.println("Unknown host: " + hostname + ". Please check the hostname with the Master!");
 			} catch (IOException e) {
 				e.printStackTrace();
-				System.out.println("Error in IO for host: " + hostname);
+				System.out.println("Error in IO for host: " + hostname + ". Make sure the Master is running!");
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
