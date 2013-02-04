@@ -8,18 +8,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LoadBalancer implements Runnable {
 
-	//Stores output streams of all active clients
+	// Stores output streams of all active clients
 	private ArrayList<ObjectOutputStream> clientOutputStreamList = new ArrayList<ObjectOutputStream>();
 
-	//Stores all filePaths of all processes running on all the clients (maps processId to filePath)
+	// Stores all filePaths of all processes running on all the clients (maps
+	// processId to filePath)
 	public static ConcurrentHashMap<Integer, String> processFilePaths = new ConcurrentHashMap<Integer, String>();
-	
-	//Stores the confirmation messages as received from each client thread (maps clientId to the message)
+
+	// Stores the confirmation messages as received from each client thread
+	// (maps clientId to the message)
 	public static ConcurrentHashMap<Integer, String> clientMessageStatus = new ConcurrentHashMap<Integer, String>();
-	
-	//Stores all filePaths each client must deal with after load balancing (size = numSlaves)
+
+	// Stores all filePaths each client must deal with after load balancing
+	// (size = numSlaves)
 	private HashMap<Integer, String> loadBalancedFilePaths = new HashMap<Integer, String>();
-	
+
 	public LoadBalancer(ArrayList<ObjectOutputStream> outputStreamList) {
 		this.clientOutputStreamList = outputStreamList;
 	}
@@ -29,16 +32,16 @@ public class LoadBalancer implements Runnable {
 		try {
 			while (true) {
 				Thread.sleep(5000);
-				System.out.println("size of output stream list: " + clientOutputStreamList.size() + " (load balancer)");
 				for (ObjectOutputStream out : clientOutputStreamList) {
 					sendStartLoadBalanceSignal(out);
 				}
-				while (true && clientOutputStreamList.size() != 0 ) {
-					if (clientMessageStatus.size() == clientOutputStreamList.size()) {
-						System.out.println("Load Balancing Bro");
+				while (true && clientOutputStreamList.size() != 0) {
+					if (clientMessageStatus.size() == clientOutputStreamList
+							.size()) {
 						balanceLoad();
 						for (int i = 0; i < clientOutputStreamList.size(); i++) {
-							ObjectOutputStream out = clientOutputStreamList.get(i);
+							ObjectOutputStream out = clientOutputStreamList
+									.get(i);
 							out.flush();
 							out.writeObject(loadBalancedFilePaths.get(i));
 							out.flush();
@@ -59,33 +62,35 @@ public class LoadBalancer implements Runnable {
 	}
 
 	/**
-	 * Uses the existing processFilePaths to fill up the loadBalancedFilePaths hash map
+	 * Uses the existing processFilePaths to fill up the loadBalancedFilePaths
+	 * hash map
 	 */
 	private void balanceLoad() {
-		
+
 		int numClients = clientOutputStreamList.size();
 		int i = 0;
-		System.out.println(" Length of Output Stream List in Balance Load: " + numClients);
-		
 		for (String filePath : processFilePaths.values()) {
 			String currentPath = loadBalancedFilePaths.get(i % numClients);
-			String finalPath = currentPath == null || currentPath.length() == 0 ? filePath : currentPath + "," + filePath;
+			String finalPath = currentPath == null || currentPath.length() == 0 ? filePath
+					: currentPath + "," + filePath;
 			loadBalancedFilePaths.put(i % numClients, finalPath);
 			i++;
 		}
-		System.out.println(" Length of All Processes \n" + ProcessManager3.allProcesses.size());
 		for (int processId : ProcessManager3.allProcesses.keySet()) {
-			String filePath = ProcessManager3.allProcesses.get(processId) + "\t" + processId;
+			String filePath = ProcessManager3.allProcesses.get(processId)
+					+ "\t" + processId;
 			String currentPath = loadBalancedFilePaths.get(i % numClients);
-			String finalPath = currentPath == null || currentPath.length() == 0 ? filePath : currentPath + "," + filePath;
+			String finalPath = currentPath == null || currentPath.length() == 0 ? filePath
+					: currentPath + "," + filePath;
 			loadBalancedFilePaths.put(i % numClients, finalPath);
 			i++;
 			ProcessManager3.allProcesses.remove(processId);
 		}
 	}
-	
+
 	/**
 	 * A function that sends a start signal to it's client.
+	 * 
 	 * @return Sent successfully or not
 	 */
 	public boolean sendStartLoadBalanceSignal(ObjectOutputStream out) {
@@ -93,7 +98,6 @@ public class LoadBalancer implements Runnable {
 			out.flush();
 			out.writeObject((Object) new String("__START__"));
 			out.flush();
-			System.out.println(" Sent Start (load balancer)");
 			return true;
 		} catch (IOException e) {
 			System.out
@@ -105,6 +109,7 @@ public class LoadBalancer implements Runnable {
 
 	/**
 	 * A function that sends a done signal to it's client.
+	 * 
 	 * @return Sent successfully or not
 	 */
 	public boolean sendStopLoadBalanceSignal(ObjectOutputStream out) {
@@ -112,7 +117,6 @@ public class LoadBalancer implements Runnable {
 			out.flush();
 			out.writeObject((Object) new String("__DONE__"));
 			out.flush();
-			System.out.println(" Sending Done (load balancer)");
 			return true;
 		} catch (IOException e) {
 			System.out

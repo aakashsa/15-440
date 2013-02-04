@@ -6,6 +6,12 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
 
+/**
+ * Extends OutputStream but encloses RandomAccessFile 
+ * object that gets reinitialized every time
+ * @author nikhiltibrewal
+ *
+ */
 public class TransactionalFileOutputStream extends OutputStream  implements Serializable {
 
 	private static final long serialVersionUID = 3140469395351996961L;
@@ -23,7 +29,9 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 		}
 	}
 	
-	@Override
+	/**
+	 * Write method that seeks to the previous file pointer state and resumes writing
+	 */
 	public void write(int b){
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");

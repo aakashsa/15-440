@@ -15,17 +15,30 @@ import interfaces.MigratableProcess;
 
 //processes.ZipProcess input.txt output.zip
 
+/**
+ * A simple Process That zips input file to an output zip file.
+ * @author aakashsa
+ */
 public class ZipProcess implements MigratableProcess, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
+	// Argument List
 	private ArrayList<String> arguments = null;
-
+	
+	// File Streams
 	private TransactionalFileInputStream in;
 	private TransactionalFileOutputStream fos;
-	private String fileName;
-
+	
+	// To Suspend Process
 	private volatile boolean suspending;
 
-	public ZipProcess(String args[]) {
+	public ZipProcess(String args[]) throws Exception {
+		if (args.length != 2) {
+			System.out.println("usage: processes.ZipProcess <inputFile> <outputFile>");
+			throw new Exception("Invalid Arguments");
+		}
+		
 		arguments = new ArrayList<String>(Arrays.asList(args));
 
 		File processFile = new File(args[1]);
@@ -33,7 +46,7 @@ public class ZipProcess implements MigratableProcess, Serializable {
 			try {
 				processFile.createNewFile();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				System.out.println("ERROR : File Create Exception");
 				e.printStackTrace();
 			}
 		}
@@ -41,7 +54,7 @@ public class ZipProcess implements MigratableProcess, Serializable {
 			fos = new TransactionalFileOutputStream(args[1], false);
 			in = new TransactionalFileInputStream(args[0]);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR : File IO Exception");
 			e.printStackTrace();
 		}
 	}
@@ -49,18 +62,16 @@ public class ZipProcess implements MigratableProcess, Serializable {
 	@Override
 	public void run() {
 		byte[] buffer = new byte[1024];
-		System.out.println(" Running ZipProcess");
 		ZipOutputStream zos = null;
 		try {
 			zos = new ZipOutputStream(fos);
 			ZipEntry ze = new ZipEntry(arguments.get(0));
 			zos.putNextEntry(ze);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR : File IO Exception");
 			e1.printStackTrace();
 		}
 
-		// TODO Auto-generated method stub
 		try {
 
 			while (!suspending) {
@@ -77,23 +88,20 @@ public class ZipProcess implements MigratableProcess, Serializable {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR : File IO Exception");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR : Interupt Exception");
 			e.printStackTrace();
 		}
 		suspending = false;
-		System.out.println("Process \"" + this.toString() + "\" was terminated");
 	}
 
 	@Override
 	public void suspend() {
-		// suspending + "\n");
+		// suspending;
 		suspending = true;
-		System.out.println("Suspending Zip\n");
-		while (suspending)
-			;
+		while (suspending);
 	}
 
 	public String toString() {

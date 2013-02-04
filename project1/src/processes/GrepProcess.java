@@ -41,7 +41,7 @@ public class GrepProcess implements MigratableProcess
 
 	public void run()
 	{
-		System.out.println("Running Grep Processes with query \n" + query);
+		//System.out.println("Running Grep Processes with query \n" + query);
 		PrintStream out = new PrintStream(outFile);
 		DataInputStream in = new DataInputStream(inFile);
 		//System.out.println("suspending var here is: " + suspending + "\n");
@@ -94,7 +94,7 @@ public class GrepProcess implements MigratableProcess
 	{
 		//System.out.println("suspending var in beginning of suspend: " + suspending + "\n");
 		suspending = true;
-		System.out.println("Suspending Grep\n");
+		//System.out.println("Suspending Grep\n");
 		//System.out.println("suspending var after changing it: " + suspending + "\n");
 		while (suspending);
 	}

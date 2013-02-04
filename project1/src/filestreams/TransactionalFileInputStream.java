@@ -26,9 +26,11 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 	}
 
 	@Override
+	/**
+	 * read method that seeks to the previous file pointer state and resumes reading
+	 */
 	public int read() throws IOException {
-		this.fileStream = new FileInputStream(filePath);
-		
+		this.fileStream = new FileInputStream(filePath);	
 		fileStream.skip(pointer);
 		byte[] readByte = new byte[1]; 
 		int returnValue = fileStream.read(readByte,0, 1);

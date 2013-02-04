@@ -21,13 +21,11 @@ public class ClientThread implements Runnable {
 		this.id = id;
 		
 		try {
-			System.out.println("Sending ID to slave... (Client thread)");
 			this.out = out;
 			out.flush();
 			out.writeObject((Object) new Integer(id));
 			out.flush();
 			this.in = in;
-			System.out.println("Client thread sent id....");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -39,9 +37,6 @@ public class ClientThread implements Runnable {
 			while (true) {
 				// Block read for allFilePaths from slave
 				String receivedString = (String) in.readObject();
-				System.out.println(" Receieved Filepath string from Slave : "
-						+ receivedString + " (client thread)");
-
 				String[] filePaths = receivedString.split(",");
 				for (String path : filePaths) {
 					if (path.length() > 0) {
@@ -53,8 +48,7 @@ public class ClientThread implements Runnable {
 				LoadBalancer.clientMessageStatus.put(this.id, "SENT");
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			
+			e.printStackTrace();			
 			System.out.println("Removing Stream... (client thread)" );
 			MasterServer.clientOutputStreamList.remove(out);
 			System.out.println("Removed Stream (client thread)" );

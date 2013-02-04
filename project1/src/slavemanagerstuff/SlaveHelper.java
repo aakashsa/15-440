@@ -19,8 +19,8 @@ public class SlaveHelper implements Runnable {
 	private ObjectOutputStream out = null;
 	private int id = -1;
 
-	public SlaveHelper(int id, Socket clientSocket, ObjectOutputStream out, ObjectInputStream in) {
-		System.out.println("Slave Helper Spawned");
+	public SlaveHelper(int id, Socket clientSocket, ObjectOutputStream out,
+			ObjectInputStream in) {
 		try {
 			this.out = out;
 			this.out.flush();
@@ -37,45 +37,46 @@ public class SlaveHelper implements Runnable {
 			int iter = 0;
 			String[] filePaths = null;
 			while (true) {
-				System.out.println("Reading in Slave Helper");
 				// Read for messages from Load Balancer
 				Object read = in.readObject();
-
 				String command = (String) read;
-				System.out.println(" Received Command " + command);
 				if (command != null) {
 					if (command.equals("__START__")) {
-						System.out.println("Got start ");
+
 						String allFilePaths = new String();
 						// Start Case : Suspend all Processes and serialize to
 						// file and send back the File Paths
-						System.out.println(" Length of running processes " + ProcessManager3.runningProcesses.keySet().size());
+
 						for (int k : ProcessManager3.runningProcesses.keySet()) {
-							
+
 							ThreadProcess tp = ProcessManager3.runningProcesses
 									.get(k);
 
 							if (!tp.getThread().isAlive()) {
-								System.out.println("THREAD DIED : PROCESS ENDED ");
+								System.out
+										.println("THREAD DIED : PROCESS ENDED ");
 								tp.getThread().join();
 								ProcessManager3.runningProcesses.remove(k);
-								System.out.println(" Removed + "+ k);
+								System.out.println(" Removed + " + k);
 							} else {
 								MigratableProcess process = tp.getProcess();
 								process.suspend();
 								ProcessManager3.runningProcesses.remove(k);
 								iter++;
 								// Writing Suspended Processes to Disk
-								String filePath = ProcessManager3.fileDirectory + iter + id + k + ".dat";
+								String filePath = ProcessManager3.fileDirectory
+										+ iter + id + k + ".dat";
 
 								File processFile = new File(filePath);
 								if (!processFile.exists()) {
 									processFile.createNewFile();
 								}
 
-								//Write process to file
-								FileOutputStream f_out = new FileOutputStream(processFile, false);
-								ObjectOutputStream oos = new ObjectOutputStream(f_out);
+								// Write process to file
+								FileOutputStream f_out = new FileOutputStream(
+										processFile, false);
+								ObjectOutputStream oos = new ObjectOutputStream(
+										f_out);
 								oos.writeObject((Object) process);
 								oos.flush();
 								oos.close();
@@ -88,15 +89,11 @@ public class SlaveHelper implements Runnable {
 									allFilePaths += "," + filePath;
 								}
 							}
-							System.out.println("Wrote to Disk, and all filepaths: "+ allFilePaths);
 						}
-						//Send all file paths to load balancer
+						// Send all file paths to load balancer
 						out.writeObject(allFilePaths);
 						out.flush();
-						System.out.println("Sent all filepaths to client thread. (slave helper)");
-
 					} else if (command.equals("__DONE__")) {
-						System.out.println("Got Done ");
 						// Done Case : Read process from file and spawn new
 						// threads for each process
 						if (filePaths != null) {
@@ -107,19 +104,23 @@ public class SlaveHelper implements Runnable {
 									path = filePathContents[0];
 									int processNumber = Integer
 											.parseInt(filePathContents[1]);
-									FileInputStream f_in = new FileInputStream(path);
-									ObjectInputStream oin = new ObjectInputStream(f_in);
-									MigratableProcess process = (MigratableProcess) oin.readObject();
+									FileInputStream f_in = new FileInputStream(
+											path);
+									ObjectInputStream oin = new ObjectInputStream(
+											f_in);
+									MigratableProcess process = (MigratableProcess) oin
+											.readObject();
 									oin.close();
 									Thread processThread = new Thread(process);
-									ThreadProcess tp = new ThreadProcess(processThread, process);
-									System.out.println("Adding process to running processes list "+ processNumber);
+									ThreadProcess tp = new ThreadProcess(
+											processThread, process);
 									// Add to running processes collection
-									ProcessManager3.runningProcesses.put(processNumber, tp);
+									ProcessManager3.runningProcesses.put(
+											processNumber, tp);
 									processThread.start();
 								}
 							}
-							//Reset file paths
+							// Reset file paths
 							filePaths = null;
 						}
 
