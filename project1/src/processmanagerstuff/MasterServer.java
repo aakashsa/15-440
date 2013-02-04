@@ -58,11 +58,14 @@ public class MasterServer implements Runnable {
 				ObjectOutputStream out = new ObjectOutputStream(output);
 				ObjectInputStream in = new ObjectInputStream(input);
 
+				// If Server is Busy the Send Back Error Code of -1
 				if (clientOutputStreamList.size() == maxClientsCount) {
 					System.out.println("Server BUSY !");
 					out.writeObject((Object) new Integer(-1));
 					clientSocket.close();
-				} else {
+				}
+				// Accept the connection and Add the OutputStreamList
+				else {
 					System.out
 							.println("accepted connection, spawning client thread... (master server)");
 					clientOutputStreamList.add(out);

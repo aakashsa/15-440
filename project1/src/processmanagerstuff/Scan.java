@@ -29,6 +29,7 @@ public class Scan implements Runnable {
 			if (sc2.hasNext()) {
 				String name = sc2.next().trim(); // trim any white spaces around
 													// command
+				// ps Command
 				if (name.equals("ps")) {
 					if (!isSlave) {
 						System.out.println("No Local processes on Master");
@@ -36,7 +37,8 @@ public class Scan implements Runnable {
 					if (sc2.hasNext()) {
 						System.out
 								.println("Invalid command: ps does not take any arguments!");
-					} else {
+					}					
+					else {
 						if (ProcessManager3.runningProcesses.size() == 0)
 							System.out.println("No running process");
 						for (ThreadProcess tp : ProcessManager3.runningProcesses
@@ -53,6 +55,7 @@ public class Scan implements Runnable {
 						System.exit(-1);
 					}
 				} else {
+					// Parsing Process Command
 					if (!isSlave) {
 						// Parse arguments to a new process
 						cliArgs.clear();
@@ -72,7 +75,7 @@ public class Scan implements Runnable {
 
 							for (int i = 0; i < cliArgs.size(); i++)
 								processArgs[i] = cliArgs.get(i);
-
+							// Instantiating A Migratable Process and Writing it to Disc	
 							MigratableProcess process = (MigratableProcess) ctor
 									.newInstance((Object) processArgs);
 

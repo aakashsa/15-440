@@ -33,18 +33,22 @@ public class LoadBalancer implements Runnable {
 			while (true) {
 				Thread.sleep(5000);
 				for (ObjectOutputStream out : clientOutputStreamList) {
+					// Start Signal For Slaves to Write the Processes to Disk and Send Back File Paths
 					sendStartLoadBalanceSignal(out);
 				}
 				while (true && clientOutputStreamList.size() != 0) {
 					if (clientMessageStatus.size() == clientOutputStreamList
 							.size()) {
+						// Filling up the HashMap to figure out which Slave gets what processes 
 						balanceLoad();
 						for (int i = 0; i < clientOutputStreamList.size(); i++) {
 							ObjectOutputStream out = clientOutputStreamList
 									.get(i);
 							out.flush();
+							// Writing the File Paths to Client Over Socket
 							out.writeObject(loadBalancedFilePaths.get(i));
 							out.flush();
+							// Sending the Done Signal so that the processes can be run again ( resumed )
 							sendStopLoadBalanceSignal(out);
 						}
 						clientMessageStatus.clear();
