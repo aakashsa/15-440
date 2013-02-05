@@ -4,7 +4,6 @@ import interfaces.MigratableProcess;
 
 /**
  * Infinite Process For Testing : Specially to Test with Load Balancing
- * @author aakashsabharwal
  *
  */
 public class InfiniteProcess implements MigratableProcess {
