@@ -71,7 +71,8 @@ public class Scan implements Runnable {
 						// Parse process and run it in a new thread
 						Constructor<?> ctor = null;
 						try {
-							String processName = name.contains("processes.") ? name : "processes." + name;
+							String processName = name.contains("processes.") 
+									? name : "processes." + name;
 							Class<?> processClass = Class.forName(processName);
 							Class<?>[] ctorArgs = new Class[1];
 							ctorArgs[0] = String[].class;
