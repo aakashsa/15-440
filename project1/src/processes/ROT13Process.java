@@ -47,6 +47,7 @@ public class ROT13Process implements MigratableProcess {
 
 		try {
 			while (!suspending) {
+				Thread.sleep(4*1000);
 				String line = in.readLine();
 				if (line == null){
 					break;
@@ -68,6 +69,9 @@ public class ROT13Process implements MigratableProcess {
 			System.out.println("ERROR (" +this.getClass().getSimpleName()+ "): " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			System.out.println("ERROR (" +this.getClass().getSimpleName()+ "): " + e.getLocalizedMessage());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		suspending = false;
 	}

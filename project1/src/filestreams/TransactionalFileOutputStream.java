@@ -7,36 +7,44 @@ import java.io.RandomAccessFile;
 import java.io.Serializable;
 
 /**
- * Extends OutputStream but encloses RandomAccessFile 
- * object that gets reinitialized every time
- *
+ * Extends OutputStream but encloses RandomAccessFile object that gets
+ * reinitialized every time
+ * 
  */
-public class TransactionalFileOutputStream extends OutputStream  implements Serializable {
+public class TransactionalFileOutputStream extends OutputStream implements
+		Serializable {
 
 	private static final long serialVersionUID = 3140469395351996961L;
 	private transient RandomAccessFile fileObject;
-	private String fileString; 
+	private String fileString;
 	private long pointer;
 
 	public TransactionalFileOutputStream(String fileString, boolean b) {
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");
 			this.fileString = fileString;
-			pointer = 0;
+			if (b) {
+				pointer = fileObject.length();
+			} else {
+				pointer = 0;
+			}
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR: " + e.getLocalizedMessage());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * Write method that seeks to the previous file pointer state 
-	 * and resumes writing
+	 * Write method that seeks to the previous file pointer state and resumes
+	 * writing
 	 */
-	public void write(int b){
+	public void write(int b) {
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");
 			fileObject.seek(pointer);
-			byte lowByte = (byte)(b & 0xFF);
+			byte lowByte = (byte) (b & 0xFF);
 			fileObject.write(lowByte);
 			pointer = fileObject.getFilePointer();
 			fileObject.close();
@@ -67,11 +75,11 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 	/**
 	 * Write function with a different signature.
 	 */
-	public void write(byte[] b,int off,int len) throws IOException {
+	public void write(byte[] b, int off, int len) throws IOException {
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");
 			fileObject.seek(pointer);
-			fileObject.write(b,off,len);
+			fileObject.write(b, off, len);
 			pointer = fileObject.getFilePointer();
 			fileObject.close();
 		} catch (FileNotFoundException e) {
@@ -79,5 +87,5 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
 }

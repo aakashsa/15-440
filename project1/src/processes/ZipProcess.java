@@ -19,26 +19,26 @@ import interfaces.MigratableProcess;
 public class ZipProcess implements MigratableProcess, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	// Argument List
 	private ArrayList<String> arguments = null;
-	
+
 	// File Streams
 	private TransactionalFileInputStream in;
 	private TransactionalFileOutputStream fos;
-	
+
 	// To Suspend Process
 	private volatile boolean suspending;
 
 	public ZipProcess(String args[]) throws Exception {
-		if (args.length != 2) {
-			System.out.println("usage: processes.ZipProcess <inputFile> <outputFile>");
+		if (args.length != 1) {
+			System.out.println("usage: processes.ZipProcess <inputFile>");
 			throw new Exception("Invalid Arguments");
 		}
-		
+
 		arguments = new ArrayList<String>(Arrays.asList(args));
 
-		File processFile = new File(args[1]);
+		File processFile = new File("outputZip.zip");
 		if (!processFile.exists()) {
 			try {
 				processFile.createNewFile();
@@ -48,7 +48,7 @@ public class ZipProcess implements MigratableProcess, Serializable {
 			}
 		}
 		try {
-			fos = new TransactionalFileOutputStream(args[1], false);
+			fos = new TransactionalFileOutputStream("outputZip.zip", false);
 			in = new TransactionalFileInputStream(args[0]);
 		} catch (IOException e) {
 			System.out.println("ERROR : File IO Exception");
@@ -72,22 +72,18 @@ public class ZipProcess implements MigratableProcess, Serializable {
 		try {
 
 			while (!suspending) {
-				Thread.sleep(4*1000);
+
 				int len;
 				if ((len = in.read(buffer)) > 0) {
 					zos.write(buffer, 0, len);
-				} 
-				else {
-					zos.closeEntry();					 
-		    		zos.close();
-					break;					
+				} else {
+					zos.closeEntry();
+					zos.close();
+					break;
 				}
 			}
 		} catch (IOException e) {
 			System.out.println("ERROR : File IO Exception");
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			System.out.println("ERROR : Interupt Exception");
 			e.printStackTrace();
 		}
 		suspending = false;
@@ -97,7 +93,8 @@ public class ZipProcess implements MigratableProcess, Serializable {
 	public void suspend() {
 		// suspending;
 		suspending = true;
-		while (suspending);
+		while (suspending)
+			;
 	}
 
 	public String toString() {
