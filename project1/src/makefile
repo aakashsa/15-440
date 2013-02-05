@@ -3,7 +3,7 @@ all:
 master:
 	make clean 
 	make all
-	java processmanagerstuff/ProcessManager $(HOST)
+	java processmanagerstuff/ProcessManager $(PORT)
 slave: 
 	java processmanagerstuff/ProcessManager -c $(HOST) $(PORT)
 clean:
