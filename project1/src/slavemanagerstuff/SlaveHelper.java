@@ -16,7 +16,6 @@ import processmanagerstuff.ProcessManager;
 /**
  * This class is responsible for communicating on the client side.
  * It sends data/messages to server and receives as well.
- * @author nikhiltibrewal
  *
  */
 public class SlaveHelper implements Runnable {

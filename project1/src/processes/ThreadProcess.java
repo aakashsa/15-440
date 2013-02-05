@@ -4,7 +4,6 @@ import interfaces.MigratableProcess;
 /**
  * A helper class type that is used to enclose a migratable
  * process and the thread that is running that process
- * @author nikhiltibrewal
  *
  */
 public class ThreadProcess {
