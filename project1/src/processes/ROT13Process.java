@@ -15,6 +15,7 @@ import interfaces.MigratableProcess;
  * Simple Process to do the ROT13 substitution cipher of the text of a file.
  */
 public class ROT13Process implements MigratableProcess {
+	
 	private static final long serialVersionUID = 1L;
 	private TransactionalFileInputStream inFile;
 	private TransactionalFileOutputStream outFile;
@@ -26,30 +27,31 @@ public class ROT13Process implements MigratableProcess {
 
 	public ROT13Process(String args[]) throws Exception {
 		if (args.length != 2) {
-			System.out.println("usage: ROT13 <inputFile> <outputFile>");
-			throw new Exception("Invalid Arguments");
+			System.out.println("usage: ROT13Process <inputFile> <outputFile>");
+			throw new Exception("ERROR: Invalid Arguments");
 		}
-
+		
+		// Open the input and output files
 		inFile = new TransactionalFileInputStream(args[0]);
 		outFile = new TransactionalFileOutputStream(args[1], false);
 		
+		// Store arguments passed in
 		arguments = new ArrayList<String>(Arrays.asList(args));
 	}
 
 	@Override
 	public void run() {
+		// The ROT13 algorithm
 		PrintStream out = new PrintStream(outFile);
 		DataInputStream in = new DataInputStream(inFile);
 
 		try {
 			while (!suspending) {
-
 				String line = in.readLine();
 				if (line == null){
 					break;
 				}
 				for (char c : line.toCharArray()) {
-
 					if (c >= 'a' && c <= 'm')
 						c += 13;
 					else if (c >= 'A' && c <= 'M')
@@ -63,17 +65,15 @@ public class ROT13Process implements MigratableProcess {
 				out.println();				
 			}
 		} catch (EOFException e) {
-			// End of File
+			System.out.println("ERROR (" +this.getClass().getSimpleName()+ "): " + e.getLocalizedMessage());
 		} catch (IOException e) {
 			System.out.println("ERROR (" +this.getClass().getSimpleName()+ "): " + e.getLocalizedMessage());
 		}
-
 		suspending = false;
 	}
 
 	@Override
 	public void suspend() {
-		// TODO Auto-generated method stub
 		suspending = true;
 		while (suspending)
 			;
