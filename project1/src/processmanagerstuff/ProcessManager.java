@@ -15,13 +15,6 @@ import processes.ThreadProcess;
 
 import slavemanagerstuff.SlaveHelper;
 
-//processes.GP hi input.txt output.txt
-//processes.GrepProcess hi input.txt output.txt
-//processes.GrepProcess hi input.txt output.txt
-//processes.ZipProcess input.txt output.txt 
-//processes.ROT13 rot13input.txt outputrot2.txt
-//processes.ROT13 rinput.txt outputrot2.zip
-
 /**
  * Main ProcessManager Class That starts both the Master as well as the Slave.
  * 
