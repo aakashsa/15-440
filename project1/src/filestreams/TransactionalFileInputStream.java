@@ -9,10 +9,9 @@ import java.io.Serializable;
 /**
  * Extends InputStream but encloses a FileInputStream
  * object that gets reinitialized every time
- * @author nikhiltibrewal
  *
  */
-public class TransactionalFileInputStream   extends InputStream implements Serializable {
+public class TransactionalFileInputStream extends InputStream implements Serializable {
 
 	private static final long serialVersionUID = 2024155839564601916L;
 	private long pointer;
@@ -27,7 +26,8 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 
 	@Override
 	/**
-	 * read method that seeks to the previous file pointer state and resumes reading
+	 * Read method that seeks to the previous file pointer state and 
+	 * resumes reading
 	 */
 	public int read() throws IOException {
 		this.fileStream = new FileInputStream(filePath);	
@@ -42,6 +42,9 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 		return readByte[0];
 	}
 	
+	/**
+	 * Read function with different signature.
+	 */
 	public int read(byte[] b,int off,int len) throws IOException {
 		this.fileStream = new FileInputStream(filePath);
 		fileStream.skip(pointer);
@@ -52,7 +55,9 @@ public class TransactionalFileInputStream   extends InputStream implements Seria
 		return returnValue;
 	}
 	
-	 
+	/**
+	 * Read function with different signature.
+	 */
 	public int read(byte[] b) throws IOException {
 		this.fileStream = new FileInputStream(filePath);
 		fileStream.skip(pointer);

@@ -4,21 +4,23 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import filestreams.TransactionalFileInputStream;
 import filestreams.TransactionalFileOutputStream;
 import interfaces.MigratableProcess;
 
-//processes.ROT13 rot13input.txt output.txt 
-
 /**
  * Simple Process to do the ROT13 substitution cipher of the text of a file.
- * @author aakashsa
  */
 public class ROT13 implements MigratableProcess {
 	private static final long serialVersionUID = 1L;
 	private TransactionalFileInputStream inFile;
 	private TransactionalFileOutputStream outFile;
+	
+	// Argument List
+	private ArrayList<String> arguments = null;
 
 	private volatile boolean suspending;
 
@@ -30,6 +32,8 @@ public class ROT13 implements MigratableProcess {
 
 		inFile = new TransactionalFileInputStream(args[0]);
 		outFile = new TransactionalFileOutputStream(args[1], false);
+		
+		arguments = new ArrayList<String>(Arrays.asList(args));
 	}
 
 	@Override
@@ -42,7 +46,6 @@ public class ROT13 implements MigratableProcess {
 
 				String line = in.readLine();
 				if (line == null){
-					System.out.println("Finished ROT13");
 					break;
 				}
 				for (char c : line.toCharArray()) {
@@ -62,7 +65,7 @@ public class ROT13 implements MigratableProcess {
 		} catch (EOFException e) {
 			// End of File
 		} catch (IOException e) {
-			System.out.println("GrepProcess: Error: " + e);
+			System.out.println("ERROR (" +this.getClass().getSimpleName()+ "): " + e.getLocalizedMessage());
 		}
 
 		suspending = false;
@@ -74,6 +77,14 @@ public class ROT13 implements MigratableProcess {
 		suspending = true;
 		while (suspending)
 			;
+	}
+	
+	public String toString() {
+		String result = this.getClass().getSimpleName();
+		for (String arg : arguments) {
+			result = result + " " + arg;
+		}
+		return result;
 	}
 
 }

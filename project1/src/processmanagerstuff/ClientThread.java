@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
  * A runnable object that runs on the server for a particular
  * client. It is responsible for communicating information
  * with the client.
- * @author nikhiltibrewal
  *
  */
 public class ClientThread implements Runnable {
@@ -20,6 +19,7 @@ public class ClientThread implements Runnable {
 	public ClientThread(int id, ObjectOutputStream out, ObjectInputStream in) {
 		this.id = id;
 		
+		// Send the slave a new id
 		try {
 			this.out = out;
 			out.flush();
@@ -27,7 +27,8 @@ public class ClientThread implements Runnable {
 			out.flush();
 			this.in = in;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("ERROR: Client thread couldn't " +
+					"send id to slave (" + e.getLocalizedMessage() + ")");
 		}
 	}
 
@@ -35,9 +36,11 @@ public class ClientThread implements Runnable {
 	public void run() {
 		try {
 			while (true) {
-				// Block read for allFilePaths from slave
+				// Read for all file paths from slave
 				String receivedString = (String) in.readObject();
 				String[] filePaths = receivedString.split(",");
+				
+				//Add each file path to a collection in the Load Balancer
 				for (String path : filePaths) {
 					if (path.length() > 0) {
 						String[] pathContents = path.split("\\t");
@@ -45,15 +48,14 @@ public class ClientThread implements Runnable {
 						LoadBalancer.processFilePaths.put(processId, path);
 					}
 				}
+				// Send a message to Load balancer after sending all paths
 				LoadBalancer.clientMessageStatus.put(this.id, "SENT");
 			}
 		} catch (IOException e) {
-			e.printStackTrace();			
-			System.out.println("Removing Stream... (client thread)" );
+			System.out.println("Slave " + id + " disconnected!");
 			MasterServer.clientOutputStreamList.remove(out);
-			System.out.println("Removed Stream (client thread)" );
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 		}
 	}
 }

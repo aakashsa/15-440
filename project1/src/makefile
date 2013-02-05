@@ -3,9 +3,9 @@ all:
 master:
 	make clean 
 	make all
-	java processmanagerstuff/ProcessManager3 1234
+	java processmanagerstuff/ProcessManager3
 slave: 
-	java processmanagerstuff/ProcessManager3 -c localhost 1234
+	java processmanagerstuff/ProcessManager3 -c localhost
 clean:
 	find . -name "*.class" -delete
 	

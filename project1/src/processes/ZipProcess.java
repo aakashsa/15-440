@@ -13,11 +13,8 @@ import filestreams.TransactionalFileOutputStream;
 
 import interfaces.MigratableProcess;
 
-//processes.ZipProcess input.txt output.zip
-
 /**
  * A simple Process That zips input file to an output zip file.
- * @author aakashsa
  */
 public class ZipProcess implements MigratableProcess, Serializable {
 
@@ -81,7 +78,6 @@ public class ZipProcess implements MigratableProcess, Serializable {
 					zos.write(buffer, 0, len);
 				} 
 				else {
-					System.out.println("Finished ZIP");
 					zos.closeEntry();					 
 		    		zos.close();
 					break;					

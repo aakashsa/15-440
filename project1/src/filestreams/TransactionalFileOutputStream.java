@@ -9,7 +9,6 @@ import java.io.Serializable;
 /**
  * Extends OutputStream but encloses RandomAccessFile 
  * object that gets reinitialized every time
- * @author nikhiltibrewal
  *
  */
 public class TransactionalFileOutputStream extends OutputStream  implements Serializable {
@@ -25,12 +24,13 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 			this.fileString = fileString;
 			pointer = 0;
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 		}
 	}
 	
 	/**
-	 * Write method that seeks to the previous file pointer state and resumes writing
+	 * Write method that seeks to the previous file pointer state 
+	 * and resumes writing
 	 */
 	public void write(int b){
 		try {
@@ -41,12 +41,15 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 			pointer = fileObject.getFilePointer();
 			fileObject.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 		}
 	}
 
+	/**
+	 * Write function with a different signature
+	 */
 	public void write(byte[] b) throws IOException {
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");
@@ -61,6 +64,9 @@ public class TransactionalFileOutputStream extends OutputStream  implements Seri
 		}
 	}
 
+	/**
+	 * Write function with a different signature.
+	 */
 	public void write(byte[] b,int off,int len) throws IOException {
 		try {
 			this.fileObject = new RandomAccessFile(fileString, "rw");

@@ -17,19 +17,27 @@ public class ThreadProcess {
 		this.p = p;
 	}
 	
+	/**
+	 * Get thread running the process
+	 * @return
+	 */
 	public Thread getThread() {
 		return t;
 	}
 	
+	/**
+	 * Get process running here
+	 * @return
+	 */
 	public MigratableProcess getProcess() {
 		return p;
 	}
 	
+	/**
+	 * Check if the thread running the process is alive
+	 * @return
+	 */
 	public boolean threadIsAlive() {
 		return t.isAlive();
-	}
-	
-	public void assignNewThread(Thread t2) {
-		this.t = t2;
-	}
+	}	
 }
