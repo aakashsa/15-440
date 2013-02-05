@@ -32,7 +32,7 @@ public class ZipProcess implements MigratableProcess, Serializable {
 
 	public ZipProcess(String args[]) throws Exception {
 		if (args.length != 1) {
-			System.out.println("usage: processes.ZipProcess <inputFile>");
+			System.out.println("usage: ZipProcess <inputFile>");
 			throw new Exception("Invalid Arguments");
 		}
 

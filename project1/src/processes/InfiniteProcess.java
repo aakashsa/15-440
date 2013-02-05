@@ -8,6 +8,8 @@ import interfaces.MigratableProcess;
  *
  */
 public class InfiniteProcess implements MigratableProcess {
+
+	private static final long serialVersionUID = -8447703973329062270L;
 	private volatile boolean suspending;
 
 	public InfiniteProcess(String args[]){
