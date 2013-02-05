@@ -44,9 +44,9 @@ public class Scan implements Runnable {
 							System.out.println("No running processes on " +
 									"Master");
 						} else {
-							if (ProcessManager3.runningProcesses.size() == 0)
+							if (ProcessManager.runningProcesses.size() == 0)
 								System.out.println("No running processes");
-							for (ThreadProcess tp : ProcessManager3.runningProcesses.values()) {
+							for (ThreadProcess tp : ProcessManager.runningProcesses.values()) {
 								System.out.println(tp.getProcess().toString());
 							}
 						}
@@ -87,8 +87,8 @@ public class Scan implements Runnable {
 									.newInstance((Object) processArgs);
 
 							// Write process to unique file on disk
-							String filePath = ProcessManager3.fileDirectory
-									+ ProcessManager3.numProcesses + ".dat";
+							String filePath = ProcessManager.fileDirectory
+									+ ProcessManager.numProcesses + ".dat";
 
 							File processFile = new File(filePath);
 							if (!processFile.exists()) {
@@ -104,9 +104,9 @@ public class Scan implements Runnable {
 							oos.close();
 
 							// Add new process to all processes collection
-							ProcessManager3.allProcesses.put(
-									ProcessManager3.numProcesses, filePath);
-							ProcessManager3.numProcesses++;
+							ProcessManager.allProcesses.put(
+									ProcessManager.numProcesses, filePath);
+							ProcessManager.numProcesses++;
 						} catch (ClassNotFoundException e) {
 							System.out.println("ERROR: Process " + name
 									+ " is not supported!");

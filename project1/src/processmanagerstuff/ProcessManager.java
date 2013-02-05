@@ -20,14 +20,14 @@ import slavemanagerstuff.SlaveHelper;
 //processes.GrepProcess hi input.txt output.txt
 //processes.ZipProcess input.txt output.txt 
 //processes.ROT13 rot13input.txt outputrot2.txt
-//processes.ROT13 rinput.txt outputrot2.txt
+//processes.ROT13 rinput.txt outputrot2.zip
 
 /**
  * Main ProcessManager Class That starts both the Master as well as the Slave.
  * 
  * @author aakashsa @author nikhiltibrewal
  */
-public class ProcessManager3 {
+public class ProcessManager {
 	// For both Master and Slave
 	private static boolean isSlave;
 	private static int id = -1;

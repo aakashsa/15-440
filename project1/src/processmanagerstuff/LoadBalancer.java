@@ -100,15 +100,15 @@ public class LoadBalancer implements Runnable {
 		}
 		
 		// Distribute new processes stored on Master PM
-		for (int processId : ProcessManager3.allProcesses.keySet()) {
-			String filePath = ProcessManager3.allProcesses.get(processId)
+		for (int processId : ProcessManager.allProcesses.keySet()) {
+			String filePath = ProcessManager.allProcesses.get(processId)
 					+ "\t" + processId;
 			String currPath = loadBalancedFilePaths.get(i % numClients);
 			String finalPath = currPath == null || currPath.length() == 0 ? 
 					filePath : currPath + "," + filePath;
 			loadBalancedFilePaths.put(i % numClients, finalPath);
 			i++;
-			ProcessManager3.allProcesses.remove(processId);
+			ProcessManager.allProcesses.remove(processId);
 		}
 	}
 

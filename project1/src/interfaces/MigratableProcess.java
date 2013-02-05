@@ -3,7 +3,7 @@ import java.io.Serializable;
 
 /** 
  * Each process will implement MigratableProcess and 
- * the process will limit it’s I/O to files accessed via the 
+ * the processes will limit their I/O to files accessed via the 
  * TransactionalFileInputStream and TransactionalFileOutputStream classes
  * 
  */

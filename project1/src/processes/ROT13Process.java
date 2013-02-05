@@ -14,7 +14,7 @@ import interfaces.MigratableProcess;
 /**
  * Simple Process to do the ROT13 substitution cipher of the text of a file.
  */
-public class ROT13 implements MigratableProcess {
+public class ROT13Process implements MigratableProcess {
 	private static final long serialVersionUID = 1L;
 	private TransactionalFileInputStream inFile;
 	private TransactionalFileOutputStream outFile;
@@ -24,7 +24,7 @@ public class ROT13 implements MigratableProcess {
 
 	private volatile boolean suspending;
 
-	public ROT13(String args[]) throws Exception {
+	public ROT13Process(String args[]) throws Exception {
 		if (args.length != 2) {
 			System.out.println("usage: ROT13 <inputFile> <outputFile>");
 			throw new Exception("Invalid Arguments");

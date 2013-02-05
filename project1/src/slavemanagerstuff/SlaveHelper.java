@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import processes.ThreadProcess;
-import processmanagerstuff.ProcessManager3;
+import processmanagerstuff.ProcessManager;
 
 /**
  * This class is responsible for communicating on the client side.
@@ -54,26 +54,26 @@ public class SlaveHelper implements Runnable {
 						// file and send back the File Paths
 						
 						String allFilePaths = new String();
-						for (int k : ProcessManager3.runningProcesses.keySet()) {
+						for (int k : ProcessManager.runningProcesses.keySet()) {
 
 							ThreadProcess tp = 
-									ProcessManager3.runningProcesses.get(k);
+									ProcessManager.runningProcesses.get(k);
 							
 							// If the process terminated, remove it
 							if (!tp.threadIsAlive()) {
 								System.out.println("Process \"" + tp.getProcess().toString() + "\" was terminated");
 								tp.getThread().join();
-								ProcessManager3.runningProcesses.remove(k);
+								ProcessManager.runningProcesses.remove(k);
 							} 
 							else {
 								// The process is running, so serialize it
 								MigratableProcess process = tp.getProcess();
 								process.suspend();
-								ProcessManager3.runningProcesses.remove(k);
+								ProcessManager.runningProcesses.remove(k);
 								iter++;
 								
 								// Write suspended processes to disk
-								String filePath = ProcessManager3.fileDirectory
+								String filePath = ProcessManager.fileDirectory
 										+ iter + id + k + ".dat";
 
 								File processFile = new File(filePath);
@@ -125,7 +125,7 @@ public class SlaveHelper implements Runnable {
 											new ThreadProcess(processThread, process);
 									
 									// Add to running processes collection
-									ProcessManager3.runningProcesses.put(processNumber, tp);
+									ProcessManager.runningProcesses.put(processNumber, tp);
 									processThread.start();
 									
 									// Delete file in the previous iteration
