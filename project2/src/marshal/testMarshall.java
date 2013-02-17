@@ -20,13 +20,13 @@ public class testMarshall {
 		Object [] arg1 = new String[]{"SHeila ", "Munni"};
 		Class [] arg2 = new Class[]{ String.class , String.class };
 		
-		InvokeFunction marshal = new InvokeFunction("SayHello", arg1, arg2);
+		MessageInvokeFunction marshal = new MessageInvokeFunction("SayHello", arg1, arg2);
 			
 	    try {
 	    	System.out.println("Unmarshalling object now.");
 	    	System.out.println("Arg1 = "+marshal.getFunctionName());
 	    	System.out.println("Arg2 = "+marshal.getTypes());
-
+	    	
 			Method methodInvoke = test1.getClass().getDeclaredMethod(marshal.getFunctionName() ,marshal.getTypes() );
 			System.out.println("Method Invoke = " + methodInvoke.toString());
 		    System.out.println("Args = " + marshal.getArgs());
