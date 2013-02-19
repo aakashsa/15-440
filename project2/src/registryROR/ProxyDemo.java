@@ -19,39 +19,26 @@ import marshal.MessageInvokeFunction;
 
 public class ProxyDemo {
 	public static void main(String[] args) {
-		Foo fooProxy = (Foo) Proxy.newProxyInstance(
-				ClassLoader.getSystemClassLoader(),
-				new Class<?>[] { Foo.class }, new ProxyHandler(new FooImpl()));
-
-		fooProxy.bar();
+		RemoteObjectRef r = new RemoteObjectRef("127.17", 1234,3,"registryROR.Foo");
+		Foo fooProxy = null;
+		try {
+			fooProxy = (Foo) LocalizeObject.localize(r);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		fooProxy.bars();
+		//fooProxy.bar();
 		List<Double> list = new ArrayList<Double>();
 		list.add(2.0);
 		//fooProxy.baz(10, list);
 	}
 
 	
-	}
-
-	private interface Foo {
-		int bar();
-
-		Map<String, String> baz(int a, List<Double> b);
-	}
-
-	private static class FooImpl implements Foo {
-
-		@Override
-		public int bar() {
-			throw new RuntimeException();
-			// return 10;
-		}
-
-		@Override
-		public Map<String, String> baz(int a, List<Double> b) {
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("Hello", b.toString());
-			return map;
-		}
-
-	}
 }
+
+
+

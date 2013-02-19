@@ -12,11 +12,12 @@ import java.rmi.RemoteException;
 
 import marshal.MessageInvokeFunction;
 
-public class ProxyHandler implements InvocationHandler {	
+public class ProxyHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
+		Foo impl = new FooImpl();
 		System.out.printf("Someone called method %s with arguments\n",
 				method.getName());
 		Type[] params = method.getGenericParameterTypes();
@@ -26,8 +27,8 @@ public class ProxyHandler implements InvocationHandler {
 		System.out.println("Marshalling");
 
 		MessageInvokeFunction marshal = new MessageInvokeFunction(
-				method.getName(), args, method.getParameterTypes(), null,
-				null);
+				method.getName(), args, method.getParameterTypes(), null, null,
+				0);
 		System.out.println("Serializing");
 		String filePath = "Marshaltest" + ".dat";
 
@@ -52,21 +53,27 @@ public class ProxyHandler implements InvocationHandler {
 		System.out.println("Unmarshalling");
 
 		Object returning = null;
-//		try {
-//			returning = impl
-//					.getClass()
-//					.getDeclaredMethod(marshal1.getFunctionName(),
-//							marshal1.getTypes())
-//					.invoke(impl, marshal1.getArgs());
-//		} catch (Exception e) {
-////			e.printStackTrace();
-//			MessageInvokeFunction marshal2 = new MessageInvokeFunction(
-//					marshal1.getFunctionName(), marshal1.getArgs(),
-//					marshal1.getTypes(), null, e);
-//			System.out.println(marshal2.getExp().toString());
-//			throw new RemoteException();
-//		}
+		try {
+			System.out.println("Return type "
+					+ impl.getClass()
+							.getDeclaredMethod(marshal1.getFunctionName(),
+									marshal1.getTypes()).getReturnType());
+
+			returning = impl
+					.getClass()
+					.getDeclaredMethod(marshal1.getFunctionName(),
+							marshal1.getTypes())
+					.invoke(impl, marshal1.getArgs());
+
+		} catch (Exception e) {
+			// e.printStackTrace();
+			MessageInvokeFunction marshal2 = new MessageInvokeFunction(
+					marshal1.getFunctionName(), marshal1.getArgs(),
+					marshal1.getTypes(), null, e, 0);
+			System.out.println(marshal2.getExp().toString());
+			throw new RemoteException();
+		}
 		System.out.printf("Returning %s\n\n", returning);
-		return returning;
+		return 10;
 	}
-}	
+}

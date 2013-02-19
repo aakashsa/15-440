@@ -13,14 +13,20 @@ public class MessageInvokeFunction implements Serializable {
 	private String name;
 	private Object returnVal;
 	private Exception exp;
-
+	private int objectKey;
+	
 	public MessageInvokeFunction(String name, Object[] args, Class[] types,
-			Object returnVal, Exception exp) {
+			Object returnVal, Exception exp, int objectKey) {
 		this.name = name;
 		this.args = args;
 		this.types = types;
 		this.returnVal = returnVal;
 		this.exp = exp;
+		this.objectKey = objectKey;
+	}
+	
+	public int getObjectKey (){
+		return objectKey;
 	}
 
 	public String getFunctionName() {
