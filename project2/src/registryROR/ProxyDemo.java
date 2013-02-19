@@ -19,8 +19,16 @@ import marshal.MessageInvokeFunction;
 
 public class ProxyDemo {
 	public static void main(String[] args) {
-		RemoteObjectRef r = new RemoteObjectRef("127.17", 1234,3,"registryROR.Foo");
+		RemoteObjectRef r = new RemoteObjectRef("127.17", 1234, 3,
+				"registryROR.Foo");
 		Foo fooProxy = null;
+		Class<?>[] a = FooImpl.class.getInterfaces();
+		for (int i = 0; i < a.length; i++)
+			System.out.println("Interface " + i + " " + a[i] + " \n");
+
+		if (Remote440.class.isAssignableFrom(Foo.class)) {
+			System.out.println(" Extends Remote BRO !");
+		}
 		try {
 			fooProxy = (Foo) LocalizeObject.localize(r);
 		} catch (IllegalArgumentException e) {
@@ -30,15 +38,12 @@ public class ProxyDemo {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 		fooProxy.bars();
-		//fooProxy.bar();
+		// fooProxy.bar();
 		List<Double> list = new ArrayList<Double>();
 		list.add(2.0);
-		//fooProxy.baz(10, list);
+		// fooProxy.baz(10, list);
 	}
 
-	
 }
-
-
-
