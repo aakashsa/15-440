@@ -8,6 +8,6 @@ public class LocalizeObject {
 			ClassNotFoundException {
 		return Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(),
 				new Class<?>[] { Class.forName(r.getInterfaceName1()) },
-				new ProxyHandler());
+				new ProxyHandler(r));
 	}
 }

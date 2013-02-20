@@ -3,16 +3,26 @@ package registryROR;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.net.Socket;
 import java.rmi.RemoteException;
 
 import marshal.MessageInvokeFunction;
 
 public class ProxyHandler implements InvocationHandler {
+
+	private RemoteObjectRef ror;
+
+	public ProxyHandler(RemoteObjectRef r) {
+		// TODO Auto-generated constructor stub
+		this.ror = r;
+	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
@@ -25,55 +35,27 @@ public class ProxyHandler implements InvocationHandler {
 			System.out.printf("%d: %s = %s\n", i, params[i], args[i]);
 		}
 		System.out.println("Marshalling");
+		OutputStream output = null;
+		InputStream input = null;
+		ObjectOutputStream out = null; // Slave output stream
+		ObjectInputStream in = null; // Slave input stream
+		Socket clientSocket = null; // Client socket
+
+		clientSocket = new Socket("localhost", 4023);
+		output = clientSocket.getOutputStream();
+		input = clientSocket.getInputStream();
+		out = new ObjectOutputStream(output);
+		out.flush();
+		in = new ObjectInputStream(input);
 
 		MessageInvokeFunction marshal = new MessageInvokeFunction(
 				method.getName(), args, method.getParameterTypes(), null, null,
-				0);
-		System.out.println("Serializing");
-		String filePath = "Marshaltest" + ".dat";
+				0, ror.getObjectName());
+		out.writeObject(marshal);
 
-		File processFile = new File(filePath);
-		if (!processFile.exists()) {
-			processFile.createNewFile();
-		}
+		MessageInvokeFunction reply = (MessageInvokeFunction) in.readObject();
 
-		FileOutputStream f_out = new FileOutputStream(filePath, false);
-		ObjectOutputStream oos = new ObjectOutputStream(f_out);
-		oos.writeObject((Object) marshal);
-		oos.flush();
-		oos.close();
-
-		FileInputStream f_in = new FileInputStream(filePath);
-		ObjectInputStream oin = new ObjectInputStream(f_in);
-		MessageInvokeFunction marshal1 = (MessageInvokeFunction) oin
-				.readObject();
-		oin.close();
-
-		System.out.println("UnSerializing");
-		System.out.println("Unmarshalling");
-
-		Object returning = null;
-		try {
-			System.out.println("Return type "
-					+ impl.getClass()
-							.getDeclaredMethod(marshal1.getFunctionName(),
-									marshal1.getTypes()).getReturnType());
-
-			returning = impl
-					.getClass()
-					.getDeclaredMethod(marshal1.getFunctionName(),
-							marshal1.getTypes())
-					.invoke(impl, marshal1.getArgs());
-
-		} catch (Exception e) {
-			// e.printStackTrace();
-			MessageInvokeFunction marshal2 = new MessageInvokeFunction(
-					marshal1.getFunctionName(), marshal1.getArgs(),
-					marshal1.getTypes(), null, e, 0);
-			System.out.println(marshal2.getExp().toString());
-			throw new RemoteException();
-		}
-		System.out.printf("Returning %s\n\n", returning);
+		System.out.printf("Returning %s\n\n", reply.getRetVal());
 		return 10;
 	}
 }

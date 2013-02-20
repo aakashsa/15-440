@@ -10,19 +10,21 @@ public class MessageInvokeFunction implements Serializable {
 
 	private Class[] types;
 	private Object[] args;
-	private String name;
+	private String funName;
 	private Object returnVal;
 	private Exception exp;
 	private int objectKey;
+	private String objName;
 	
-	public MessageInvokeFunction(String name, Object[] args, Class[] types,
-			Object returnVal, Exception exp, int objectKey) {
-		this.name = name;
+	public MessageInvokeFunction(String funName, Object[] args, Class[] types,
+			Object returnVal, Exception exp, int objectKey,String objName) {
+		this.funName = funName;
 		this.args = args;
 		this.types = types;
 		this.returnVal = returnVal;
 		this.exp = exp;
 		this.objectKey = objectKey;
+		this.objName = objName;
 	}
 	
 	public int getObjectKey (){
@@ -30,7 +32,10 @@ public class MessageInvokeFunction implements Serializable {
 	}
 
 	public String getFunctionName() {
-		return name;
+		return funName;
+	}
+	public String getObjName() {
+		return funName;
 	}
 
 	public Object[] getArgs() {

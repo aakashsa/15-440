@@ -21,7 +21,7 @@ public class testRebind {
 
 		// make ROR.
 		RemoteObjectRef ror = new RemoteObjectRef(IPAdr, PortNum, ObjKey,
-				InterfaceName);
+				InterfaceName,null);
 
 		// this is the ROR content.
 		System.out.println("IP address is " + ror.IP_adr);

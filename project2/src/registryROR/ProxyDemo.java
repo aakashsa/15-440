@@ -20,7 +20,7 @@ import marshal.MessageInvokeFunction;
 public class ProxyDemo {
 	public static void main(String[] args) {
 		RemoteObjectRef r = new RemoteObjectRef("127.17", 1234, 3,
-				"registryROR.Foo");
+				"registryROR.Foo","fooProxy");
 		Foo fooProxy = null;
 		Class<?>[] a = FooImpl.class.getInterfaces();
 		for (int i = 0; i < a.length; i++)
@@ -39,10 +39,10 @@ public class ProxyDemo {
 			e.printStackTrace();
 		}
 
-		fooProxy.bars();
+		fooProxy.bar();
 		// fooProxy.bar();
-		List<Double> list = new ArrayList<Double>();
-		list.add(2.0);
+		//List<Double> list = new ArrayList<Double>();
+		//list.add(2.0);
 		// fooProxy.baz(10, list);
 	}
 

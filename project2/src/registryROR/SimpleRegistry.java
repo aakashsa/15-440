@@ -64,7 +64,7 @@ public class SimpleRegistry {
 
 			// make ROR.
 			ror = new RemoteObjectRef(ro_IPAdr, ro_PortNum, ro_ObjKey,
-					ro_InterfaceName);
+					ro_InterfaceName,null);
 		} else {
 			System.out.println("it is not found!.");
 
