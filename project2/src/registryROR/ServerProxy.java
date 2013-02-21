@@ -10,11 +10,13 @@ public class ServerProxy implements Runnable {
 
 	private int port;
 	private String localHost;
+	private Object implementation;
 
-	public ServerProxy(int port, String localHost) {
+	public ServerProxy(Object implementation, int port, String localHost) {
 		// TODO Auto-generated constructor stub
 		this.port = port;
 		this.localHost = localHost;
+		this.implementation = implementation;
 	}
 
 	@Override
@@ -32,7 +34,6 @@ public class ServerProxy implements Runnable {
 		}
 
 		while (true) {
-
 			// Accept connections and initialize client streams
 			try {
 				System.out.println("Accepting Connections in ServerProxy");
@@ -44,33 +45,30 @@ public class ServerProxy implements Runnable {
 				System.out.println("Read Request");
 				MessageInvokeFunction marshalm = (MessageInvokeFunction) in
 						.readObject();
+				System.out.println(" Marshal m " + marshalm.toString());
+				System.out.println(" Marshal m Func Name " + marshalm.getFunctionName());
+				System.out.println(" Marshal m ObjectKey" + marshalm.getObjectKey());
+				System.out.println(" Marshal m  Objec Name " + marshalm.getObjName());
+				System.out.println(" Marshal m Ret Val" + marshalm.getRetVal());
+				System.out.println(" Marshal m Exception" + marshalm.getExp());
+				
 				MessageInvokeFunction marshal2;
 				try {
-//					System.out.println(" Function Invoked = "
-//							+ SampleServer440.fooSample
-//									.getClass()
-//									.getDeclaredMethod(
-//											marshalm.getFunctionName(),
-//											marshalm.getTypes())
-//									.invoke(SampleServer440.fooSample,
-//											marshalm.getArgs()));
-
-					// + FooImpl.getClass()
-					// .getDeclaredMethod(marshal1.getFunctionName(),
-					// marshal1.getTypes()).getReturnType());
 					System.out.println("Invoking Function on Server");
-					Object returning = SampleServer440.fooSample
+					System.out.println("Object = " + implementation.toString());
+					Object returning = implementation
 							.getClass()
 							.getDeclaredMethod(marshalm.getFunctionName(),
 									marshalm.getTypes())
-							.invoke(SampleServer440.fooSample,
-									marshalm.getArgs());
+							.invoke(implementation, marshalm.getArgs());
 					System.out.println("Returning Message on Proxy on Server");
 					marshal2 = new MessageInvokeFunction(
 							marshalm.getFunctionName(), marshalm.getArgs(),
 							marshalm.getTypes(), returning, null,
 							marshalm.getObjectKey(), marshalm.getObjName());
 				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Exception on Server !!");
 					// e.printStackTrace();
 					marshal2 = new MessageInvokeFunction(
 							marshalm.getFunctionName(), marshalm.getArgs(),

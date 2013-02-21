@@ -9,7 +9,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,18 +23,11 @@ import marshal.MessageInvokeFunction;
 
 public class ProxyDemo {
 	public static void main(String[] args) {
-		RemoteObjectRef r = new RemoteObjectRef("127.17", 1234, 3,
-				"registryROR.Foo","fooProxy");
 		Foo fooProxy = null;
-		Class<?>[] a = FooImpl.class.getInterfaces();
-		for (int i = 0; i < a.length; i++)
-			System.out.println("Interface " + i + " " + a[i] + " \n");
-
-		if (Remote440.class.isAssignableFrom(Foo.class)) {
-			System.out.println(" Extends Remote BRO !");
-		}
+		RemoteBar rbarProxy = null;
 		try {
-			fooProxy = (Foo) LocalizeObject.localize(r);
+			fooProxy = (Foo) LocalizeObject.localize("foo1");
+			rbarProxy = (RemoteBar) LocalizeObject.localize("Rem");
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -38,11 +35,20 @@ public class ProxyDemo {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("Return 2 =  " + fooProxy.bar(5));
 
-		fooProxy.bar();
+		System.out.println("Return 1 =  " + fooProxy.barRem(rbarProxy,17));
+
+		// ArrayList<Integer> z = new ArrayList<Integer>();
+		// z.add(1);
+		// z.add(2);
+		// z.add(3);
+		// z.add(4);
+		// z.add(5);
+
 		// fooProxy.bar();
-		//List<Double> list = new ArrayList<Double>();
-		//list.add(2.0);
+		// List<Double> list = new ArrayList<Double>();
+		// list.add(2.0);
 		// fooProxy.baz(10, list);
 	}
 

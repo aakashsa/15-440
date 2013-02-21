@@ -20,7 +20,7 @@ class Hello extends UnicastRemoteObject implements HelloInterface {
 			// Just a console message
 			System.out.println("Hello Server ready");
 			System.out.println(InetAddress.getLocalHost().toString());
-
+			
 		} catch (Exception e) {
 			// Bad things happen to good people
 			e.printStackTrace();
