@@ -3,6 +3,7 @@ package registryROR;
 import java.io.*;
 import java.net.*;
 import java.rmi.RemoteException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import marshal.MessageInvokeFunction;
 
@@ -11,12 +12,14 @@ public class ServerProxy implements Runnable {
 	private int port;
 	private String localHost;
 	private Object implementation;
+	private ConcurrentHashMap<String, Object> remoteObjectsMap;
 
-	public ServerProxy(Object implementation, int port, String localHost) {
+	public ServerProxy(int port, String localHost, ConcurrentHashMap<String, Object> remoteObjectsMap) {
 		// TODO Auto-generated constructor stub
 		this.port = port;
 		this.localHost = localHost;
-		this.implementation = implementation;
+		this.remoteObjectsMap = remoteObjectsMap;
+		//this.implementation = implementation;
 	}
 
 	@Override
@@ -54,8 +57,9 @@ public class ServerProxy implements Runnable {
 				
 				MessageInvokeFunction marshal2;
 				try {
-					System.out.println("Invoking Function on Server");
-					System.out.println("Object = " + implementation.toString());
+					implementation = remoteObjectsMap.get(marshalm.getObjName());
+					//System.out.println("Invoking Function on Server");
+					//System.out.println("Object = " + implementation.toString());
 					Object returning = implementation
 							.getClass()
 							.getDeclaredMethod(marshalm.getFunctionName(),

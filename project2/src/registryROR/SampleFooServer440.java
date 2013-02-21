@@ -7,6 +7,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SampleFooServer440 {
 
@@ -18,13 +19,16 @@ public class SampleFooServer440 {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
+		ConcurrentHashMap<String, Object> remoteObjectsMap = new ConcurrentHashMap<String, Object>();
+		
 		int port = 4023; // registry prt: above 1024 so that we can run it.
 		String name = "foo1";
 		fooSample = new FooImpl();
-
+		remoteObjectsMap.put(name, fooSample);
+		
 		// Spawn proxy
 		System.out.println("Spawning Proxy Thread on Server");
-		Thread t = new Thread(new ServerProxy(fooSample, port, "localhost"));
+		Thread t = new Thread(new ServerProxy(port, "localhost", remoteObjectsMap));
 		t.start();
 
 		// Rebind

@@ -5,6 +5,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SampleRemServer400 {
 
@@ -16,13 +17,16 @@ public class SampleRemServer400 {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
+		ConcurrentHashMap<String, Object> remoteObjectsMap = new ConcurrentHashMap<String, Object>();
+		
 		int port = 4026; // registry prt: above 1024 so that we can run it.
 		String name = "Rem";
 		RemSample = new RemoteBarImpl();
-
+		remoteObjectsMap.put(name, RemSample);
+		
 		// Spawn proxy
 		System.out.println("Spawning Proxy Thread on Server");
-		Thread t = new Thread(new ServerProxy(RemSample, port, "localhost"));
+		Thread t = new Thread(new ServerProxy(port, "localhost", remoteObjectsMap));
 		t.start();
 
 		// Rebind
@@ -33,7 +37,7 @@ public class SampleRemServer400 {
 			// String hostname = addr.getHostName();
 
 			RemoteObjectRef ror = new RemoteObjectRef("localhost", port, 1,
-					"registryROR.RemoteBar", "Rem");
+					"registryROR.RemoteBar", name);
 			Naming.rebind(name, ror);
 
 			// registry.rebind(name, fooSample);

@@ -5,6 +5,8 @@ master:
 	make all
 	java processmanagerstuff/ProcessManager $(PORT)
 slave: 
+	make clean
+	make all
 	java processmanagerstuff/ProcessManager -c $(HOST) $(PORT)
 clean:
 	find . -name "*.class" -delete
