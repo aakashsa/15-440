@@ -3,6 +3,7 @@ package registryROR;
 import java.io.*;
 import java.net.*;
 import java.rmi.RemoteException;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import marshal.MessageInvokeFunction;
@@ -19,6 +20,10 @@ public class ServerProxy implements Runnable {
 		this.port = port;
 		this.localHost = localHost;
 		this.remoteObjectsMap = remoteObjectsMap;
+		System.out.println("size of map: " + remoteObjectsMap.size());
+		for (Entry<String, Object> entry : remoteObjectsMap.entrySet()) {
+			System.out.println("key: " + entry.getKey() + ", value: " + entry.getValue());
+		}
 		//this.implementation = implementation;
 	}
 
