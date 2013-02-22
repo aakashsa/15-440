@@ -37,9 +37,16 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 		System.out.printf("Someone called method %s with arguments\n",
 				method.getName());
 		Type[] params = method.getGenericParameterTypes();
-//		for (int i = 0; i < params.length; i++) {
-//			System.out.printf("%d: %s = %s\n", i, params[i], args[i]);
-//		}
+		for (int i = 0; i < params.length; i++) {
+			//System.out.printf("%d: %s = %s\n", i, params[i], args[i]);
+			if ((Serializable.class.isAssignableFrom(args[i].getClass()))) {
+				System.out.println("Serializing Object");
+			} else if ((Remote440.class.isAssignableFrom(args[i].getClass()))) {
+				System.out.println("Remote Object");
+			}
+			else
+				throw new RemoteException();
+		}
 
 		System.out.println("Marshalling");
 		OutputStream output = null;
@@ -63,22 +70,22 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		System.out.println("Ror.getObject Name in Proxy handler = "
+				+ ror.getObjectName());
 		// (String funName, Object[] args, Class[] types,
 		// Object returnVal, Exception exp, int objectKey,String objName)
-
 		MessageInvokeFunction marshal = new MessageInvokeFunction(
 				method.getName(), args, method.getParameterTypes(), null, null,
 				0, ror.getObjectName());
 		MessageInvokeFunction reply = null;
-		
+
 		System.out.println(" Marshal  " + marshal.toString());
 		System.out.println(" Marshal  Func Name " + marshal.getFunctionName());
 		System.out.println(" Marshal  ObjectKey" + marshal.getObjectKey());
 		System.out.println(" Marshal  Objec Name " + marshal.getObjName());
 		System.out.println(" Marshal  Ret Val" + marshal.getRetVal());
 		System.out.println(" Marshal  Exception" + marshal.getExp());
-		
+
 		try {
 			out.writeObject(marshal);
 			reply = (MessageInvokeFunction) in.readObject();
@@ -89,7 +96,12 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		System.out.println(" Reply  " + reply.toString());
+		System.out.println(" Reply  Func Name " + reply.getFunctionName());
+		System.out.println(" Reply  ObjectKey" + reply.getObjectKey());
+		System.out.println(" Reply  Objec Name " + reply.getObjName());
+		System.out.println(" Reply  Ret Val" + reply.getRetVal());
+		System.out.println(" Reply  Exception" + reply.getExp());
 		if (reply.getExp() != null) {
 			System.out
 					.println("Exception = " + reply.getExp().toString() + " ");

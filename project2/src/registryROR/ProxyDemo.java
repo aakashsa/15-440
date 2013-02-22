@@ -16,8 +16,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import marshal.MessageInvokeFunction;
 
@@ -36,9 +38,11 @@ public class ProxyDemo {
 			e.printStackTrace();
 		}
 		System.out.println("Return 2 =  " + fooProxy.bar(5));
-
-		System.out.println("Return 1 =  " + fooProxy.barRem(rbarProxy,17));
-
+		System.out.println("Return 1 =  " + fooProxy.barRem(rbarProxy, 17));
+		Set a = new HashSet<Integer>();
+		a.add(1);
+		NonSerializable z = new NonSerializable();
+		System.out.println("Return 1 =  " + fooProxy.bar2(z));
 		// ArrayList<Integer> z = new ArrayList<Integer>();
 		// z.add(1);
 		// z.add(2);

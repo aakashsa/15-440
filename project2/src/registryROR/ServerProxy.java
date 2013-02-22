@@ -53,12 +53,12 @@ public class ServerProxy implements Runnable {
 				System.out.println("Read Request");
 				MessageInvokeFunction marshalm = (MessageInvokeFunction) in
 						.readObject();
-				System.out.println(" Marshal m " + marshalm.toString());
-				System.out.println(" Marshal m Func Name " + marshalm.getFunctionName());
-				System.out.println(" Marshal m ObjectKey" + marshalm.getObjectKey());
-				System.out.println(" Marshal m  Objec Name " + marshalm.getObjName());
-				System.out.println(" Marshal m Ret Val" + marshalm.getRetVal());
-				System.out.println(" Marshal m Exception" + marshalm.getExp());
+				System.out.println(" Server Proxy Marshal m " + marshalm.toString());
+				System.out.println(" Server Proxy Marshal m Func Name " + marshalm.getFunctionName());
+				System.out.println(" Server Proxy Marshal m ObjectKey" + marshalm.getObjectKey());
+				System.out.println(" Server Proxy Marshal m  Objec Name " + marshalm.getObjName());
+				System.out.println(" Server Proxy Marshal m Ret Val" + marshalm.getRetVal());
+				System.out.println(" Server Proxy Marshal m Exception" + marshalm.getExp());
 				
 				MessageInvokeFunction marshal2;
 				try {

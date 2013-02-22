@@ -37,7 +37,8 @@ public class SampleFooServer440 {
 			registry = LocateRegistry.getRegistry(port);
 			// InetAddress addr = InetAddress.getLocalHost();
 			// String hostname = addr.getHostName();
-
+//			RemoteObjectRef(String ip, int port, int obj_key, String riname,
+//					String objectName) 
 			RemoteObjectRef ror = new RemoteObjectRef("localhost", port, 1,
 					"registryROR.Foo", name);
 			Naming.rebind(name, ror);
