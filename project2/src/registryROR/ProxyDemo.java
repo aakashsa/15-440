@@ -1,28 +1,5 @@
 package registryROR;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import marshal.MessageInvokeFunction;
-
 public class ProxyDemo {
 	public static void main(String[] args) {
 		Foo fooProxy = null;
@@ -39,8 +16,7 @@ public class ProxyDemo {
 		}
 		System.out.println("Return 2 =  " + fooProxy.bar(5));
 		System.out.println("Return 1 =  " + fooProxy.barRem(rbarProxy, 17));
-		Set a = new HashSet<Integer>();
-		a.add(1);
+
 		NonSerializable z = new NonSerializable();
 		System.out.println("Return 1 =  " + fooProxy.bar2(z));
 		// ArrayList<Integer> z = new ArrayList<Integer>();

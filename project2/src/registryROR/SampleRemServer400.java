@@ -3,8 +3,6 @@ package registryROR;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SampleRemServer400 {
@@ -30,25 +28,26 @@ public class SampleRemServer400 {
 		t.start();
 
 		// Rebind
-		Registry registry;
+		//Registry registry;
 		try {
-			registry = LocateRegistry.getRegistry(port);
+			//registry = LocateRegistry.getRegistry(port);
 			// InetAddress addr = InetAddress.getLocalHost();
 			// String hostname = addr.getHostName();
 
 			RemoteObjectRef ror = new RemoteObjectRef("localhost", port, 1,
 					"registryROR.RemoteBar", name);
-			Naming.rebind(name, ror);
+			RMIRegistry440.rebind(name, ror);
 
 			// registry.rebind(name, fooSample);
 			System.out.println("Rebing Object");
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+//		catch (MalformedURLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		System.out.println("HelloGiver bound and ready to give greetings");
 

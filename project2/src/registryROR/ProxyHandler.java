@@ -45,7 +45,7 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 				System.out.println("Remote Object");
 			}
 			else
-				throw new RemoteException();
+				throw new RemoteException("[ERROR]: Object is neither remote nor serializable!");
 		}
 
 		System.out.println("Marshalling");

@@ -3,7 +3,7 @@ package registryROR;
 import java.io.Serializable;
 import java.rmi.Remote;
 
-public class RemoteObjectRef  implements Serializable,Remote{
+public class RemoteObjectRef  implements Serializable,Remote440{
 	/**
 	 * 
 	 */

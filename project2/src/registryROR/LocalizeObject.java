@@ -8,18 +8,23 @@ import java.rmi.RemoteException;
 
 public class LocalizeObject {
 
+	
+	
 	public static Object localize(String name) throws IllegalArgumentException,
 			ClassNotFoundException {
 		RemoteObjectRef r = null;
 		try {
-			r = (RemoteObjectRef) Naming.lookup(name);
-		} catch (MalformedURLException e) {
+			r = (RemoteObjectRef) RMIRegistry440.lookup(name);
+			//r = (RemoteObjectRef) Naming.lookup(name);
+		} //catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		//} 
+		catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotBoundException e) {
+		} 
+		catch (NotBoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

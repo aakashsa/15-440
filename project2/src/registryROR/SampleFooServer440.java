@@ -1,12 +1,8 @@
 package registryROR;
 
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SampleFooServer440 {
@@ -32,16 +28,16 @@ public class SampleFooServer440 {
 		t.start();
 
 		// Rebind
-		Registry registry;
+		//Registry registry;
 		try {
-			registry = LocateRegistry.getRegistry(port);
+			//registry = LocateRegistry.getRegistry(port);
 			// InetAddress addr = InetAddress.getLocalHost();
 			// String hostname = addr.getHostName();
 //			RemoteObjectRef(String ip, int port, int obj_key, String riname,
 //					String objectName) 
 			RemoteObjectRef ror = new RemoteObjectRef("localhost", port, 1,
 					"registryROR.Foo", name);
-			Naming.rebind(name, ror);
+			RMIRegistry440.rebind(name, ror);
 
 			// registry.rebind(name, fooSample);
 			System.out.println("Rebing Object");
@@ -49,10 +45,11 @@ public class SampleFooServer440 {
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+//		catch (MalformedURLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		System.out.println("HelloGiver bound and ready to give greetings");
 
