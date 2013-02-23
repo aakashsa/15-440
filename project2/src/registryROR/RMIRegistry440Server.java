@@ -77,15 +77,15 @@ public class RMIRegistry440Server {
 				RMIRegistryMessage message = (RMIRegistryMessage) in.readObject();
 				if (message.isLookupMessage()) {
 					Remote440 remoteObj = lookup(message.getName());
-					out.writeObject(new RMIRegistryMessage(null, remoteObj, null, null));
+					out.writeObject(new RMIRegistryMessage(null, remoteObj, true, null));
 				}
 				else {
 					rebind(message.getName(), message.getRemoteRef());
-					out.writeObject(new RMIRegistryMessage(null, null, null, null));
+					out.writeObject(new RMIRegistryMessage(null, null, false, null));
 				}				
 			} catch (RemoteException e){
 				try {
-					out.writeObject(new RMIRegistryMessage(null, null, null, e));
+					out.writeObject(new RMIRegistryMessage(null, null, false, e));
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -102,12 +102,19 @@ public class RMIRegistry440Server {
 		if (remoteObjects.contains(name)) {
 			System.out.println("[INFO]: Rebinding object with name " + name);
 		}
+		System.out.println("[INFO]: BINDINGbinding object with name " + name);		
 		remoteObjects.put(name, ror);
+		for ( String a : remoteObjects.keySet()){
+			System.out.println(" KEYS + " + a);
+		}
 	}
 	
-	private static Remote440 lookup(String name) throws RemoteException {		
-		if (!remoteObjects.contains(name)) {
-			throw new RemoteException("[ERROR]: Name" + name + " is not bound! (RMIRegistry440Server)");
+	private static Remote440 lookup(String name) throws RemoteException {	
+		for ( String a : remoteObjects.keySet()){
+			System.out.println(" KEYS + " + a);
+		}
+		if (!remoteObjects.containsKey(name)) {
+			throw new RemoteException("[ERROR]: Name " + name + " is not bound! (RMIRegistry440Server)");
 		}
 		return remoteObjects.get(name);
 	}

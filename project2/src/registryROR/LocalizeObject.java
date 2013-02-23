@@ -16,15 +16,18 @@ public class LocalizeObject {
 		try {
 			r = (RemoteObjectRef) RMIRegistry440.lookup(name);
 			//r = (RemoteObjectRef) Naming.lookup(name);
-		} //catch (MalformedURLException e) {
+		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		//} 
+			e.printStackTrace();
+		} 
 		catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		catch (NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

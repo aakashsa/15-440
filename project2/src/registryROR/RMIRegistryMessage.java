@@ -1,6 +1,8 @@
 package registryROR;
 
-public class RMIRegistryMessage {
+import java.io.Serializable;
+
+public class RMIRegistryMessage implements Serializable {
 	
 	private String name;
 	private Remote440 remote;

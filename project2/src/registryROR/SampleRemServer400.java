@@ -37,17 +37,19 @@ public class SampleRemServer400 {
 			RemoteObjectRef ror = new RemoteObjectRef("localhost", port, 1,
 					"registryROR.RemoteBar", name);
 			RMIRegistry440.rebind(name, ror);
-
 			// registry.rebind(name, fooSample);
 			System.out.println("Rebing Object");
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-//		catch (MalformedURLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		System.out.println("HelloGiver bound and ready to give greetings");
 
