@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class RMIRegistryMessage implements Serializable {
 	
+	private static final long serialVersionUID = -2490542686352505172L;
 	private String name;
 	private Remote440 remote;
 	private boolean bindOrLookup;

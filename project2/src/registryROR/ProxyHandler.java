@@ -1,8 +1,5 @@
 package registryROR;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -12,17 +9,15 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import marshal.MessageInvokeFunction;
 
 public class ProxyHandler implements InvocationHandler, Serializable {
 
+	private static final long serialVersionUID = -2697216062374177752L;
 	private RemoteObjectRef ror;
 
 	public ProxyHandler(RemoteObjectRef r) {
@@ -33,7 +28,7 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 	@Override
 	public synchronized Object invoke(Object proxy, Method method, Object[] args)
 			throws RemoteException {
-		Foo impl = new FooImpl();
+		//Foo impl = new FooImpl();
 		System.out.printf("Someone called method %s with arguments\n",
 				method.getName());
 		Type[] params = method.getGenericParameterTypes();

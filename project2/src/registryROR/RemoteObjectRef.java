@@ -1,12 +1,9 @@
 package registryROR;
 
 import java.io.Serializable;
-import java.rmi.Remote;
 
 public class RemoteObjectRef  implements Serializable,Remote440{
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	String IP_adr;
 	int Port;

@@ -1,10 +1,8 @@
 package registryROR;
 
-import java.rmi.Remote;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface Foo extends Remote440 {
 	int bar(int a);

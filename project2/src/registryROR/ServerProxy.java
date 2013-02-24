@@ -2,7 +2,6 @@ package registryROR;
 
 import java.io.*;
 import java.net.*;
-import java.rmi.RemoteException;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
