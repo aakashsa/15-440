@@ -1,46 +1,33 @@
 package registryROR;
 
-import java.io.*;
-import java.net.*;
-import java.rmi.RemoteException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import marshal.MessageInvokeFunction;
 
-public class ServerProxy implements Runnable {
+public class ServerRemoteObjectThread implements Runnable {
 
-	private int port;
-	private String localHost;
 	private Object implementation;
 	private ConcurrentHashMap<String, Object> remoteObjectsMap;
+	private ServerSocket serverSocket;
 
-	public ServerProxy(int port, String localHost, ConcurrentHashMap<String, Object> remoteObjectsMap) {
+	public ServerRemoteObjectThread(Object implementation,
+			ServerSocket serverSocket) {
 		// TODO Auto-generated constructor stub
-		this.port = port;
-		this.localHost = localHost;
-		this.remoteObjectsMap = remoteObjectsMap;
-		System.out.println("size of map: " + remoteObjectsMap.size());
-		for (Entry<String, Object> entry : remoteObjectsMap.entrySet()) {
-			System.out.println("key: " + entry.getKey() + ", value: " + entry.getValue());
-		}
-		//this.implementation = implementation;
+		this.serverSocket = serverSocket;
+		this.implementation = implementation;
 	}
 
 	@Override
 	public void run() {
-
-		ServerSocket serverSocket = null;
 		Socket clientSocket = null;
-
-		try {
-			// Create a new server socket
-			serverSocket = new ServerSocket(port);
-		} catch (IOException e) {
-			System.out.println("ERROR: Could not listen on port: " + port);
-			System.exit(0);
-		}
-
 		while (true) {
 			// Accept connections and initialize client streams
 			try {
@@ -53,18 +40,24 @@ public class ServerProxy implements Runnable {
 				System.out.println("Read Request");
 				MessageInvokeFunction marshalm = (MessageInvokeFunction) in
 						.readObject();
-				System.out.println(" Server Proxy Marshal m " + marshalm.toString());
-				System.out.println(" Server Proxy Marshal m Func Name " + marshalm.getFunctionName());
-				System.out.println(" Server Proxy Marshal m ObjectKey" + marshalm.getObjectKey());
-				System.out.println(" Server Proxy Marshal m  Objec Name " + marshalm.getObjName());
-				System.out.println(" Server Proxy Marshal m Ret Val" + marshalm.getRetVal());
-				System.out.println(" Server Proxy Marshal m Exception" + marshalm.getExp());
-				
+				System.out.println(" Server Proxy Marshal m "
+						+ marshalm.toString());
+				System.out.println(" Server Proxy Marshal m Func Name "
+						+ marshalm.getFunctionName());
+				System.out.println(" Server Proxy Marshal m ObjectKey"
+						+ marshalm.getObjectKey());
+				System.out.println(" Server Proxy Marshal m  Objec Name "
+						+ marshalm.getObjName());
+				System.out.println(" Server Proxy Marshal m Ret Val"
+						+ marshalm.getRetVal());
+				System.out.println(" Server Proxy Marshal m Exception"
+						+ marshalm.getExp());
+
 				MessageInvokeFunction marshal2;
 				try {
-					implementation = remoteObjectsMap.get(marshalm.getObjName());
-					//System.out.println("Invoking Function on Server");
-					//System.out.println("Object = " + implementation.toString());
+					// System.out.println("Invoking Function on Server");
+					// System.out.println("Object = " +
+					// implementation.toString());
 					Object returning = implementation
 							.getClass()
 							.getDeclaredMethod(marshalm.getFunctionName(),
@@ -93,8 +86,7 @@ public class ServerProxy implements Runnable {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-
 		}
-
 	}
+
 }

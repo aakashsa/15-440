@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class FooImpl implements Foo {
 
@@ -18,7 +17,7 @@ public class FooImpl implements Foo {
 	@Override
 	public ArrayList<Integer> bar2(ArrayList<Integer> a) {
 
-		ArrayList b = new ArrayList<Integer>();
+		ArrayList<Integer> b = new ArrayList<Integer>();
 		for (int i = a.size() - 1; i >= 0; i--) {
 			b.add(a.get(i));
 		}

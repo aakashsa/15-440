@@ -2,6 +2,7 @@ package registryROR;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class ProxyDemo {
 	public static void main(String[] args) {
@@ -19,20 +20,26 @@ public class ProxyDemo {
 		} 
 		System.out.println("Return 2 =  " + fooProxy.bar(5));
 		System.out.println("Return 1 =  " + fooProxy.barRem(rbarProxy, 17));
-
-		NonSerializable z = new NonSerializable();
+		System.out.println("Return 1 =  " + fooProxy.bar(19));
+		
+		//NonSerializable z = new NonSerializable();
 		//System.out.println("Return 1 =  " + fooProxy.bar2(z));
-		// ArrayList<Integer> z = new ArrayList<Integer>();
-		// z.add(1);
-		// z.add(2);
-		// z.add(3);
-		// z.add(4);
-		// z.add(5);
-
-		// fooProxy.bar();
-		// List<Double> list = new ArrayList<Double>();
+		 ArrayList<Integer> z = new ArrayList<Integer>();
+		 z.add(1);
+		 z.add(2);
+		 z.add(3);
+		 z.add(4);
+		 z.add(5);
+		 for (int i=0; i < z.size(); i++){
+			 System.out.println(" Element " + i + "  = "+ z.get(i));
+		 }
+		 //fooProxy.bar();
+		 //List<Double> list = new ArrayList<Double>();
 		// list.add(2.0);
-		// fooProxy.baz(10, list);
+		 z = fooProxy.bar2(z);
+		 for (int i=0; i < z.size(); i++){
+			 System.out.println(" Element " + i + "  = "+ z.get(i));
+		 }
 	}
 
 }

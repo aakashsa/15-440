@@ -51,6 +51,7 @@ public class RMIRegistry440 {
 		in.close();
 		out.close();
 		if (retMsg.getException() != null) {
+			System.out.println(" GOT BACK EXCEPTION MESSAGE");
 			throw retMsg.getException();
 		} else
 			return retMsg;
