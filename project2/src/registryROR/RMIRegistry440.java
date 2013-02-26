@@ -1,12 +1,10 @@
 package registryROR;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 /**
  * Our RMI Registry class
@@ -34,7 +32,7 @@ public class RMIRegistry440 {
 	public static void rebind(String name, Remote440 remote) throws Exception {
 		RMIRegistryMessage msg = new RMIRegistryMessage(name, remote, false,
 				null);
-		RMIRegistryMessage retMsg = ioHelper(msg);
+		ioHelper(msg);
 	}
 
 	private synchronized static RMIRegistryMessage ioHelper(

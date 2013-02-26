@@ -7,7 +7,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import marshal.MessageInvokeFunction;
@@ -15,7 +14,6 @@ import marshal.MessageInvokeFunction;
 public class ServerRemoteObjectThread implements Runnable {
 
 	private Object implementation;
-	private ConcurrentHashMap<String, Object> remoteObjectsMap;
 	private ServerSocket serverSocket;
 
 	public ServerRemoteObjectThread(Object implementation,
