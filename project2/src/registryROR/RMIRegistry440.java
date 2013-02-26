@@ -18,10 +18,6 @@ public class RMIRegistry440 {
 	private static ObjectOutputStream out = null;
 	private static Socket clientSocket = null;
 
-	// public static void main(String[] args) throws UnknownHostException,
-	// IOException {
-	// //open connections to registry
-	// }
 
 	public static Remote440 lookup(String name) throws Exception {
 		RMIRegistryMessage msg = new RMIRegistryMessage(name, null, true, null);

@@ -1,12 +1,6 @@
 package registryROR;
-
-<<<<<<< HEAD
-import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-=======
->>>>>>> a2bdb08c90e499d5e467a3406c4e086646d24d66
 public class ProxyDemo {
 	public static void main(String[] args) {
 		Foo fooProxy = null;
@@ -23,12 +17,8 @@ public class ProxyDemo {
 		} 
 		System.out.println("Return 2 =  " + fooProxy.bar(5));
 		System.out.println("Return 1 =  " + fooProxy.barRem(rbarProxy, 17));
-<<<<<<< HEAD
 		System.out.println("Return 1 =  " + fooProxy.bar(19));
 		
-=======
-
->>>>>>> a2bdb08c90e499d5e467a3406c4e086646d24d66
 		//NonSerializable z = new NonSerializable();
 		//System.out.println("Return 1 =  " + fooProxy.bar2(z));
 		 ArrayList<Integer> z = new ArrayList<Integer>();
