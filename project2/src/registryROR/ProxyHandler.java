@@ -16,6 +16,11 @@ import java.rmi.RemoteException;
 
 import marshal.MessageInvokeFunction;
 
+/**
+ * The invocation handler class that takes care of marhsalling method
+ * invocations and sending them over to the remote server so the request
+ * can be carried out.
+ */
 public class ProxyHandler implements InvocationHandler, Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -25,11 +30,17 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 		this.ror = r;
 	}
 
+	/**
+	 * The main invoke method. This is called everything a method is invoked on
+	 * and object that is bound to this proxy handler. It does the main chunk
+	 * of the work of marshalling the request and unmarshalling the response.
+	 */
 	@Override
 	public synchronized Object invoke(Object proxy, Method method, Object[] args)
 			throws RemoteException {
-		System.out.printf("Someone called method %s with arguments\n",
-				method.getName());
+		System.out.printf("Someone called method %s with arguments\n", method.getName());
+		
+		// Check if all arguments are remote or serializable, else throw exception.
 		Type[] params = method.getGenericParameterTypes();
 		for (int i = 0; i < params.length; i++) {
 			if ((Serializable.class.isAssignableFrom(args[i].getClass()))) {
@@ -41,7 +52,8 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 				throw new RemoteException("[ERROR]: Object is neither remote nor serializable!");
 		}
 
-		System.out.println("Marshalling");
+		// Marshal request and send it over to server
+		System.out.println("[INFO] Marshalling...");
 		OutputStream output = null;
 		InputStream input = null;
 		ObjectOutputStream out = null; // Slave output stream
@@ -55,12 +67,9 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 			out = new ObjectOutputStream(output);
 			out.flush();
 			in = new ObjectInputStream(input);
-
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Ror.getObject Name in Proxy handler = "
@@ -83,10 +92,8 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 			out.writeObject(marshal);
 			reply = (MessageInvokeFunction) in.readObject();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println(" Reply  " + reply.toString());
@@ -96,8 +103,7 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 		System.out.println(" Reply  Ret Val" + reply.getRetVal());
 		System.out.println(" Reply  Exception" + reply.getExp());
 		if (reply.getExp() != null) {
-			System.out
-					.println("Exception = " + reply.getExp().toString() + " ");
+			System.out.println("Exception = " + reply.getExp().toString() + " ");
 			throw new RemoteException();
 		} else {
 			System.out.printf("Returning %s\n\n", reply.getRetVal());

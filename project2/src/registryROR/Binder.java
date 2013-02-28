@@ -2,9 +2,8 @@ package registryROR;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.ServerSocket;
-import java.rmi.RemoteException;
+import java.net.UnknownHostException;
 
 /**
  * This class is used by the server side implementations to
@@ -21,34 +20,31 @@ public class Binder {
 		try {
 			serverSocket = new ServerSocket(0);
 		} catch (IOException e) {
+			System.out.println("[ERROR]: Couldn't start proxy for object: "+ name);
 			e.printStackTrace();
+			System.exit(0);
 		}
 		int port = serverSocket.getLocalPort();
-		System.out.println(" Port = " + serverSocket.getLocalPort());
+		System.out.println(" Binder on port = " + serverSocket.getLocalPort());
 
+		// Start proxy thread for object
 		Thread t = new Thread(new ServerRemoteObjectThread(impl, serverSocket));
 		t.start();
 
-		// Rebind
-		// Registry registry;
 		try {
-			// registry = LocateRegistry.getRegistry(port);
+			// Rebind the remote object in registry
 			InetAddress addr = InetAddress.getLocalHost();
 			String hostname = addr.getHostName();
-			// System.out.println(" Hostname = " + hostname);
-			RemoteObjectRef ror = new RemoteObjectRef(hostname, port,
-					interface_name, name);
+			RemoteObjectRef ror = new RemoteObjectRef(hostname, port, interface_name, name);
 			RMIRegistry440.rebind(name, ror);
-			// registry.rebind(name, fooSample);
-			System.out.println("Rebing Object");
-		} catch (RemoteException e) {
+			System.out.println("Rebind Object");
+		} catch (UnknownHostException e) {
+			System.out.println("[ERROR]: Binder couldn't get self host");
 			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			System.exit(0);
 		} catch (Exception e) {
+			System.out.println("[ERROR]: Error in binding object to name in registry");
 			e.printStackTrace();
 		}
-
-		System.out.println("HelloGiver bound and ready to give greetings");
 	}
 }

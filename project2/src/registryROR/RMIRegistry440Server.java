@@ -13,11 +13,10 @@ import java.rmi.RemoteException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Still need to send back exceptions like remote exception for methods like
- * rebind
- * 
- * @author nikhiltibrewal
- * 
+ * The RMI Registry! This class is the actual registry. It
+ * maintains a local object that keeps a map of all names
+ * to their remote objects, and serves requests like rebind
+ * and lookup
  */
 public class RMIRegistry440Server {
 
@@ -29,8 +28,7 @@ public class RMIRegistry440Server {
 
 		// Get the port the registry must run on
 		if (args.length != 1) {
-			System.out
-					.println("[ERROR]: Usage java RMIRegistry440Server <port>");
+			System.out.println("[ERROR]: Usage java RMIRegistry440Server <port>");
 			System.exit(0);
 		}
 
@@ -49,8 +47,7 @@ public class RMIRegistry440Server {
 		try {
 			hostname = InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
-			System.out
-					.println("[ERROR]: RMIRegistry440Server couldn't get own hostname. Quitting...");
+			System.out.println("[ERROR]: RMIRegistry440Server couldn't get own hostname. Quitting...");
 			System.exit(0);
 		}
 
@@ -65,11 +62,13 @@ public class RMIRegistry440Server {
 		try {
 			server = new ServerSocket(port);
 		} catch (IOException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			System.out.println("[ERROR]: Could not listen on port: " + port);
 			System.exit(0);
 		}
+		
 		ObjectOutputStream out = null;
+		
 		while (true) {
 			try {
 				clientSocket = server.accept();
@@ -78,52 +77,47 @@ public class RMIRegistry440Server {
 				out = new ObjectOutputStream(output);
 				ObjectInputStream in = new ObjectInputStream(input);
 
-				RMIRegistryMessage message = (RMIRegistryMessage) in
-						.readObject();
+				// Get the request, and carry it out, then send back response
+				RMIRegistryMessage message = (RMIRegistryMessage) in.readObject();
 				if (message.isLookupMessage()) {
 					Remote440 remoteObj = lookup(message.getName());
-					out.writeObject(new RMIRegistryMessage(null, remoteObj,
-							true, null));
+					out.writeObject(new RMIRegistryMessage(null, remoteObj, true, null));
 				} else {
 					rebind(message.getName(), message.getRemoteRef());
-					out.writeObject(new RMIRegistryMessage(null, null, false,
-							null));
+					out.writeObject(new RMIRegistryMessage(null, null, false, null));
 				}
 			} catch (RemoteException e) {
-				System.out.println("Remote Exception E 93");
+				System.out.println("Remote Exception in RMI Registry");
 				try {
 					out.writeObject(new RMIRegistryMessage(null, null, false, e));
 				} catch (IOException e1) {
-					System.out.println("IO Exception E 97");
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			} catch (IOException e) {
-				System.out.println("IO Exception E 102");
+				System.out.println("IO Exception RMI Registry");
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
-				System.out.println("Class NOT FOUND Exception E 105");
+				System.out.println("Class not found exception RMI Registry");
 				e.printStackTrace();
 			}
 		}
 	}
 
+	/**
+	 * The rebind function in the registry. It binds the remote object to the
+	 * given name. If the name has an entry, then that is replaced with the new
+	 * object
+	 */
 	private static void rebind(String name, Remote440 ror) throws RemoteException {
-//		throw new RemoteException();
-		if (remoteObjects.contains(name)) {
-			System.out.println("[INFO]: Rebinding object with name " + name);
-		}
-		System.out.println("[INFO]: BINDINGbinding object with name " + name);
+		System.out.println("[INFO]: Binding object with name " + name);
 		remoteObjects.put(name, ror);
-		for (String a : remoteObjects.keySet()) {
-			System.out.println(" KEYS + " + a);
-		}
 	}
 
+	/**
+	 * The lookup function of the registry. It throws an exception if the name
+	 * isn't bound to anything, otherwise it returns the object bound to the name
+	 */
 	private static Remote440 lookup(String name) throws RemoteException {
-		for (String a : remoteObjects.keySet()) {
-			System.out.println(" KEYS + " + a);
-		}
 		if (!remoteObjects.containsKey(name)) {
 			throw new RemoteException("[ERROR]: Name " + name
 					+ " is not bound! (RMIRegistry440Server)");
