@@ -5,9 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 public interface Foo extends Remote440 {
+
+	int getCounter();
+	
+	void increment();
+	
+	void decrement();
+	
 	int bar(int a);
 
-	int barRem(RemoteBar a, int b);
+	int barRem(int b);
 
 	ArrayList<Integer> bar2(ArrayList<Integer> a);
 

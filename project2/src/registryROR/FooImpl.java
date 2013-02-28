@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class FooImpl implements Foo {
 
+	private int counter = 0;
+
 	@Override
 	public int bar(int a) {
 		// throw new RuntimeException();
@@ -39,17 +41,39 @@ public class FooImpl implements Foo {
 		// TODO Auto-generated method stub
 		System.out.println("YO BARZZZZ");
 	}
+
 	public String bar2(NonSerializable a) {
 		// TODO Auto-generated method stub
 		System.out.println("YO BARZZZZ");
-		return  a.toString();
+		return a.toString();
 	}
 
 	@Override
-	public int barRem(RemoteBar a, int b) {
-		// TODO Auto-generated method stub
-		System.out.println(" barRem in Foo Impl");
-		return 100 + a.getbar() + b;
+	public int barRem(int b) {
+		if (b == 0) {
+			System.out.println("Return Now");
+			return -10;
+		} else {
+			System.out.println("In Foo b = " + b);
+			return this.barRem(b - 1);
+		}
 	}
 
+	@Override
+	public int getCounter() {
+		// TODO Auto-generated method stub
+		return counter;
+	}
+
+	@Override
+	public void increment() {
+		// TODO Auto-generated method stub
+		counter++;
+	}
+
+	@Override
+	public void decrement() {
+		// TODO Auto-generated method stub
+		counter--;
+	}
 }
