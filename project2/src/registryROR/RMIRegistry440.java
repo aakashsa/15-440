@@ -7,17 +7,17 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * Our RMI Registry class
- * 
- * @author nikhiltibrewal
- * 
+ * RMI Registry class. This is a wrapper around the
+ * lookup and rebind methods of the registry. It
+ * essentially takes in the necessary objects from
+ * the caller, and communicates back and forth with
+ * the registry to send and get results.
  */
 public class RMIRegistry440 {
 
 	private static ObjectInputStream in = null;
 	private static ObjectOutputStream out = null;
 	private static Socket clientSocket = null;
-
 
 	public static Remote440 lookup(String name) throws Exception {
 		RMIRegistryMessage msg = new RMIRegistryMessage(name, null, true, null);
@@ -26,8 +26,7 @@ public class RMIRegistry440 {
 	}
 
 	public static void rebind(String name, Remote440 remote) throws Exception {
-		RMIRegistryMessage msg = new RMIRegistryMessage(name, remote, false,
-				null);
+		RMIRegistryMessage msg = new RMIRegistryMessage(name, remote, false, null);
 		ioHelper(msg);
 	}
 

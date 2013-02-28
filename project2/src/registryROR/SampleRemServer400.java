@@ -1,10 +1,9 @@
 package registryROR;
 
+/**
+ * A sample server for testing purposes
+ */
 public class SampleRemServer400 {
-
-	/**
-	 * @param args
-	 */
 
 	public static void main(String[] args) {
 		String name = "Rem";

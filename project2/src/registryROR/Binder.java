@@ -6,20 +6,22 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.rmi.RemoteException;
 
+/**
+ * This class is used by the server side implementations to
+ * do the common process for a remote object, i.e. binding it
+ * in the registry and starting a proxy thread for that object,
+ */
 public class Binder {
 
 	public static void bindObject(String name, String interface_name, Object impl) {
 
-		// registry prt: above 1024 so that we can run it.
-
-		// Spawn proxy
+		// Spawn proxy thread for remote object
 		System.out.println("Spawning Proxy Thread on Server");
 		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(0);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		int port = serverSocket.getLocalPort();
 		System.out.println(" Port = " + serverSocket.getLocalPort());
@@ -40,17 +42,13 @@ public class Binder {
 			// registry.rebind(name, fooSample);
 			System.out.println("Rebing Object");
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		System.out.println("HelloGiver bound and ready to give greetings");
-
 	}
 }

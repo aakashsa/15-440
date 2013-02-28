@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A sample remote object for testing purposes
+ */
 public class FooImpl implements Foo {
 
 	private int counter = 0;
@@ -61,19 +64,16 @@ public class FooImpl implements Foo {
 
 	@Override
 	public int getCounter() {
-		// TODO Auto-generated method stub
 		return counter;
 	}
 
 	@Override
 	public void increment() {
-		// TODO Auto-generated method stub
 		counter++;
 	}
 
 	@Override
 	public void decrement() {
-		// TODO Auto-generated method stub
 		counter--;
 	}
 }

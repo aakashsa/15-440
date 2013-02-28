@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A sample remote interface for testing purposes
+ */
 public interface Foo extends Remote440 {
 
 	int getCounter();

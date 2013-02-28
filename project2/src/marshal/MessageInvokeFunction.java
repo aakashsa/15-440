@@ -1,22 +1,32 @@
 package marshal;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
 
+/**
+ * This class encapsulates a message for invoking a method
+ * on a remote object
+ */
 public class MessageInvokeFunction implements Serializable {
 
-	private Class[] types;
+	private static final long serialVersionUID = 3591693051047559786L;
+	
+	// Store all attributes needed to call a method on a remote object
+	
+	// Need argument objects and their types
+	private Class<?>[] types;
 	private Object[] args;
+	
+	// Function name, return value, and exception
 	private String funName;
 	private Object returnVal;
 	private Exception exp;
+	
 	private int objectKey;
+	// Object name as binded in registry
 	private String objName;
 
-	public MessageInvokeFunction(String funName, Object[] args, Class[] types,
+	// Constructor - just saves all attributes to get later
+	public MessageInvokeFunction(String funName, Object[] args, Class<?>[] types,
 			Object returnVal, Exception exp, int objectKey, String objName) {
 		this.funName = funName;
 		this.args = args;
@@ -27,6 +37,8 @@ public class MessageInvokeFunction implements Serializable {
 		this.objName = objName;
 	}
 
+	// Getters for all fields
+	
 	public int getObjectKey() {
 		return objectKey;
 	}
@@ -43,7 +55,7 @@ public class MessageInvokeFunction implements Serializable {
 		return args;
 	}
 
-	public Class[] getTypes() {
+	public Class<?>[] getTypes() {
 		return types;
 	}
 
