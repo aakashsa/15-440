@@ -15,7 +15,7 @@ public class Binder {
 	public static void bindObject(String name, String interface_name, Object impl) {
 
 		// Spawn proxy thread for remote object
-		System.out.println("Spawning Proxy Thread on Server");
+		System.out.println("[INFO] Spawning proxy thread on server for object: " + name);
 		ServerSocket serverSocket = null;
 		try {
 			serverSocket = new ServerSocket(0);
@@ -25,25 +25,26 @@ public class Binder {
 			System.exit(0);
 		}
 		int port = serverSocket.getLocalPort();
-		System.out.println(" Binder on port = " + serverSocket.getLocalPort());
+		System.out.println("[INFO] Binder for " + name + " on port = " + port);
 
 		// Start proxy thread for object
 		Thread t = new Thread(new ServerRemoteObjectThread(impl, serverSocket));
 		t.start();
+		System.out.println("[INFO] Done spawning proxy thread for " + name);
 
 		try {
 			// Rebind the remote object in registry
 			InetAddress addr = InetAddress.getLocalHost();
 			String hostname = addr.getHostName();
 			RemoteObjectRef ror = new RemoteObjectRef(hostname, port, interface_name, name);
+			System.out.println("[INFO] Attempting to rebind object: " + name);
 			RMIRegistry440.rebind(name, ror);
-			System.out.println("Rebind Object");
 		} catch (UnknownHostException e) {
 			System.out.println("[ERROR]: Binder couldn't get self host");
 			e.printStackTrace();
 			System.exit(0);
 		} catch (Exception e) {
-			System.out.println("[ERROR]: Error in binding object to name in registry");
+			System.out.println("[ERROR]: Error in binding object to name in registry for " + name);
 			e.printStackTrace();
 		}
 	}

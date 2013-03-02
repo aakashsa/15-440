@@ -43,4 +43,9 @@ public class RemoteObjectRef implements Serializable, Remote440 {
 	public int getPort() {
 		return Port;
 	}
+	
+	@Override
+	public String toString() {
+		return "<" + Remote_Interface_Name + "," + IP_adr + "," + Port + ">";
+	}
 }

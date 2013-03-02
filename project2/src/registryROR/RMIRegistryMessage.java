@@ -14,22 +14,30 @@ public class RMIRegistryMessage implements Serializable {
 	// whether the operation is bind or lookup, and an exception
 	private String name;
 	private Remote440 remote;
-	private boolean bindOrLookup;
+	private Request req;
 	private Exception e;
+	private Object retVal;
 	
-	public RMIRegistryMessage(String name, Remote440 r, Boolean flag, Exception e) {
+	public enum Request {REBIND, LOOKUP, ALLOBJECTS, NONE};
+	
+	public RMIRegistryMessage(String name, Remote440 r, Request req, Exception e, Object retVal) {
 		this.name = name;
 		this.remote = r;
-		this.bindOrLookup = flag;
+		this.req = req;
 		this.e = e;
+		this.retVal = retVal;
 	}
 
-	/**
-	 * returns true if the message is a lookup message
-	 * Flag is true for lookup, and false for rebind
-	 */
 	public boolean isLookupMessage() {
-		return bindOrLookup;
+		return req.equals(Request.LOOKUP);
+	}
+	
+	public boolean isRebindMessage() {
+		return req.equals(Request.REBIND);
+	}
+	
+	public boolean isAllObjectsMessage() {
+		return req.equals(Request.ALLOBJECTS);
 	}
 	
 	// Getters for attributes
@@ -44,5 +52,9 @@ public class RMIRegistryMessage implements Serializable {
 		
 	public Exception getException() {
 		return e;
+	}
+	
+	public Object getRetVal() {
+		return retVal;
 	}
 }

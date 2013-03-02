@@ -12,8 +12,6 @@ import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import java.rmi.RemoteException;
-
 import marshal.MessageInvokeFunction;
 
 /**
@@ -37,30 +35,28 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 	 */
 	@Override
 	public synchronized Object invoke(Object proxy, Method method, Object[] args)
-			throws RemoteException {
-		System.out.printf("Someone called method %s with arguments\n", method.getName());
+			throws RemoteException440 {
+		System.out.println("[INFO] Calling method " + method.getName());
 		
 		// Check if all arguments are remote or serializable, else throw exception.
 		Type[] params = method.getGenericParameterTypes();
 		for (int i = 0; i < params.length; i++) {
-			if ((Serializable.class.isAssignableFrom(args[i].getClass()))) {
-				System.out.println("Serializing Object");
-			} else if ((Remote440.class.isAssignableFrom(args[i].getClass()))) {
-				System.out.println("Remote Object");
+			if (!(Serializable.class.isAssignableFrom(args[i].getClass())) &&
+					!(Remote440.class.isAssignableFrom(args[i].getClass()))) {
+				throw new RemoteException440("[ERROR] Object is neither remote nor serializable!");
 			}
-			else
-				throw new RemoteException("[ERROR]: Object is neither remote nor serializable!");
 		}
 
 		// Marshal request and send it over to server
-		System.out.println("[INFO] Marshalling...");
+		System.out.println("[INFO] Marshalling request from ror object " + ror.getObjectName() + "...");
 		OutputStream output = null;
 		InputStream input = null;
-		ObjectOutputStream out = null; // Slave output stream
-		ObjectInputStream in = null; // Slave input stream
-		Socket clientSocket = null; // Client socket
+		ObjectOutputStream out = null;
+		ObjectInputStream in = null;
+		Socket clientSocket = null;
 
 		try {
+			// Connect to the ROR's proxy running on server side
 			clientSocket = new Socket(ror.getIp(), ror.getPort());
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
@@ -72,41 +68,44 @@ public class ProxyHandler implements InvocationHandler, Serializable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Ror.getObject Name in Proxy handler = "
-				+ ror.getObjectName());
-		// (String funName, Object[] args, Class[] types,
-		// Object returnVal, Exception exp, int objectKey,String objName)
-		MessageInvokeFunction marshal = new MessageInvokeFunction(
+		
+		// Create the invoke message object
+		MessageInvokeFunction request = new MessageInvokeFunction(
 				method.getName(), args, method.getParameterTypes(), null, null,
-				0, ror.getObjectName());
+				0, ror.getObjectName(), method.getReturnType());
 		MessageInvokeFunction reply = null;
 
-		System.out.println(" Marshal  " + marshal.toString());
-		System.out.println(" Marshal  Func Name " + marshal.getFunctionName());
-		System.out.println(" Marshal  ObjectKey" + marshal.getObjectKey());
-		System.out.println(" Marshal  Objec Name " + marshal.getObjName());
-		System.out.println(" Marshal  Ret Val" + marshal.getRetVal());
-		System.out.println(" Marshal  Exception" + marshal.getExp());
-
+		System.out.println(" Request Func Name  - " + request.getFunctionName());
+		System.out.println(" Request Objec Name - " + request.getObjName());
+		System.out.println(" Request Ret Val    - " + request.getRetVal());
+		System.out.println(" Request Exception  - " + request.getExp());
+		
+		// Block on reading a response back from remote server
 		try {
-			out.writeObject(marshal);
+			out.writeObject(request);
 			reply = (MessageInvokeFunction) in.readObject();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		System.out.println(" Reply  " + reply.toString());
-		System.out.println(" Reply  Func Name " + reply.getFunctionName());
-		System.out.println(" Reply  ObjectKey" + reply.getObjectKey());
-		System.out.println(" Reply  Objec Name " + reply.getObjName());
-		System.out.println(" Reply  Ret Val" + reply.getRetVal());
-		System.out.println(" Reply  Exception" + reply.getExp());
+
+		if (reply == null) {
+			System.out.println("[ERROR] Reply is null!");
+		}
+		
+		System.out.println(" Reply Func Name  - " + reply.getFunctionName());
+		System.out.println(" Reply Objec Name - " + reply.getObjName());
+		System.out.println(" Reply Ret Val    - " + reply.getRetVal());
+		System.out.println(" Reply Exception  - " + reply.getExp());
+				
+		// Return exception if remote method threw an exception,
+		// else return the return value
 		if (reply.getExp() != null) {
-			System.out.println("Exception = " + reply.getExp().toString() + " ");
-			throw new RemoteException();
+			System.out.println("[ERROR] Exception = " + reply.getExp().toString());
+			throw new RemoteException440(reply.getExp().getLocalizedMessage());
 		} else {
-			System.out.printf("Returning %s\n\n", reply.getRetVal());
+			System.out.printf("[INFO] Returning %s\n\n", reply.getRetVal());
 			return reply.getRetVal();
 		}
 	}

@@ -20,6 +20,7 @@ public class MessageInvokeFunction implements Serializable {
 	private String funName;
 	private Object returnVal;
 	private Exception exp;
+	private Class<?> returnType;
 	
 	private int objectKey;
 	// Object name as binded in registry
@@ -27,7 +28,7 @@ public class MessageInvokeFunction implements Serializable {
 
 	// Constructor - just saves all attributes to get later
 	public MessageInvokeFunction(String funName, Object[] args, Class<?>[] types,
-			Object returnVal, Exception exp, int objectKey, String objName) {
+			Object returnVal, Exception exp, int objectKey, String objName, Class<?> returnType) {
 		this.funName = funName;
 		this.args = args;
 		this.types = types;
@@ -35,6 +36,7 @@ public class MessageInvokeFunction implements Serializable {
 		this.exp = exp;
 		this.objectKey = objectKey;
 		this.objName = objName;
+		this.returnType = returnType;
 	}
 
 	// Getters for all fields
@@ -65,5 +67,9 @@ public class MessageInvokeFunction implements Serializable {
 
 	public Exception getExp() {
 		return exp;
+	}	
+	
+	public Class<?> getReturnType() {
+		return returnType;
 	}
 }

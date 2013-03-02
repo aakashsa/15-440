@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * This is a wrapper around the
@@ -19,12 +20,15 @@ public class RMIRegistry440 {
 	private static ObjectOutputStream out = null;
 	private static Socket clientSocket = null;
 
+	// This value would need to be known before hand
+	private static int registryPort = 4444;
+	
 	/**
 	 * Lookup method - takes in the name of object to lookup,
 	 * and throws exception if anything goes wrong
 	 */
 	public static Remote440 lookup(String name) throws Exception {
-		RMIRegistryMessage msg = new RMIRegistryMessage(name, null, true, null);
+		RMIRegistryMessage msg = new RMIRegistryMessage(name, null, RMIRegistryMessage.Request.LOOKUP, null, null);
 		RMIRegistryMessage retMsg = ioHelper(msg);
 		return retMsg.getRemoteRef();
 	}
@@ -34,8 +38,23 @@ public class RMIRegistry440 {
 	 * If there's an exception, it throws that exception.
 	 */
 	public static void rebind(String name, Remote440 remote) throws Exception {
-		RMIRegistryMessage msg = new RMIRegistryMessage(name, remote, false, null);
+		RMIRegistryMessage msg = new RMIRegistryMessage(name, remote, RMIRegistryMessage.Request.REBIND, null, null);
 		ioHelper(msg);
+	}
+	
+	/**
+	 * All objects method
+	 */
+	public static ArrayList<String> getAllObjects() throws Exception {
+		RMIRegistryMessage msg = new RMIRegistryMessage(null, null, RMIRegistryMessage.Request.ALLOBJECTS, null, null);
+		RMIRegistryMessage retMsg = ioHelper(msg);
+		ArrayList<String> ret = null;
+		try {
+			ret = (ArrayList<String>) retMsg.getRetVal();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 	/**
@@ -45,7 +64,7 @@ public class RMIRegistry440 {
 	 */
 	private synchronized static RMIRegistryMessage ioHelper(
 			RMIRegistryMessage msg) throws Exception {
-		clientSocket = new Socket("localhost", 5123);
+		clientSocket = new Socket("localhost", registryPort);
 		OutputStream output = clientSocket.getOutputStream();
 		InputStream input = clientSocket.getInputStream();
 		out = new ObjectOutputStream(output);

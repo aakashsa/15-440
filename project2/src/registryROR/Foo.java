@@ -26,4 +26,12 @@ public interface Foo extends Remote440 {
 	public String bar2(NonSerializable a);
 
 	Map<String, String> baz(int a, List<Double> b);
+	
+	ArrayList<Integer> modifyByRemoteObj(ArrayList<Integer> a, RemoteBar b);
+	
+	Foo renewRemoteArgument(RemoteBar r);
+	
+	RemoteBar returnRemoteArgument(RemoteBar r);
+	
+	NonSerializable returnObjectNotSerializable();
 }
