@@ -1,5 +1,11 @@
 package registryROR;
 
+
+/**
+ * A class to test if there is any synchronization issues in
+ * ServerRemoteObjectThread. It create two threads that many multiple
+ * calls to the same remote object.
+ */
 public class CallingSameObjectTest {
 
 	public static void main(String[] args) {
