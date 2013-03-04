@@ -1,20 +1,23 @@
 all:
-	javac registryROR/*.java
+	javac rmi440/*/*.java
+	javac rmi440/*/*/*.java
+
 registry:
 	make clean 
 	make all
-	java registryROR/RMIRegistry440Server $(PORT)
+	java rmi440/registrycode/RMIRegistry440Server $(PORT)
+
 rem:
-	java registryROR/SampleRemServer400
+	java rmi440/tests/server/SampleRemServer400
+
 foo: 
-	java registryROR/SampleFooServer440
-servers:
-	java registryROR/SampleRemServer400 &
-	java registryROR/SampleFooServer440 &
+	java rmi440/tests/server/SampleFooServer440
+
 demo:
-	javac registryROR/AllTests.java
-	java registryROR/AllTests
-same:
-	java registryROR/CallingSameObjectTest
+	javac rmi440/tests/client/AllTests.java
+	javac rmi440/tests/client/CallingSameObjectTest.java
+	java rmi440/tests/client/AllTests
+	java rmi440/tests/client/CallingSameObjectTest
+
 clean:
 	find . -name "*.class" -delete
