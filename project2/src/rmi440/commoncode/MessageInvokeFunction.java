@@ -3,8 +3,10 @@ package rmi440.commoncode;
 import java.io.Serializable;
 
 /**
+ * 
  * This class encapsulates a message for invoking a method
- * on a remote object
+ * on a remote object and wrapping the return value or the exception received.
+ * 
  */
 public class MessageInvokeFunction implements Serializable {
 

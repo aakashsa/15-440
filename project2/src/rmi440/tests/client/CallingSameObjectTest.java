@@ -5,7 +5,7 @@ import rmi440.tests.common.Foo;
 
 /**
  * A class to test if there is any synchronization issues in
- * ServerRemoteObjectThread. It create two threads that many multiple
+ * ServerRemoteObjectThread. It create two threads that make multiple
  * calls to the same remote object.
  */
 public class CallingSameObjectTest {
