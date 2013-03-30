@@ -1,4 +1,4 @@
-package NodeFunction;
+package mapper;
 
 import java.util.*;
 
