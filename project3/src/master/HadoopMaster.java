@@ -9,7 +9,7 @@ import communication.ServiceThread;
 
 import lib.Constants;
 
-import nodefunction.RecordReader;
+//import nodefunction.RecordReader;
 
 public class HadoopMaster {
 
@@ -48,12 +48,12 @@ public class HadoopMaster {
 
 		// mod chunk numbers with number of workers
 		for (int i = 0; i < numChunks; i++) {
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(2000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			new Thread(new ServiceThread(i, i % Constants.NUMBER_WORKERS,
 					args[0])).start();
 			// System.out.println("Chunk Number in readChunk Call = " + i);
