@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import communication.ChunkObject;
 import communication.MessageClass;
 
 import lib.Constants;
@@ -32,11 +33,9 @@ public class WorkerMain {
 				ObjectOutputStream out = new ObjectOutputStream(output);
 				out.flush();
 				ObjectInputStream in = new ObjectInputStream(input);
-				MessageClass readMessage = (MessageClass) in.readObject();
-				RecordReader.readChunk(readMessage.getChunkNumber(),
-						lib.Constants.CHUNK_SIZE, lib.Constants.RECORD_SIZE,
-						readMessage.getFileName());
-				out.writeObject(new Integer(1));
+				ChunkObject readMessage = (ChunkObject) in.readObject();
+				RecordReader.readChunk(readMessage);
+				out.writeObject(new Integer(readMessage.getChunkNumber()));
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

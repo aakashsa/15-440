@@ -15,16 +15,14 @@ public class ServiceThread implements Runnable {
 
 	private String host;
 	private int port;
-	private int chunkNumber;
 	private int workerNumber;
-	private String fileName;
+	private ChunkObject chunk;
 
-	public ServiceThread(int chunkNumber, int workerNumber, String fileName) {
+	public ServiceThread(ChunkObject chunk, int workerNumber) {
 		this.host = Constants.WORKER_HOSTS[workerNumber];
 		this.port = Constants.WORKER_PORTS[workerNumber];
-		this.chunkNumber = chunkNumber;
 		this.workerNumber = workerNumber;
-		this.fileName = fileName;
+		this.chunk = chunk;
 	}
 
 	@Override
@@ -36,12 +34,17 @@ public class ServiceThread implements Runnable {
 					.getOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(output);
 			out.flush();
-			out.writeObject(new MessageClass(chunkNumber, Constants.CHUNK_SIZE,
-					Constants.RECORD_SIZE, fileName));
+			out.writeObject(chunk);
 			InputStream input = HadoopMaster.workerSocket[workerNumber]
 					.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
-			System.out.println("Got Back Ack = " + in.readObject());
+			System.out.println("Got Back Ack for chunk number = "
+					+ in.readObject());
+			synchronized (HadoopMaster.OBJ_LOCK) {
+				HadoopMaster.freeWorkers.add(workerNumber);
+				HadoopMaster.busyWorkerMap.remove(workerNumber);
+				HadoopMaster.chunkWorkerMap.remove(chunk);
+			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

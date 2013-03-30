@@ -2,8 +2,8 @@ package lib;
 
 public class Constants {
 
-	public static final int RECORD_SIZE = 1024;
-	public static final int CHUNK_SIZE = 2048;
+	public static final int RECORD_SIZE = 128;
+	public static final int CHUNK_SIZE = 5000;
 	public static final int NUMBER_MAPPERS = 4;
 	public static final int NUMBER_REDUCERS = 4;
 	public static final int NUMBER_WORKERS = 4;
