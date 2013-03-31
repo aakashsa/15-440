@@ -8,8 +8,6 @@ import communication.ServiceThread;
 import lib.Constants;
 import java.util.concurrent.*;
 
-//import nodefunction.RecordReader;
-
 public class HadoopMaster {
 
 	public static Socket[] workerSocket;
@@ -27,28 +25,29 @@ public class HadoopMaster {
 	 */
 	public static void main(String[] args) {
 
+		// Initialize status data structures
 		chunkQueue = new ConcurrentLinkedQueue<ChunkObject>();
 		freeWorkers = new ConcurrentLinkedQueue<Integer>();
 		chunkWorkerMap = new ConcurrentHashMap<ChunkObject, Integer>();
 		busyWorkerMap = new ConcurrentHashMap<Integer, ChunkObject>();
-		// TODO Auto-generated method stub
+
+		// Get input file name and size
 		System.out.println("File Path = " + args[0]);
 		File f = new File(args[0]);
 		int fileSize = (int) f.length();
 		System.out.println("File Size = " + fileSize);
 
 		int round = (fileSize % lib.Constants.RECORD_SIZE);
-		int numRecordsFile = (fileSize / lib.Constants.RECORD_SIZE);
+		int numRecordsInFile = (fileSize / lib.Constants.RECORD_SIZE);
 		if (round != 0)
-			numRecordsFile++;
+			numRecordsInFile++;
 		round = (lib.Constants.CHUNK_SIZE % lib.Constants.RECORD_SIZE);
-		int numRecordsChunk = lib.Constants.CHUNK_SIZE
-				/ lib.Constants.RECORD_SIZE;
+		int numRecordsPerChunk = lib.Constants.CHUNK_SIZE / lib.Constants.RECORD_SIZE;
 
-		System.out.println(" num of Records per File = " + numRecordsFile);
-		System.out.println(" num of Records per Chunk = " + numRecordsChunk);
+		System.out.println(" num of Records in File = " + numRecordsInFile);
+		System.out.println(" num of Records per Chunk = " + numRecordsPerChunk);
 
-		int numChunks = numRecordsFile / numRecordsChunk;
+		int numChunks = numRecordsInFile / numRecordsPerChunk;
 		if (round != 0)
 			numChunks++;
 		System.out.println(" num of Chunks = " + numChunks);
@@ -60,12 +59,12 @@ public class HadoopMaster {
 		}
 		// mod chunk numbers with number of workers
 		for (int i = 0; i < numChunks; i++) {
-			ChunkObject chunKey = new ChunkObject(i, i * numRecordsChunk,
-					numRecordsChunk, lib.Constants.RECORD_SIZE, args[0]);
+			ChunkObject chunKey = new ChunkObject(i, i * numRecordsPerChunk,
+					numRecordsPerChunk, lib.Constants.RECORD_SIZE, args[0]);
 			chunkQueue.add(chunKey);
 			chunkWorkerMap.put(chunKey, -1);
 		}
-		while (!chunkWorkerMap.isEmpty() || !chunkQueue.isEmpty()) {
+		while (!chunkWorkerMap.isEmpty() && !chunkQueue.isEmpty()) {
 			synchronized (OBJ_LOCK) {
 				if (!freeWorkers.isEmpty() && !chunkQueue.isEmpty()) {
 					ChunkObject chunkJob = null;
