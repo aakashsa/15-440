@@ -7,6 +7,10 @@ import java.io.Serializable;
  * map task.
  */
 public class ChunkObject implements Serializable{
+	
+	// serial ID
+	private static final long serialVersionUID = 265849063821656550L;
+
 	// number of this chunk (like a chunk ID)
 	private int chunkNumber;
 	
