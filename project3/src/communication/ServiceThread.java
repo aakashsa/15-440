@@ -38,9 +38,10 @@ public class ServiceThread implements Runnable {
 			InputStream input = HadoopMaster.workerSocket[workerNumber]
 					.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
-			System.out.println("Got Back Ack for chunk number = "
-					+ in.readObject());
+			int read = (Integer) in.readObject();
 			synchronized (HadoopMaster.OBJ_LOCK) {
+				HadoopMaster.fileSizeRead += read;
+				System.out.println("new File Size  = " + HadoopMaster.fileSizeRead);
 				HadoopMaster.freeWorkers.add(workerNumber);
 				HadoopMaster.busyWorkerMap.remove(workerNumber);
 				HadoopMaster.chunkWorkerMap.remove(chunk);

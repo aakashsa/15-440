@@ -1,5 +1,7 @@
 package nodework;
 
+import interfaces.Mapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -7,11 +9,14 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 
 import communication.ChunkObject;
 import communication.MessageClass;
 
 import lib.Constants;
+import mapper.NaiveMapperIntString;
+import mapper.NaiveMapperStringString;
 
 public class WorkerMain {
 
@@ -34,8 +39,39 @@ public class WorkerMain {
 				out.flush();
 				ObjectInputStream in = new ObjectInputStream(input);
 				ChunkObject readMessage = (ChunkObject) in.readObject();
-				RecordReader.readChunk(readMessage);
-				out.writeObject(new Integer(readMessage.getChunkNumber()));
+				Iterator<String> itr = RecordReader.readChunk(readMessage);
+				Mapper mapper = null;
+				if (Constants.fileInputFormat.equals("TEXTFORMAT")) {
+					mapper = new NaiveMapperIntString();
+
+					int i = 0;
+					while (itr.hasNext()) {
+						String element = itr.next();
+						mapper.map(i, element);
+						i++;
+					}
+				} else {
+					mapper = new NaiveMapperStringString();
+					while (itr.hasNext()) {
+						String element = itr.next();
+						String[] keyValue = element.split("\t");
+						Class[] methodParameters = new Class[] { String.class,
+								String.class };
+						try {
+							mapper.getClass().getDeclaredMethod("map",
+									methodParameters);
+							mapper.map(keyValue[0], keyValue[1]);
+						} catch (SecurityException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (NoSuchMethodException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+
+				out.writeObject(new Integer(RecordReader.read));
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

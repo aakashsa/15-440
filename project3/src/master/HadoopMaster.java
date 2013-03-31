@@ -20,6 +20,7 @@ public class HadoopMaster {
 
 	public static final Object OBJ_LOCK = new Object();
 
+	public static int fileSizeRead = 0;
 	/*
 	 * * @param args
 	 */
@@ -76,7 +77,6 @@ public class HadoopMaster {
 				}
 			}
 		}
-
 		// System.out.println("Chunk Number in readChunk Call = " + i);
 		// RecordReader.readChunk(i, lib.Constants.CHUNK_SIZE,
 		// lib.Constants.RECORD_SIZE, args[0]);
