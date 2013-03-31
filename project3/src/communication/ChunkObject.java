@@ -2,14 +2,34 @@ package communication;
 
 import java.io.Serializable;
 
-
+/**
+ * A class that encapsulates a chunk of the input file for each
+ * map task.
+ */
 public class ChunkObject implements Serializable{
+	// number of this chunk (like a chunk ID)
 	private int chunkNumber;
+	
+	// record this chunk starts at
 	private int startingRecord;
+	
+	// number of records in this chunk
 	private int numRecordsChunk;
+	
+	// size of each record
 	private int recordSize;
+	
+	// filename to read chunks from
 	private String fileName;
 
+	/**
+	 * Constructor that makes private copies of arguments.
+	 * @param chunkNumber
+	 * @param startingRecord
+	 * @param numRecordsChunk
+	 * @param recordSize
+	 * @param fileName
+	 */
 	public ChunkObject(int chunkNumber, int startingRecord,
 			int numRecordsChunk, int recordSize, String fileName) {
 		this.startingRecord = startingRecord;
@@ -19,6 +39,9 @@ public class ChunkObject implements Serializable{
 		this.chunkNumber = chunkNumber;
 	}
 
+	/**
+	 * Check if two chunks are equal
+	 */
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ChunkObject))
 			return false;
@@ -46,7 +69,6 @@ public class ChunkObject implements Serializable{
 
 	/**
 	 * @param startingRecord
-	 *            the startingRecord to set
 	 */
 	public void setStartingRecord(int startingRecord) {
 		this.startingRecord = startingRecord;
@@ -61,7 +83,6 @@ public class ChunkObject implements Serializable{
 
 	/**
 	 * @param numRecordsChunk
-	 *            the numRecordsChunk to set
 	 */
 	public void setNumRecordsChunk(int numRecordsChunk) {
 		this.numRecordsChunk = numRecordsChunk;
@@ -76,7 +97,6 @@ public class ChunkObject implements Serializable{
 
 	/**
 	 * @param recordSize
-	 *            the recordSize to set
 	 */
 	public void setRecordSize(int recordSize) {
 		this.recordSize = recordSize;
@@ -91,7 +111,6 @@ public class ChunkObject implements Serializable{
 
 	/**
 	 * @param fileName
-	 *            the fileName to set
 	 */
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
@@ -106,7 +125,6 @@ public class ChunkObject implements Serializable{
 
 	/**
 	 * @param chunkNumber
-	 *            the chunkNumber to set
 	 */
 	public void setChunkNumber(int chunkNumber) {
 		this.chunkNumber = chunkNumber;
