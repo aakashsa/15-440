@@ -21,6 +21,7 @@ public class HadoopMaster {
 	public static final Object OBJ_LOCK = new Object();
 
 	public static int fileSizeRead = 0;
+
 	/*
 	 * * @param args
 	 */
@@ -42,13 +43,15 @@ public class HadoopMaster {
 		int numRecordsInFile = (fileSize / lib.Constants.RECORD_SIZE);
 		if (round != 0)
 			numRecordsInFile++;
-		round = (lib.Constants.CHUNK_SIZE % lib.Constants.RECORD_SIZE);
-		int numRecordsPerChunk = lib.Constants.CHUNK_SIZE / lib.Constants.RECORD_SIZE;
+		int numRecordsPerChunk = lib.Constants.CHUNK_SIZE
+				/ lib.Constants.RECORD_SIZE;
 
 		System.out.println(" num of Records in File = " + numRecordsInFile);
 		System.out.println(" num of Records per Chunk = " + numRecordsPerChunk);
 
-		int numChunks = numRecordsInFile / numRecordsPerChunk;
+		int numChunks = fileSize / (numRecordsPerChunk * Constants.RECORD_SIZE);
+		round = fileSize % (numRecordsPerChunk * Constants.RECORD_SIZE);
+
 		if (round != 0)
 			numChunks++;
 		System.out.println(" num of Chunks = " + numChunks);
