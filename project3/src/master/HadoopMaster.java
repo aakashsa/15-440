@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.net.Socket;
 import communication.ChunkObject;
 import communication.ServiceThread;
+import communication.WorkerInfo;
 
 import lib.Constants;
+import lib.ConstantsParser;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -23,7 +25,7 @@ import org.json.simple.parser.ParseException;
 
 public class HadoopMaster {
 
-	public static Socket[] workerSocket;
+	public static Socket[] workerSockets;
 
 	public static ConcurrentLinkedQueue<ChunkObject> chunkQueue;
 	public static ConcurrentLinkedQueue<Integer> freeWorkers;
@@ -46,47 +48,21 @@ public class HadoopMaster {
 		chunkWorkerMap = new ConcurrentHashMap<ChunkObject, Integer>();
 		busyWorkerMap = new ConcurrentHashMap<Integer, ChunkObject>();
 
-		// Parse the JSON config file
-		long recordSize = -1;
-		long chunkSize = -1;
-		long numMappers = -1;
-		long numReducers = -1;
-		long numWorkers = -1;
-		String fileInputFormat = "";
-		HashMap<Integer, String> allWorkers = new HashMap<Integer, String>();
+		String inputFile = args[0];
 		
-		JSONParser parser = new JSONParser();
-		try {
-			//URL f = Constants.class.getClassLoader().getResource("lib/Constants.json");
-			//System.out.println("File: " + f.getFile());
-			//JSONArray a = (JSONArray) parser.parse(new FileReader(f.getFile()));
-			JSONObject o = (JSONObject) parser.parse(new FileReader("/Users/nikhiltibrewal/Desktop/Nikhil/CMU/Junior/Spring 13/15-440/hw1/15-440/project3/bin/lib/Constants.json"));
-			
-			chunkSize = (Long) o.get("CHUNK_SIZE");
-			recordSize = (Long) o.get("RECORD_SIZE");
-			numMappers = (Long) o.get("NUMBER_MAPPERS");
-			numReducers = (Long) o.get("NUMBER_REDUCERS");
-			numWorkers = (Long) o.get("NUMBER_WORKERS");
-			fileInputFormat = (String) o.get("FILE_INPUT_FORMAT");
-			
-			int workerNum = 0;
-			JSONArray workers = (JSONArray) o.get("WORKERS");
-			for (Object obj : workers) {
-				workerNum++;
-				JSONObject worker = (JSONObject) obj;
-				allWorkers.put(workerNum, worker.get("host") + "," + worker.get("port"));
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		// Parse the JSON config file
+		ConstantsParser cp = new ConstantsParser();
+		long recordSize = cp.getRecordSize();
+		long chunkSize = cp.getChunkSize();
+		long numMappers = cp.getNumMappers();
+		long numReducers = cp.getNumReducers();
+		String fileInputFormat = cp.getInputFormat();
+		HashMap<Integer, WorkerInfo> allWorkers = cp.getAllWorkers();
+		int numWorkers = allWorkers.size();
 		
 		// Get input file name and size
-		System.out.println("File Path = " + args[0]);
-		File f = new File(args[0]);
+		System.out.println("File Path = " + inputFile);
+		File f = new File(inputFile);
 		int fileSize = (int) f.length();
 		System.out.println("File Size = " + fileSize);
 
@@ -107,13 +83,15 @@ public class HadoopMaster {
 		System.out.println(" num of Chunks = " + numChunks);
 
 		// Spawn threads for telling workers to map appropriate chunks
-		workerSocket = new Socket[(int) numWorkers];
+		// First add all workers to free workers queue
+		workerSockets = new Socket[(int) numWorkers];
 		for (int i = 0; i < numWorkers; i++) {
 			freeWorkers.add(i);
 		}
-		// mod chunk numbers with number of workers
+		
+		// Add all chunks to chunk queue, and assign to null workers initially
 		for (int i = 0; i < numChunks; i++) {
-			ChunkObject chunKey = new ChunkObject(i, i * numRecordsPerChunk, numRecordsPerChunk, (int) recordSize, args[0]);
+			ChunkObject chunKey = new ChunkObject(i, i * numRecordsPerChunk, numRecordsPerChunk, (int) recordSize, inputFile);
 			chunkQueue.add(chunKey);
 			chunkWorkerMap.put(chunKey, -1);
 		}
@@ -125,7 +103,7 @@ public class HadoopMaster {
 					chunkJob = chunkQueue.remove();
 					newWorker = freeWorkers.remove();
 					busyWorkerMap.put(newWorker, chunkJob);
-					new Thread(new ServiceThread(chunkJob, newWorker)).start();
+					new Thread(new ServiceThread(chunkJob, newWorker, allWorkers.get(newWorker))).start();
 				}
 			}
 		}

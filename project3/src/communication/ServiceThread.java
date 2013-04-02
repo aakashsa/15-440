@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import lib.Constants;
 import master.HadoopMaster;
 
 public class ServiceThread implements Runnable {
@@ -18,9 +17,9 @@ public class ServiceThread implements Runnable {
 	private int workerNumber;
 	private ChunkObject chunk;
 
-	public ServiceThread(ChunkObject chunk, int workerNumber) {
-		this.host = Constants.WORKER_HOSTS[workerNumber];
-		this.port = Constants.WORKER_PORTS[workerNumber];
+	public ServiceThread(ChunkObject chunk, int workerNumber, WorkerInfo wi) {
+		this.host = wi.getHost();
+		this.port = wi.getPort();
 		this.workerNumber = workerNumber;
 		this.chunk = chunk;
 	}
@@ -29,13 +28,13 @@ public class ServiceThread implements Runnable {
 	public void run() {
 		// Opening a Socket and sending a request to map a chunk
 		try {
-			HadoopMaster.workerSocket[workerNumber] = new Socket(host, port);
-			OutputStream output = HadoopMaster.workerSocket[workerNumber]
+			HadoopMaster.workerSockets[workerNumber] = new Socket(host, port);
+			OutputStream output = HadoopMaster.workerSockets[workerNumber]
 					.getOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(output);
 			out.flush();
 			out.writeObject(chunk);
-			InputStream input = HadoopMaster.workerSocket[workerNumber]
+			InputStream input = HadoopMaster.workerSockets[workerNumber]
 					.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
 			int read = (Integer) in.readObject();

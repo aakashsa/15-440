@@ -3,7 +3,6 @@
 	"CHUNK_SIZE":9,
 	"NUMBER_MAPPERS":2,
 	"NUMBER_REDUCERS":2,
-	"NUMBER_WORKERS":2,
 	"WORKERS":[
 	{
 		"host":"localhost",
@@ -20,5 +19,5 @@
 		"host":"localhost",
 		"port":9056
 	}],
-	"FILE_INPUT_FORMAT":"KEYVALUEFORMAT"
+	"FILE_INPUT_FORMAT":"KEYVALUEINPUTFORMAT"
 }

@@ -12,9 +12,8 @@ import java.net.Socket;
 import java.util.Iterator;
 
 import communication.ChunkObject;
-import communication.MessageClass;
 
-import lib.Constants;
+import lib.ConstantsParser;
 import mapper.NaiveMapperIntString;
 import mapper.NaiveMapperStringString;
 
@@ -25,12 +24,12 @@ public class WorkerMain {
 	 */
 	public static void main(String[] args) {
 
-		// TODO Auto-generated method stub
 		ServerSocket server = null;
-		int workernum = Integer.parseInt(args[0]);
+		int workerNum = Integer.parseInt(args[0]);
 		System.out.println("Worker number " + args[0]);
+		ConstantsParser cp = new ConstantsParser();
 		try {
-			server = new ServerSocket(Constants.WORKER_PORTS[workernum]);
+			server = new ServerSocket(cp.getAllWorkers().get(workerNum).getPort());
 			while (true) {
 				Socket workerSocket = server.accept();
 				OutputStream output = workerSocket.getOutputStream();
@@ -41,7 +40,7 @@ public class WorkerMain {
 				ChunkObject readMessage = (ChunkObject) in.readObject();
 				Iterator<String> itr = RecordReader.readChunk(readMessage);
 				Mapper mapper = null;
-				if (Constants.fileInputFormat.equals("TEXTFORMAT")) {
+				if (cp.getInputFormat().equals("TEXTINPUTFORMAT")) {
 					mapper = new NaiveMapperIntString();
 
 					int i = 0;
@@ -50,7 +49,7 @@ public class WorkerMain {
 						mapper.map(i, element);
 						i++;
 					}
-				} else {
+				} else { // input format is KEYVALUEINPUTFORMAT
 					mapper = new NaiveMapperStringString();
 					while (itr.hasNext()) {
 						String element = itr.next();
