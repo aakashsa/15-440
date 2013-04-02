@@ -1,0 +1,24 @@
+{
+	"RECORD_SIZE":9,
+	"CHUNK_SIZE":9,
+	"NUMBER_MAPPERS":2,
+	"NUMBER_REDUCERS":2,
+	"NUMBER_WORKERS":2,
+	"WORKERS":[
+	{
+		"host":"localhost",
+		"port":9045
+	},
+	{
+		"host":"localhost",
+		"port":9056
+	},
+	{
+		"host":"localhost",
+		"port":9056
+	},{
+		"host":"localhost",
+		"port":9056
+	}],
+	"FILE_INPUT_FORMAT":"KEYVALUEFORMAT"
+}

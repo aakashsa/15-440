@@ -15,10 +15,10 @@ public class ChunkObject implements Serializable{
 	private int chunkNumber;
 	
 	// record this chunk starts at
-	private int startingRecord;
+	private long startingRecord;
 	
 	// number of records in this chunk
-	private int numRecordsChunk;
+	private long numRecordsChunk;
 	
 	// size of each record
 	private int recordSize;
@@ -29,15 +29,15 @@ public class ChunkObject implements Serializable{
 	/**
 	 * Constructor that makes private copies of arguments.
 	 * @param chunkNumber
-	 * @param startingRecord
-	 * @param numRecordsChunk
+	 * @param l
+	 * @param numRecordsPerChunk
 	 * @param recordSize
 	 * @param fileName
 	 */
-	public ChunkObject(int chunkNumber, int startingRecord,
-			int numRecordsChunk, int recordSize, String fileName) {
-		this.startingRecord = startingRecord;
-		this.numRecordsChunk = numRecordsChunk;
+	public ChunkObject(int chunkNumber, long l,
+			long numRecordsPerChunk, int recordSize, String fileName) {
+		this.startingRecord = l;
+		this.numRecordsChunk = numRecordsPerChunk;
 		this.recordSize = recordSize;
 		this.fileName = fileName;
 		this.chunkNumber = chunkNumber;
@@ -67,7 +67,7 @@ public class ChunkObject implements Serializable{
 	/**
 	 * @return the startingRecord
 	 */
-	public int getStartingRecord() {
+	public long getStartingRecord() {
 		return startingRecord;
 	}
 
@@ -81,7 +81,7 @@ public class ChunkObject implements Serializable{
 	/**
 	 * @return the numRecordsChunk
 	 */
-	public int getNumRecordsChunk() {
+	public long getNumRecordsChunk() {
 		return numRecordsChunk;
 	}
 
