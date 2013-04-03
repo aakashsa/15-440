@@ -22,17 +22,17 @@
 	"FILE_INPUT_FORMAT":"TextInputFormat",
 	"TYPES": {
 		"MAPPER":{
-			"K1":"IntWritable",
+			"K1":"NullWritable",
 			"V1":"TextWritable",
-			"K2":"IntWritable",
-			"V2":"TextWritable"
+			"K2":"TextWritable",
+			"V2":"IntWritable"
 		},
 		"REDUCER":{
-			"K1":"IntWritable",
-			"V1":"TextWritable",
-			"K2":"IntWritable",
+			"K1":"TextWritable",
+			"V1":"IntWritable",
+			"K2":"TextWritable",
 			"V2":"IntWritable"
 		}
 	},
-	"MAPPERCLASS":"NaiveMapperIntString"
+	"MAPPERCLASS":"WordCountMapper"
 }

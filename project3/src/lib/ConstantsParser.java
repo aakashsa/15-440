@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import org.json.simple.JSONArray;
@@ -35,12 +34,10 @@ public class ConstantsParser {
 	private Class<?> mapperClass;
 
 	public static void main(String[] args) {
-		ConstantsParser cp = new ConstantsParser();
+		new ConstantsParser();
 	}
 
 	public ConstantsParser() {
-		System.out.println("Constructor");
-
 		parseConstants();
 	}
 
@@ -58,8 +55,7 @@ public class ConstantsParser {
 			// System.out.println("File: " + f.getFile());
 			// JSONArray a = (JSONArray) parser.parse(new
 			// FileReader(f.getFile()));
-			JSONObject o = (JSONObject) parser.parse(new FileReader(
-					"lib/Constants.json"));
+			JSONObject o = (JSONObject) parser.parse(new FileReader("src/lib/Constants.json"));
 
 			recordSize = (Long) o.get("RECORD_SIZE");
 			if (recordSize <= 0)

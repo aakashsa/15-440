@@ -53,20 +53,13 @@ public class WorkerMain {
 				Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>> mapper = 
 						(Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>>) mapperClass.newInstance();
 				Context<Writable<?>, Writable<?>> cx = new Context<Writable<?>, Writable<?>>();
-				if (cx==null)
-					System.out.println("Problem EARLY !!!");
 				
 				while (itr.hasNext()) {
 					InputFormat<Writable<?>, Writable<?>> iformat = itr.next();
-					if (cx==null)
-						System.out.println("Problem BEFORE !!!");
-					if (iformat==null)
-						System.out.println("Problem 2 !!!");
-					if (mapper==null)
-						System.out.println("Problem 3 !!!");
 					cx = mapper.map(iformat.getKey(), iformat.getValue(), cx);
-					if (cx==null)
-						System.out.println("Problem !!!");
+					if (cx == null) {
+						throw new RuntimeException("Mapper returned Null Context");
+					}
 					ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
 					// WRITE THIS SHIT TO FILE! for now, printing it out
 					for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {

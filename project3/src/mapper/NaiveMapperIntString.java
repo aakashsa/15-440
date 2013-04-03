@@ -25,5 +25,4 @@ public class NaiveMapperIntString implements
 		}
 		return context;
 	}
-
 }

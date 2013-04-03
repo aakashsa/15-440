@@ -2,17 +2,17 @@ package lib;
 
 import interfaces.InputFormat;
 
-public class TextInputFormat extends InputFormat<IntWritable, TextWritable> {
+public class TextInputFormat extends InputFormat<NullWritable, TextWritable> {
 	
 	private TextWritable value;
-	private IntWritable key = new IntWritable(0);
+	private NullWritable key = new NullWritable();
 	
 	@Override
 	public void parse(String str) {
 		value = new TextWritable(str);
 	}
 	
-	public IntWritable getKey() {
+	public NullWritable getKey() {
 		return key;
 	}
 	
@@ -22,7 +22,7 @@ public class TextInputFormat extends InputFormat<IntWritable, TextWritable> {
 
 	@Override
 	public String getKeyType() {
-		return IntWritable.class.getName();
+		return NullWritable.class.getName();
 	}
 
 	@Override

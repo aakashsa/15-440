@@ -10,6 +10,9 @@ public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable>
 	@Override
 	public void parse(String str) {
 		String[] contents = str.split("\\t");
+		if (!(contents.length == 2)) {
+			throw new RuntimeException("Couldn't parse key and value from input '" + str + "'");
+		}
 		value = new TextWritable(contents[1]);
 		key = new TextWritable(contents[0]);
 	}
