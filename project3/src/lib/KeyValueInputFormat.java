@@ -2,26 +2,36 @@ package lib;
 
 import interfaces.InputFormat;
 
-public class KeyValueInputFormat extends InputFormat<String, String> {
+public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable> {
 
-	private String value;
-	private String key;
+	private TextWritable value;
+	private TextWritable key;
 
 	@Override
 	public void parse(String str) {
 		String[] contents = str.split("\\t");
-		value = contents[1];
-		key = contents[0];
+		value = new TextWritable(contents[1]);
+		key = new TextWritable(contents[0]);
 	}
 
 	@Override
-	public String getKey() {
+	public TextWritable getKey() {
 		return key;
 	}
 
 	@Override
-	public String getValue() {
+	public TextWritable getValue() {
 		return value;
+	}
+
+	@Override
+	public String getKeyType() {
+		return TextWritable.class.getName();
+	}
+
+	@Override
+	public String getValueType() {
+		return TextWritable.class.getName();
 	}
 
 }

@@ -2,32 +2,17 @@ package mapper;
 
 import interfaces.Mapper;
 
-import java.util.StringTokenizer;
+import lib.IntWritable;
+import lib.NullWritable;
+import lib.TextWritable;
 
 import nodework.Context;
 
 public class NaiveMapperStringString implements
-		Mapper<String, String, String, Integer> {
-	public void map(String key, String value) {
-		 System.out.println("Key = " + key + " Value = " + value);
-//	
-		// System.out.println("Startign to do String ");
-//		String word;
-//
-//		// TODO Auto-generated method stub
-//		String line = value.toString();
-//		StringTokenizer tokenizer = new StringTokenizer(line);
-//		while (tokenizer.hasMoreTokens()) {
-//			word = tokenizer.nextToken();
-//			 System.out.println("Key = " + word + " Value = " + 1);
-//		}
-	}
+		Mapper<NullWritable, TextWritable, TextWritable, IntWritable> {
 
 	@Override
-	public Context map(String key, String value, Context context) {
-		 System.out.println("Key = " + key + " Value = " + value);
-
-		// TODO Auto-generated method stub
+	public Context<TextWritable, IntWritable> map(NullWritable key, TextWritable value, Context<TextWritable, IntWritable> context) {
 		return null;
 	}
 }

@@ -17,6 +17,7 @@ public abstract class Writable<T> implements Serializable {
 		validFormats.add("TextWritable");
 		validFormats.add("LongWritable");
 		validFormats.add("DoubleWritable");
+		validFormats.add("NullWritable");
 		return validFormats;
 	}
 }

@@ -1,25 +1,15 @@
 package master;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.net.Socket;
 import communication.ChunkObject;
 import communication.ServiceThread;
 import communication.WorkerInfo;
 
-import lib.Constants;
 import lib.ConstantsParser;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.concurrent.*;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class HadoopMaster {
 
@@ -35,9 +25,6 @@ public class HadoopMaster {
 
 	public static int fileSizeRead = 0;
 
-	/*
-	 * * @param args
-	 */
 	public static void main(String[] args) {
 
 		// Initialize status data structures
@@ -52,9 +39,6 @@ public class HadoopMaster {
 		ConstantsParser cp = new ConstantsParser();
 		long recordSize = cp.getRecordSize();
 		long chunkSize = cp.getChunkSize();
-		long numMappers = cp.getNumMappers();
-		long numReducers = cp.getNumReducers();
-		String fileInputFormat = cp.getInputFormat();
 		HashMap<Integer, WorkerInfo> allWorkers = cp.getAllWorkers();
 		int numWorkers = allWorkers.size();
 

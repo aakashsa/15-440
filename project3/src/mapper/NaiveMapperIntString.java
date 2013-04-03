@@ -13,11 +13,9 @@ public class NaiveMapperIntString implements
 		Mapper<IntWritable, TextWritable, IntWritable, TextWritable> {
 
 	@Override
-	public Context map(IntWritable key, TextWritable value, Context context) {
-		// System.out.println("Startign to do String ");
+	public Context<IntWritable, TextWritable> map(IntWritable key, TextWritable value, Context<IntWritable, TextWritable> context) {
 		String word;
 
-		// TODO Auto-generated method stub
 		String line = value.getValue();
 		StringTokenizer tokenizer = new StringTokenizer(line);
 		while (tokenizer.hasMoreTokens()) {

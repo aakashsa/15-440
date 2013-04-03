@@ -3,13 +3,13 @@ package interfaces;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class InputFormat<K,V> {
+public abstract class InputFormat<K extends Writable<?>, V extends Writable<?>> {
 	
 	private static Set<String> validFormats = new HashSet<String>();
 	
 	public static Set<String> validInputFormats() {
-		validFormats.add("TEXTINPUTFORMAT");
-		validFormats.add("KEYVALUEINPUTFORMAT");
+		validFormats.add("TextInputFormat");
+		validFormats.add("KeyValueInputFormat");
 		return validFormats;
 	}
 	
@@ -18,4 +18,8 @@ public abstract class InputFormat<K,V> {
 	public abstract K getKey();
 	
 	public abstract V getValue();
+	
+	public abstract String getKeyType();
+	
+	public abstract String getValueType();
 }
