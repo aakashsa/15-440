@@ -9,6 +9,7 @@ public class IntWritable extends Writable<Integer> {
 	
 	public IntWritable(int i) {
 		this.i = i;
+
 	}
 	
 	@Override

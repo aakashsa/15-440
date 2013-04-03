@@ -1,6 +1,6 @@
 {
-	"RECORD_SIZE":9,
-	"CHUNK_SIZE":9,
+	"RECORD_SIZE":256,
+	"CHUNK_SIZE":512,
 	"NUMBER_MAPPERS":2,
 	"NUMBER_REDUCERS":2,
 	"WORKERS":[
@@ -22,17 +22,17 @@
 	"FILE_INPUT_FORMAT":"TextInputFormat",
 	"TYPES": {
 		"MAPPER":{
-			"K1":"NullWritable",
+			"K1":"IntWritable",
 			"V1":"TextWritable",
-			"K2":"TextWritable",
-			"V2":"IntWritable"
+			"K2":"IntWritable",
+			"V2":"TextWritable"
 		},
 		"REDUCER":{
-			"K1":"TextWritable",
-			"V1":"IntWritable",
+			"K1":"IntWritable",
+			"V1":"TextWritable",
 			"K2":"IntWritable",
 			"V2":"IntWritable"
 		}
 	},
-	"MAPPERCLASS":"NaiveMapperStringString"
+	"MAPPERCLASS":"NaiveMapperIntString"
 }

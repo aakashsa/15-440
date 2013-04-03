@@ -39,6 +39,8 @@ public class ConstantsParser {
 	}
 
 	public ConstantsParser() {
+		System.out.println("Constructor");
+
 		parseConstants();
 	}
 
@@ -49,13 +51,15 @@ public class ConstantsParser {
 	private void parseConstants() {
 		JSONParser parser = new JSONParser();
 		try {
-			System.out.println("Test Class Path for IntWritable = " + IntWritable.class.getName());
+			System.out.println("Test Class Path for IntWritable = "
+					+ IntWritable.class.getName());
 			// URL f =
 			// Constants.class.getClassLoader().getResource("lib/Constants.json");
 			// System.out.println("File: " + f.getFile());
 			// JSONArray a = (JSONArray) parser.parse(new
 			// FileReader(f.getFile()));
-			JSONObject o = (JSONObject) parser.parse(new FileReader("src/lib/Constants.json"));
+			JSONObject o = (JSONObject) parser.parse(new FileReader(
+					"lib/Constants.json"));
 
 			recordSize = (Long) o.get("RECORD_SIZE");
 			if (recordSize <= 0)
@@ -88,7 +92,7 @@ public class ConstantsParser {
 						(int) port));
 				workerNum++;
 			}
-			
+
 			// parse mapper and reducer types
 			mapperReducerTypes[0] = (String) ((JSONObject) ((JSONObject) o
 					.get("TYPES")).get("MAPPER")).get("K1");
@@ -123,22 +127,33 @@ public class ConstantsParser {
 			// Check if the types given in constants file are
 			// actually the types of the mapper class provided by user
 			// Get types of actual Mapper class provided by user
-			ParameterizedType pt = (ParameterizedType) mapperClass.getGenericInterfaces()[0];
+			ParameterizedType pt = (ParameterizedType) mapperClass
+					.getGenericInterfaces()[0];
 
-			String mapK1 = ((Class<?>) pt.getActualTypeArguments()[0]).getName();
-			String mapV1 = ((Class<?>) pt.getActualTypeArguments()[1]).getName();
-			String mapK2 = ((Class<?>) pt.getActualTypeArguments()[2]).getName();
-			String mapV2 = ((Class<?>) pt.getActualTypeArguments()[3]).getName();
+			String mapK1 = ((Class<?>) pt.getActualTypeArguments()[0])
+					.getName();
+			String mapV1 = ((Class<?>) pt.getActualTypeArguments()[1])
+					.getName();
+			String mapK2 = ((Class<?>) pt.getActualTypeArguments()[2])
+					.getName();
+			String mapV2 = ((Class<?>) pt.getActualTypeArguments()[3])
+					.getName();
 
 			System.out.println(" Mapper Func K1 =  " + mapK1);
 			System.out.println(" Mapper Func V1 =  " + mapV1);
 			System.out.println(" Mapper Func K2 =  " + mapK2);
 			System.out.println(" Mapper Func V2 =  " + mapV2);
 
-			// check if the mapper class has types same as those in constants file
+			// check if the mapper class has types same as those in constants
+			// file
 			if (!mapK1.equals("lib." + mapperReducerTypes[0]))
 				throw new IllegalArgumentException(
-						"Mapper K1 type in Constants.json does not match the type of Mapper class K1");
+
+						"Mapper K1 type = "
+								+ "lib."
+								+ mapperReducerTypes[0]
+								+ " in Constants.json does not match the type of Mapper class K1"
+								+ mapK1);
 			if (!mapV1.equals("lib." + mapperReducerTypes[1]))
 				throw new IllegalArgumentException(
 						"Mapper V1 type in Constants.json does not match the type of Mapper class V1");
@@ -160,36 +175,44 @@ public class ConstantsParser {
 							"Key and Value types for mapper and reducer must be Writable types as in Documentation");
 				} else {
 					// Getting the writable class from type name
-					classArray[i] = Class.forName("lib." + mapperReducerTypes[i]);
+					classArray[i] = Class.forName("lib."
+							+ mapperReducerTypes[i]);
 				}
 			}
 			for (int i = 0; i < classArray.length; i++) {
-				System.out.println(" Class " + i + " " + classArray[i].getName());
+				System.out.println(" Class " + i + " "
+						+ classArray[i].getName());
 			}
-			
+
 			// Parse file input format
 			String fileInputFormat = (String) o.get("FILE_INPUT_FORMAT");
-			
+
 			// check if it's a valid input format
 			if (!(InputFormat.validInputFormats().contains(fileInputFormat))) {
 				throw new IllegalArgumentException("File input format "
 						+ fileInputFormat + " is not supported");
 			}
-			
-			// check if the mapper has the same input key and value types as needed by input format
+
+			// check if the mapper has the same input key and value types as
+			// needed by input format
 			fileInputFormatClass = Class.forName("lib." + fileInputFormat);
-			InputFormat<?,?> inputFormat = (InputFormat<?,?>) fileInputFormatClass.newInstance();
-			
+			InputFormat<?, ?> inputFormat = (InputFormat<?, ?>) fileInputFormatClass
+					.newInstance();
+
 			String keyInput = inputFormat.getKeyType();
 			String valueInput = inputFormat.getValueType();
-			
+
 			if (!keyInput.equals("lib." + mapperReducerTypes[0]))
-				throw new IllegalArgumentException(
-						"File input key format (" + keyInput + ") doesn't match with map input key format (lib." + mapperReducerTypes[0] + ")");
+				throw new IllegalArgumentException("File input key format ("
+						+ keyInput
+						+ ") doesn't match with map input key format (lib."
+						+ mapperReducerTypes[0] + ")");
 			if (!valueInput.equals("lib." + mapperReducerTypes[1]))
-				throw new IllegalArgumentException(
-						"File input value format (" + keyInput + ") doesn't match with map input value format (lib." + mapperReducerTypes[1] + ")");
-			
+				throw new IllegalArgumentException("File input value format ("
+						+ keyInput
+						+ ") doesn't match with map input value format (lib."
+						+ mapperReducerTypes[1] + ")");
+
 			System.out.println("Done Parsing");
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -252,7 +275,7 @@ public class ConstantsParser {
 	public Class<?> getMapperClass() {
 		return mapperClass;
 	}
-	
+
 	/**
 	 * Getters for mapper and reducer types
 	 */

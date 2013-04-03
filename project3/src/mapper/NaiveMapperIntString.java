@@ -21,6 +21,7 @@ public class NaiveMapperIntString implements
 		while (tokenizer.hasMoreTokens()) {
 			word = tokenizer.nextToken();
 			System.out.println("Key = " + word + " Value = " + 1);
+			context.write(key, value);
 		}
 		return context;
 	}

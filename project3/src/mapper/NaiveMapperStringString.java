@@ -13,6 +13,8 @@ public class NaiveMapperStringString implements
 
 	@Override
 	public Context<TextWritable, IntWritable> map(NullWritable key, TextWritable value, Context<TextWritable, IntWritable> context) {
-		return null;
+
+		context.write(value, new IntWritable(1));
+		return context;
 	}
 }
