@@ -23,5 +23,11 @@ public class LongWritable extends Writable<Long> {
 	public void setValue(long i) {
 		this.i = i;
 	}
+
+	@Override
+	public String toString() {
+		return ((Long) i).toString();
+	}
+	
 	
 }

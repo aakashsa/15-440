@@ -23,5 +23,11 @@ public class DoubleWritable extends Writable<Double> {
 	public void setValue(double i) {
 		this.i = i;
 	}
+
+	@Override
+	public String toString() {
+		return ((Double) i).toString();
+	}
+	
 	
 }

@@ -1,6 +1,7 @@
 package nodework;
 
 import interfaces.InputFormat;
+import interfaces.Writable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,9 +25,9 @@ public class RecordReader {
 	 * Reading a Particular Chunk from a particular file with a given path and
 	 * recordSize
 	 */
-	public Iterator<InputFormat<?,?>> readChunk(ChunkObject chunk) {
+	public Iterator<InputFormat<Writable<?>, Writable<?>>> readChunk(ChunkObject chunk) {
 		read = 0;
-		ArrayList<InputFormat<?,?>> records = new ArrayList<InputFormat<?,?>>();
+		ArrayList<InputFormat<Writable<?>, Writable<?>>> records = new ArrayList<InputFormat<Writable<?>, Writable<?>>>();
 
 		try {
 			rin = new RandomAccessFile(chunk.getFileName(), "r");
@@ -40,7 +41,8 @@ public class RecordReader {
 				read += rin.read(recordBytes, 0, chunk.getRecordSize());
 				// Check for Encoding Characters
 				String value = new String(recordBytes);
-				InputFormat<?,?> iFormat = (InputFormat<?,?>) inputFormatClass.newInstance();
+				@SuppressWarnings("unchecked")
+				InputFormat<Writable<?>, Writable<?>> iFormat = (InputFormat<Writable<?>, Writable<?>>) inputFormatClass.newInstance();
 				iFormat.parse(value);
 				records.add(iFormat);
 			}

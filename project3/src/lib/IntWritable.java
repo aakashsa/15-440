@@ -24,4 +24,9 @@ public class IntWritable extends Writable<Integer> {
 		this.i = i;
 	}
 
+	@Override
+	public String toString() {
+		return ((Integer) i).toString();
+	}
+
 }

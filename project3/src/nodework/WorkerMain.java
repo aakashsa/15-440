@@ -2,16 +2,16 @@ package nodework;
 
 import interfaces.InputFormat;
 import interfaces.Mapper;
+import interfaces.Writable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import communication.ChunkObject;
@@ -44,42 +44,25 @@ public class WorkerMain {
 				
 				// Use file input format to read records from file
 				RecordReader recordReader = new RecordReader(fileInputFormatClass);
-				Iterator<InputFormat<?,?>> itr = recordReader.readChunk(readMessage);
+				Iterator<InputFormat<Writable<?>, Writable<?>>> itr = recordReader.readChunk(readMessage);
 				
 				// Initialize Mapper instance
 				Class<?> mapperClass = cp.getMapperClass();
-				Mapper<?,?,?,?> mapper = (Mapper<?,?,?,?>) mapperClass.newInstance();
+				@SuppressWarnings("unchecked")
+				Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>> mapper = 
+						(Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>>) mapperClass.newInstance();
+				Context<Writable<?>, Writable<?>> cx = new Context<Writable<?>, Writable<?>>();
 				
-				
-//				if (cp.getInputFormat().equals("TEXTINPUTFORMAT")) {
-//					mapper = new NaiveMapperIntString();
-//					int i = 0;
-//					while (itr.hasNext()) {
-//						String element = itr.next();
-//						// mapper.map(i, element);
-//						i++;
-//					}
-//				} else { // input format is KEYVALUEINPUTFORMAT
-//					mapper = new NaiveMapperStringString();
-//					while (itr.hasNext()) {
-//						String element = itr.next();
-//						String[] keyValue = element.split("\t");
-//						Class[] methodParameters = new Class[] { String.class,
-//								String.class };
-//						try {
-//							mapper.getClass().getDeclaredMethod("map",
-//									methodParameters);
-//							// mapper.map(keyValue[0], keyValue[1]);
-//						} catch (SecurityException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						} catch (NoSuchMethodException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//					}
-//				}
-
+				while (itr.hasNext()) {
+					InputFormat<Writable<?>, Writable<?>> iformat = itr.next();
+					cx = mapper.map(iformat.getKey(), iformat.getValue(), cx);
+					ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
+					// WRITE THIS SHIT TO FILE! for now, printing it out
+					for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
+						System.out.println(kv.getKey().toString() + "\t" + kv.getValue().toString());
+					}
+					cx.clear();
+				}
 				out.writeObject(new Integer(RecordReader.read));
 			}
 		} catch (IOException e) {

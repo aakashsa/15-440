@@ -1,8 +1,10 @@
 package nodework;
 
+import interfaces.Writable;
+
 import java.util.ArrayList;
 
-public class Context<K, V> {
+public class Context<K extends Writable<?>, V extends Writable<?>> {
 
 	private ArrayList<KeyValue<K,V>> items;
 	

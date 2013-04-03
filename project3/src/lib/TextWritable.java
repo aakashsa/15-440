@@ -23,5 +23,10 @@ public class TextWritable extends Writable<String> {
 	public void setValue(String s) {
 		this.s = s;
 	}
+
+	@Override
+	public String toString() {
+		return s;
+	}
 	
 }

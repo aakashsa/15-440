@@ -17,5 +17,10 @@ public class NullWritable extends Writable<String> {
 	
 	public String getValue() {
 		return null;
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return "NULL";
+	}
 }

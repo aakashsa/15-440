@@ -20,4 +20,7 @@ public abstract class Writable<T> implements Serializable {
 		validFormats.add("NullWritable");
 		return validFormats;
 	}
+	
+	@Override
+	public abstract String toString();
 }
