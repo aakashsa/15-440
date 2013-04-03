@@ -14,10 +14,10 @@
 	},
 	{
 		"host":"localhost",
-		"port":9056
+		"port":9057
 	},{
 		"host":"localhost",
-		"port":9056
+		"port":9058
 	}],
 	"FILE_INPUT_FORMAT":"TextInputFormat",
 	"TYPES": {

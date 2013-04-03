@@ -55,7 +55,7 @@ public class ConstantsParser {
 			// System.out.println("File: " + f.getFile());
 			// JSONArray a = (JSONArray) parser.parse(new
 			// FileReader(f.getFile()));
-			JSONObject o = (JSONObject) parser.parse(new FileReader("src/lib/Constants.json"));
+			JSONObject o = (JSONObject) parser.parse(new FileReader("lib/Constants.json"));
 
 			recordSize = (Long) o.get("RECORD_SIZE");
 			if (recordSize <= 0)
