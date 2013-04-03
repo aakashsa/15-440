@@ -21,8 +21,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
-
 public class HadoopMaster {
 
 	public static Socket[] workerSockets;
@@ -49,7 +47,7 @@ public class HadoopMaster {
 		busyWorkerMap = new ConcurrentHashMap<Integer, ChunkObject>();
 
 		String inputFile = args[0];
-		
+
 		// Parse the JSON config file
 		ConstantsParser cp = new ConstantsParser();
 		long recordSize = cp.getRecordSize();
@@ -59,7 +57,7 @@ public class HadoopMaster {
 		String fileInputFormat = cp.getInputFormat();
 		HashMap<Integer, WorkerInfo> allWorkers = cp.getAllWorkers();
 		int numWorkers = allWorkers.size();
-		
+
 		// Get input file name and size
 		System.out.println("File Path = " + inputFile);
 		File f = new File(inputFile);
@@ -88,10 +86,11 @@ public class HadoopMaster {
 		for (int i = 0; i < numWorkers; i++) {
 			freeWorkers.add(i);
 		}
-		
+
 		// Add all chunks to chunk queue, and assign to null workers initially
 		for (int i = 0; i < numChunks; i++) {
-			ChunkObject chunKey = new ChunkObject(i, i * numRecordsPerChunk, numRecordsPerChunk, (int) recordSize, inputFile);
+			ChunkObject chunKey = new ChunkObject(i, i * numRecordsPerChunk,
+					numRecordsPerChunk, (int) recordSize, inputFile);
 			chunkQueue.add(chunKey);
 			chunkWorkerMap.put(chunKey, -1);
 		}
@@ -103,7 +102,8 @@ public class HadoopMaster {
 					chunkJob = chunkQueue.remove();
 					newWorker = freeWorkers.remove();
 					busyWorkerMap.put(newWorker, chunkJob);
-					new Thread(new ServiceThread(chunkJob, newWorker, allWorkers.get(newWorker))).start();
+					new Thread(new ServiceThread(chunkJob, newWorker,
+							allWorkers.get(newWorker))).start();
 				}
 			}
 		}

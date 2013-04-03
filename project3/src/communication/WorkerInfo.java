@@ -1,7 +1,10 @@
 package communication;
 
-public class WorkerInfo {
+import java.io.Serializable;
 
+public class WorkerInfo implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private int workerNum;
 	private String host;
 	private int port;

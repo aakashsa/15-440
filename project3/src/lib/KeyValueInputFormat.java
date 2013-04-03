@@ -6,7 +6,7 @@ public class KeyValueInputFormat extends InputFormat<String, String> {
 
 	private String value;
 	private String key;
-	
+
 	@Override
 	public void parse(String str) {
 		String[] contents = str.split("\\t");

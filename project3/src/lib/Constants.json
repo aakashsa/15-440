@@ -19,5 +19,20 @@
 		"host":"localhost",
 		"port":9056
 	}],
-	"FILE_INPUT_FORMAT":"KEYVALUEINPUTFORMAT"
+	"FILE_INPUT_FORMAT":"KEYVALUEINPUTFORMAT",
+	"TYPES": {
+		"MAPPER":{
+			"K1":"IntWritable",
+			"V1":"TextWritable",
+			"K2":"IntWritable",
+			"V2":"TextWritable"
+		},
+		"REDUCER":{
+			"K1":"IntWritable",
+			"V1":"TextWritable",
+			"K2":"IntWritable",
+			"V2":"IntWritable"
+		}
+	},
+	"MAPPERCLASS":"NaiveMapperIntString"
 }

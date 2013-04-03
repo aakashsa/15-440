@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import communication.ChunkObject;
@@ -29,7 +30,8 @@ public class WorkerMain {
 		System.out.println("Worker number " + args[0]);
 		ConstantsParser cp = new ConstantsParser();
 		try {
-			server = new ServerSocket(cp.getAllWorkers().get(workerNum).getPort());
+			server = new ServerSocket(cp.getAllWorkers().get(workerNum)
+					.getPort());
 			while (true) {
 				Socket workerSocket = server.accept();
 				OutputStream output = workerSocket.getOutputStream();
@@ -42,11 +44,10 @@ public class WorkerMain {
 				Mapper mapper = null;
 				if (cp.getInputFormat().equals("TEXTINPUTFORMAT")) {
 					mapper = new NaiveMapperIntString();
-
 					int i = 0;
 					while (itr.hasNext()) {
 						String element = itr.next();
-						mapper.map(i, element);
+						// mapper.map(i, element);
 						i++;
 					}
 				} else { // input format is KEYVALUEINPUTFORMAT
@@ -59,7 +60,7 @@ public class WorkerMain {
 						try {
 							mapper.getClass().getDeclaredMethod("map",
 									methodParameters);
-							mapper.map(keyValue[0], keyValue[1]);
+							// mapper.map(keyValue[0], keyValue[1]);
 						} catch (SecurityException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -80,4 +81,5 @@ public class WorkerMain {
 			e.printStackTrace();
 		}
 	}
+
 }
