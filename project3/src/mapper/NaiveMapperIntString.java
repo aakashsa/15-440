@@ -20,7 +20,7 @@ public class NaiveMapperIntString implements
 		StringTokenizer tokenizer = new StringTokenizer(line);
 		while (tokenizer.hasMoreTokens()) {
 			word = tokenizer.nextToken();
-			System.out.println("Key = " + word + " Value = " + 1);
+			//System.out.println("Key = " + word + " Value = " + 1);
 			context.write(key, value);
 		}
 		return context;

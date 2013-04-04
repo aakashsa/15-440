@@ -10,14 +10,14 @@ import java.net.UnknownHostException;
 
 import master.HadoopMaster;
 
-public class ServiceThread implements Runnable {
+public class ServiceMapThread implements Runnable {
 
 	private String host;
 	private int port;
 	private int workerNumber;
 	private ChunkObject chunk;
 
-	public ServiceThread(ChunkObject chunk, int workerNumber, WorkerInfo wi) {
+	public ServiceMapThread(ChunkObject chunk, int workerNumber, WorkerInfo wi) {
 		this.host = wi.getHost();
 		this.port = wi.getPort();
 		this.workerNumber = workerNumber;
@@ -28,11 +28,13 @@ public class ServiceThread implements Runnable {
 	public void run() {
 		// Opening a Socket and sending a request to map a chunk
 		try {
+			System.out.println("Port number = " + port);
 			HadoopMaster.workerSockets[workerNumber] = new Socket(host, port);
 			OutputStream output = HadoopMaster.workerSockets[workerNumber]
 					.getOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(output);
 			out.flush();
+			out.writeObject("Map");
 			out.writeObject(chunk);
 			InputStream input = HadoopMaster.workerSockets[workerNumber]
 					.getInputStream();

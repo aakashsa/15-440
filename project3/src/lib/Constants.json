@@ -1,6 +1,6 @@
 {
-	"RECORD_SIZE":256,
-	"CHUNK_SIZE":512,
+	"RECORD_SIZE":17,
+	"CHUNK_SIZE":68,
 	"NUMBER_MAPPERS":2,
 	"NUMBER_REDUCERS":2,
 	"WORKERS":[
@@ -11,13 +11,6 @@
 	{
 		"host":"localhost",
 		"port":9056
-	},
-	{
-		"host":"localhost",
-		"port":9057
-	},{
-		"host":"localhost",
-		"port":9058
 	}],
 	"FILE_INPUT_FORMAT":"TextInputFormat",
 	"TYPES": {
@@ -34,5 +27,6 @@
 			"V2":"IntWritable"
 		}
 	},
-	"MAPPERCLASS":"WordCountMapper"
+	"MAPPERCLASS":"WordCountMapper",
+	"REDUCERCLASS":"WordCountReducer"
 }

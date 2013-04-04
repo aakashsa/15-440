@@ -32,6 +32,7 @@ public class ConstantsParser {
 	private String[] mapperReducerTypes = new String[8];
 	private Class<?>[] classArray = new Class<?>[8];
 	private Class<?> mapperClass;
+	private Class<?> reducerClass;
 
 	public static void main(String[] args) {
 		new ConstantsParser();
@@ -48,14 +49,19 @@ public class ConstantsParser {
 	private void parseConstants() {
 		JSONParser parser = new JSONParser();
 		try {
-			System.out.println("Test Class Path for IntWritable = "
-					+ IntWritable.class.getName());
-			// URL f =
+			Integer a = 1;
+			Integer b = 1;
+
+			// System.out.println("Test Class Path for IntWritable = "
+			// + IntWritable.class.getName());
+			// // URL f =
 			// Constants.class.getClassLoader().getResource("lib/Constants.json");
 			// System.out.println("File: " + f.getFile());
 			// JSONArray a = (JSONArray) parser.parse(new
 			// FileReader(f.getFile()));
-			JSONObject o = (JSONObject) parser.parse(new FileReader("lib/Constants.json"));
+			JSONObject o = (JSONObject) parser.parse(new FileReader(
+					"src/lib/Constants.json"));
+					//"lib/Constants.json"));
 
 			recordSize = (Long) o.get("RECORD_SIZE");
 			if (recordSize <= 0)
@@ -120,6 +126,9 @@ public class ConstantsParser {
 			String mapperClassName = (String) o.get("MAPPERCLASS");
 			mapperClass = Class.forName("mapper." + mapperClassName);
 
+			String reducerClassName = (String) o.get("REDUCERCLASS");
+			reducerClass = Class.forName("reducer." + reducerClassName);
+
 			// Check if the types given in constants file are
 			// actually the types of the mapper class provided by user
 			// Get types of actual Mapper class provided by user
@@ -135,10 +144,22 @@ public class ConstantsParser {
 			String mapV2 = ((Class<?>) pt.getActualTypeArguments()[3])
 					.getName();
 
-			System.out.println(" Mapper Func K1 =  " + mapK1);
-			System.out.println(" Mapper Func V1 =  " + mapV1);
-			System.out.println(" Mapper Func K2 =  " + mapK2);
-			System.out.println(" Mapper Func V2 =  " + mapV2);
+			ParameterizedType ptr = (ParameterizedType) reducerClass
+					.getGenericInterfaces()[0];
+
+			String reducerK1 = ((Class<?>) ptr.getActualTypeArguments()[0])
+					.getName();
+			String reducerV1 = ((Class<?>) ptr.getActualTypeArguments()[1])
+					.getName();
+			String reducerK2 = ((Class<?>) ptr.getActualTypeArguments()[2])
+					.getName();
+			String reducerV2 = ((Class<?>) ptr.getActualTypeArguments()[3])
+					.getName();
+			//
+			// System.out.println(" Mapper Func K1 =  " + mapK1);
+			// System.out.println(" Mapper Func V1 =  " + mapV1);
+			// System.out.println(" Mapper Func K2 =  " + mapK2);
+			// System.out.println(" Mapper Func V2 =  " + mapV2);
 
 			// check if the mapper class has types same as those in constants
 			// file
@@ -160,6 +181,19 @@ public class ConstantsParser {
 				throw new IllegalArgumentException(
 						"Mapper V2 type in Constants.json does not match the type of Mapper class V2");
 
+			if (!reducerK1.equals("lib." + mapperReducerTypes[4]))
+				throw new IllegalArgumentException(
+						"Reducer V1 type in Constants.json does not match the type of Reducer class V1");
+			if (!reducerV1.equals("lib." + mapperReducerTypes[5]))
+				throw new IllegalArgumentException(
+						"Reducer V1 type in Constants.json does not match the type of Reducer class V1");
+			if (!reducerK2.equals("lib." + mapperReducerTypes[6]))
+				throw new IllegalArgumentException(
+						"Reducer K2 type in Constants.json does not match the type of Reducer class K2");
+			if (!reducerV2.equals("lib." + mapperReducerTypes[7]))
+				throw new IllegalArgumentException(
+						"Reducer V2 type in Constants.json does not match the type of Reducer class V2");
+
 			// Checking that all of K1,V1,K2,V2 for mapper and reducer have
 			// writable types
 			// And that they match the given Map function
@@ -175,10 +209,10 @@ public class ConstantsParser {
 							+ mapperReducerTypes[i]);
 				}
 			}
-			for (int i = 0; i < classArray.length; i++) {
-				System.out.println(" Class " + i + " "
-						+ classArray[i].getName());
-			}
+			// for (int i = 0; i < classArray.length; i++) {
+			// System.out.println(" Class " + i + " "
+			// + classArray[i].getName());
+			// }
 
 			// Parse file input format
 			String fileInputFormat = (String) o.get("FILE_INPUT_FORMAT");
@@ -209,7 +243,7 @@ public class ConstantsParser {
 						+ ") doesn't match with map input value format (lib."
 						+ mapperReducerTypes[1] + ")");
 
-			System.out.println("Done Parsing");
+			// System.out.println("Done Parsing");
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (IOException e2) {
@@ -271,6 +305,10 @@ public class ConstantsParser {
 	public Class<?> getMapperClass() {
 		return mapperClass;
 	}
+	public Class<?> getReducerClass() {
+		return reducerClass;
+	}
+		
 
 	/**
 	 * Getters for mapper and reducer types

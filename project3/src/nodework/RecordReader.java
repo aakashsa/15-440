@@ -32,7 +32,7 @@ public class RecordReader {
 		try {
 			rin = new RandomAccessFile(chunk.getFileName(), "r");
 			byte[] recordBytes = new byte[chunk.getRecordSize()];
-			System.out.println("Doing chunk Number " + chunk.getChunkNumber());
+			System.out.println("Doing Map chunk Number " + chunk.getChunkNumber());
 
 			for (int i = 0; i < chunk.getNumRecordsChunk(); i++) {
 				rin.seek(chunk.getChunkNumber() * chunk.getNumRecordsChunk()

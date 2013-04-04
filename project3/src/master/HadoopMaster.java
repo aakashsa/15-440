@@ -3,7 +3,7 @@ package master;
 import java.io.File;
 import java.net.Socket;
 import communication.ChunkObject;
-import communication.ServiceThread;
+import communication.ServiceMapThread;
 import communication.WorkerInfo;
 
 import lib.ConstantsParser;
@@ -78,6 +78,7 @@ public class HadoopMaster {
 			chunkQueue.add(chunKey);
 			chunkWorkerMap.put(chunKey, -1);
 		}
+		// Mapping 
 		while (!chunkWorkerMap.isEmpty() && !chunkQueue.isEmpty()) {
 			synchronized (OBJ_LOCK) {
 				if (!freeWorkers.isEmpty() && !chunkQueue.isEmpty()) {
@@ -86,10 +87,26 @@ public class HadoopMaster {
 					chunkJob = chunkQueue.remove();
 					newWorker = freeWorkers.remove();
 					busyWorkerMap.put(newWorker, chunkJob);
-					new Thread(new ServiceThread(chunkJob, newWorker,
+					new Thread(new ServiceMapThread(chunkJob, newWorker,
 							allWorkers.get(newWorker))).start();
 				}
 			}
 		}
+		
+		// Reducing Part
+		/*while (!chunkWorkerMap.isEmpty() && !chunkQueue.isEmpty()) {
+			synchronized (OBJ_LOCK) {
+				if (!freeWorkers.isEmpty() && !chunkQueue.isEmpty()) {
+					ChunkObject chunkJob = null;
+					int newWorker = 0;
+					chunkJob = chunkQueue.remove();
+					newWorker = freeWorkers.remove();
+					busyWorkerMap.put(newWorker, chunkJob);
+					new Thread(new ServiceMapThread(chunkJob, newWorker,
+							allWorkers.get(newWorker))).start();
+				}
+			}
+		}
+	*/	
 	}
 }
