@@ -6,20 +6,16 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
 import communication.ChunkObject;
 import communication.ReduceTask;
 import communication.ServiceMapThread;
 import communication.MapTask;
 import communication.WorkerInfo;
-
 import lib.ConstantsParser;
 import lib.Job;
 import lib.Utils;
-
 import java.util.HashMap;
 import java.util.concurrent.*;
-
 import test.JobConfiguration;
 
 public class HadoopMaster {
@@ -37,7 +33,7 @@ public class HadoopMaster {
 	public static int fileSizeRead = 0;
 
 	public static int mapsDone = 0;
-	
+
 	public static void main(String[] args) {
 
 		// Initialize status data structures
@@ -60,7 +56,8 @@ public class HadoopMaster {
 		Job job = null;
 		try {
 			Class<?> jobConfClass = Class.forName(jobConfClassName);
-			JobConfiguration jConf = (JobConfiguration) jobConfClass.newInstance();
+			JobConfiguration jConf = (JobConfiguration) jobConfClass
+					.newInstance();
 			Job[] jobs = jConf.setup();
 			job = jobs[0];
 			Utils.performJobSanityChecks(job);
@@ -73,7 +70,7 @@ public class HadoopMaster {
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
 		}
-		
+
 		// Get input file name and size
 		System.out.println("File Path = " + inputFile);
 		File f = new File(inputFile);
@@ -110,44 +107,69 @@ public class HadoopMaster {
 			chunkQueue.add(chunKey);
 			chunkWorkerMap.put(chunKey, -1);
 		}
-		
+
 		Thread[] t_array = new Thread[(int) numChunks];
 		int i = 0;
-		
-		// Mapping 
+
+		File theDir = new File("partition/");
+
+		// if the directory does not exist, create it
+		if (!theDir.exists()) {
+			System.out.println("creating directory: " + "partition/");
+			theDir.mkdir();
+		}
+		// Mapping
 		while (!chunkWorkerMap.isEmpty() && !chunkQueue.isEmpty()) {
 			synchronized (OBJ_LOCK) {
 				if (!freeWorkers.isEmpty() && !chunkQueue.isEmpty()) {
 					ChunkObject chunkJob = null;
 					int newWorker = 0;
 					chunkJob = chunkQueue.remove();
-					MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass());
+					MapTask task = new MapTask(chunkJob,
+							job.getFileInputFormatClass(), job.getMapperClass());
 					newWorker = freeWorkers.remove();
 					busyWorkerMap.put(newWorker, chunkJob);
-					t_array[i] = new Thread(new ServiceMapThread(task, newWorker,
-							allWorkers.get(newWorker)));
+					t_array[i] = new Thread(new ServiceMapThread(task,
+							newWorker, allWorkers.get(newWorker)));
 					t_array[i].start();
 					i++;
 				}
 			}
 		}
-		
+
 		System.out.println("[INFO] Done mapping. Starting reduce tasks...");
-		
+
+		// Reduce Set up - Checking if all the reduce folders exist
+
+		for (int j = 0; j < cp.getNumReducers(); j++) {
+			File theDir1 = new File("partition/reducer_" + j);
+
+			// if the directory does not exist, create it
+			if (!theDir1.exists()) {
+				System.out.println("creating directory: " + "reducer_" + j);
+				theDir1.mkdir();
+			}
+		}
+
 		Socket reduceSocket;
 		OutputStream output;
 		ObjectOutputStream out;
-		
+
 		while (true) {
 			if (HadoopMaster.mapsDone == numChunks) {
 				System.out.println(" SENDING REDUCE COMMANDS");
 				for (WorkerInfo info : allWorkers.values()) {
 					try {
-						reduceSocket = new Socket(info.getHost(), info.getPort());
+						reduceSocket = new Socket(info.getHost(),
+								info.getPort());
 						output = reduceSocket.getOutputStream();
 						out = new ObjectOutputStream(output);
 						out.flush();
-						ReduceTask task = new ReduceTask(info.getWorkerNum(), job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), "final_answers/");
+						ReduceTask task = new ReduceTask(info.getWorkerNum(),
+								job.getReducerClass(),
+								job.getMapperOutputKeyClass(),
+								job.getMapperOutputValueClass(),
+								"final_answers/");
 						out.writeObject(task);
 					} catch (UnknownHostException e) {
 						e.printStackTrace();
@@ -159,5 +181,10 @@ public class HadoopMaster {
 			}
 			System.out.println(" mapsdone = " + HadoopMaster.mapsDone);
 		}
+
+		//Utils.removeDirectory(new File("partition/"));
+
+		// FileUtils.deleteDirectory(new File("directory"));
+
 	}
 }

@@ -11,9 +11,9 @@ order in which they want them to run.
 
 ----------------------
 
-* Create folders for all reducers before hand
-* Make sure partition folders are empty before each job
-* Reducer should only create part files when needed
-* Fault tolerance
+* Create folders for all reducers before hand - Done
+* Make sure partition folders are empty before each job - Done for now commented out.
+* Reducer should only create part files when needed - Done
+* Fault tolerance 
 * Add threads to worker
 * Add job tracker thread to master
