@@ -6,19 +6,22 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import communication.ChunkObject;
-import communication.ReduceTask;
-import communication.ServiceMapThread;
-import communication.MapTask;
-import communication.WorkerInfo;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import lib.ConstantsParser;
 import lib.Job;
 import lib.Utils;
-import java.util.HashMap;
-import java.util.concurrent.*;
 import test.JobConfiguration;
 
-public class HadoopMaster {
+import communication.ChunkObject;
+import communication.MapTask;
+import communication.ReduceTask;
+import communication.ServiceMapThread;
+import communication.WorkerInfo;
+
+public class JobThread implements Runnable {
 
 	public static Socket[] workerSockets;
 
@@ -26,13 +29,22 @@ public class HadoopMaster {
 	public static ConcurrentLinkedQueue<Integer> freeWorkers;
 	public static ConcurrentHashMap<ChunkObject, Integer> chunkWorkerMap;
 	public static ConcurrentHashMap<Integer, ChunkObject> busyWorkerMap;
-	
+
 	public static final Object OBJ_LOCK = new Object();
 	public static int fileSizeRead = 0;
 	public static int mapsDone = 0;
 
+	private String jobConfClassName; 
 	
-	public static void main(String[] args) {
+	private String inputFile;
+	
+	public JobThread(String jobConfClassName,String fileName){
+		inputFile = fileName;	
+		this.jobConfClassName = jobConfClassName;	
+	}
+	
+	@Override
+	public void run() {
 
 		// Initialize status data structures
 		chunkQueue = new ConcurrentLinkedQueue<ChunkObject>();
@@ -40,7 +52,6 @@ public class HadoopMaster {
 		chunkWorkerMap = new ConcurrentHashMap<ChunkObject, Integer>();
 		busyWorkerMap = new ConcurrentHashMap<Integer, ChunkObject>();
 
-		String inputFile = args[0];
 
 		// Parse the JSON config file
 		ConstantsParser cp = new ConstantsParser("lib/Constants.json");
@@ -50,7 +61,6 @@ public class HadoopMaster {
 		int numWorkers = allWorkers.size();
 
 		// Get jobs and do sanity checks
-		String jobConfClassName = "test.JobConfiguration";
 		Job job = null;
 		try {
 			Class<?> jobConfClass = Class.forName(jobConfClassName);
@@ -157,11 +167,13 @@ public class HadoopMaster {
 		while (true) {
 			int temp;
 			// NEED TO LOCK THE 
-			synchronized (HadoopMaster.OBJ_LOCK) {
-				temp = HadoopMaster.mapsDone;
+			synchronized ( JobThread.OBJ_LOCK) {
+				temp = JobThread.mapsDone;
 			}
 			if (temp == numChunks) {
-
+				synchronized ( JobThread.OBJ_LOCK) {
+					JobThread.mapsDone =0;
+				}
 				System.out.println("[INFO] Sending Reduce Commands.");
 				for (WorkerInfo info : allWorkers.values()) {
 					try {
@@ -189,6 +201,6 @@ public class HadoopMaster {
 		// Utils.removeDirectory(new File("partition/"));
 
 		// FileUtils.deleteDirectory(new File("directory"));
-
-	}
+	
+	}	
 }

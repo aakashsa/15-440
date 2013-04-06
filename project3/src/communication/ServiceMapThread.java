@@ -8,7 +8,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import master.HadoopMaster;
+import master.HadoopMasterNew;
+import master.JobThread;
 
 public class ServiceMapThread implements Runnable {
 
@@ -28,24 +29,24 @@ public class ServiceMapThread implements Runnable {
 	public void run() {
 		// Opening a Socket and sending a request to map a chunk
 		try {
-			System.out.println("Port number = " + port);
-			HadoopMaster.workerSockets[workerNumber] = new Socket(host, port);
-			OutputStream output = HadoopMaster.workerSockets[workerNumber]
+			//System.out.println("Port number = " + port);
+			JobThread.workerSockets[workerNumber] = new Socket(host, port);
+			OutputStream output = JobThread.workerSockets[workerNumber]
 					.getOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(output);
 			out.flush();
 			out.writeObject(task);
-			InputStream input = HadoopMaster.workerSockets[workerNumber]
+			InputStream input = JobThread.workerSockets[workerNumber]
 					.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
 			int read = (Integer) in.readObject();
-			synchronized (HadoopMaster.OBJ_LOCK) {
-				HadoopMaster.fileSizeRead += read;
-				System.out.println("new File Size  = " + HadoopMaster.fileSizeRead);
-				HadoopMaster.freeWorkers.add(workerNumber);
-				HadoopMaster.busyWorkerMap.remove(workerNumber);
-				HadoopMaster.chunkWorkerMap.remove(task.chunk);
-				HadoopMaster.mapsDone++;
+			synchronized (JobThread.OBJ_LOCK) {
+				JobThread.fileSizeRead += read;
+				//System.out.println("new File Size  = " + HadoopMaster.fileSizeRead);
+				JobThread.freeWorkers.add(workerNumber);
+				JobThread.busyWorkerMap.remove(workerNumber);
+				JobThread.chunkWorkerMap.remove(task.chunk);
+				JobThread.mapsDone++;
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

@@ -29,7 +29,6 @@ public class Partitioner {
 						+ reducerNumber);
 				theDir.mkdir();
 			}
-
 			OutputStream file = new FileOutputStream("partition/reducer_"
 					+ reducerNumber + "/key_" + key.toString() + ".txt", true);
 			PrintWriter out = new PrintWriter(file, true);

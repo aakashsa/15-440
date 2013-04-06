@@ -3,6 +3,7 @@ package lib;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 
 import org.json.simple.JSONArray;
@@ -16,7 +17,7 @@ import communication.WorkerInfo;
  * A helper class to parse the config file and do sanity checks
  * 
  */
-public class ConstantsParser {
+public class ConstantsParser implements Serializable{
 
 	// map from worker number of worker info (worker numbers start at 0)
 	private HashMap<Integer, WorkerInfo> allWorkers = new HashMap<Integer, WorkerInfo>();

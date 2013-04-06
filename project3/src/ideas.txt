@@ -15,5 +15,17 @@ order in which they want them to run.
 * Make sure partition folders are empty before each job - Done for now commented out.
 * Reducer should only create part files when needed - Done
 * Fault tolerance 
-* Add threads to worker
-* Add job tracker thread to master
+* Threads to Jobs - Partially done except for extracting shared maps back to the master
+* Add threads to worker - Done Seems to be working for now. Check and make sure ?
+* Add job tracker thread to master 
+
+
+ javac -cp json-simple-1.1.1.jar ./*/*.java
+ 
+Master 
+	java -classpath .:json-simple-1.1.1.jar master/HadoopMasterNew
+and then to run the job
+	RUNJOB test.JobConfiguration words.txt
+
+Worker 
+	 java -classpath .:json-simple-1.1.1.jar nodework/Worker 9045
