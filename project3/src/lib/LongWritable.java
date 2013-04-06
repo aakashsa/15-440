@@ -7,13 +7,21 @@ public class LongWritable extends Writable<Long> {
 	private static final long serialVersionUID = 1L;
 	private long i;
 	
+	public LongWritable() {
+	}
+	
 	public LongWritable(long i) {
 		this.i = i;
 	}
 	
 	@Override
-	public Long parse() {
-		return null;
+	public LongWritable parseFromString(String s) {
+		try {
+			this.i = Long.parseLong(s); 
+		} catch (Exception e) { 
+			e.printStackTrace(); 
+		}
+		return this;
 	}
 	
 	public long getValue() {
@@ -27,7 +35,5 @@ public class LongWritable extends Writable<Long> {
 	@Override
 	public String toString() {
 		return ((Long) i).toString();
-	}
-	
-	
+	}	
 }

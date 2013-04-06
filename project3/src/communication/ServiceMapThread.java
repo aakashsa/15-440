@@ -15,13 +15,13 @@ public class ServiceMapThread implements Runnable {
 	private String host;
 	private int port;
 	private int workerNumber;
-	private ChunkObject chunk;
+	private MapTask task;
 
-	public ServiceMapThread(ChunkObject chunk, int workerNumber, WorkerInfo wi) {
+	public ServiceMapThread(MapTask task, int workerNumber, WorkerInfo wi) {
 		this.host = wi.getHost();
 		this.port = wi.getPort();
 		this.workerNumber = workerNumber;
-		this.chunk = chunk;
+		this.task = task;
 	}
 
 	@Override
@@ -34,8 +34,7 @@ public class ServiceMapThread implements Runnable {
 					.getOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(output);
 			out.flush();
-			out.writeObject("Map");
-			out.writeObject(chunk);
+			out.writeObject(task);
 			InputStream input = HadoopMaster.workerSockets[workerNumber]
 					.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
@@ -45,7 +44,8 @@ public class ServiceMapThread implements Runnable {
 				System.out.println("new File Size  = " + HadoopMaster.fileSizeRead);
 				HadoopMaster.freeWorkers.add(workerNumber);
 				HadoopMaster.busyWorkerMap.remove(workerNumber);
-				HadoopMaster.chunkWorkerMap.remove(chunk);
+				HadoopMaster.chunkWorkerMap.remove(task.chunk);
+				HadoopMaster.mapsDone++;
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

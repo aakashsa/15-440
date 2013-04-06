@@ -1,4 +1,4 @@
-package reducer;
+package test;
 
 import java.util.Iterator;
 
@@ -6,7 +6,6 @@ import nodework.Context;
 import lib.IntWritable;
 import lib.TextWritable;
 import interfaces.Reducer;
-import interfaces.Writable;
 
 public class WordCountReducer implements
 		Reducer<TextWritable, IntWritable, TextWritable, IntWritable> {
@@ -18,7 +17,7 @@ public class WordCountReducer implements
 		while (values.hasNext()) {
 			sum += values.next().getValue();
 		}
-		System.out.println("Key = " + key.getValue() + " Value = " + sum);
-		//context.write(key, new IntWritable(sum));
+		//System.out.println("Key = " + key.getValue() + " Value = " + sum);
+		context.write(key, new IntWritable(sum));
 	}
 }

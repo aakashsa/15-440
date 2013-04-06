@@ -13,4 +13,8 @@ public class IdentityMapper implements
 		context.write(key, value);
 		return context;
 	}
+
+	@Override
+	public void init() {
+	}	
 }

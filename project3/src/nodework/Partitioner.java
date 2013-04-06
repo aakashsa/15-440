@@ -4,18 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-
-import communication.AppendingObjectOutputStream;
+import java.io.PrintWriter;
 
 import lib.ConstantsParser;
 
 import interfaces.Writable;
 
 public class Partitioner {
-	private static ObjectOutput output;
 
 	public static void partitiondata(Writable<?> key, Writable<?> value) {
 		try {
@@ -36,12 +32,10 @@ public class Partitioner {
 			}
 
 			OutputStream file = new FileOutputStream("partition/reducer_"
-					+ reducerNumber + "/key_" + key.toString() + ".ser", true);
-			// System.out.println(" .dat POINT ");
-			output = new AppendingObjectOutputStream(file);
-			output.writeObject(value);
-			((ObjectOutputStream) output).reset();
-			output.close();
+					+ reducerNumber + "/key_" + key.toString() + ".txt", true);
+			PrintWriter out = new PrintWriter(file, true);
+			out.println(value.toString());
+			out.close();
 			file.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

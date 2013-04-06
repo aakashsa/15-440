@@ -25,4 +25,8 @@ public class NaiveMapperIntString implements
 		}
 		return context;
 	}
+
+	@Override
+	public void init() {
+	}
 }

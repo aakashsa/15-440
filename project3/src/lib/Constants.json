@@ -11,22 +11,5 @@
 	{
 		"host":"localhost",
 		"port":9056
-	}],
-	"FILE_INPUT_FORMAT":"TextInputFormat",
-	"TYPES": {
-		"MAPPER":{
-			"K1":"NullWritable",
-			"V1":"TextWritable",
-			"K2":"TextWritable",
-			"V2":"IntWritable"
-		},
-		"REDUCER":{
-			"K1":"TextWritable",
-			"V1":"IntWritable",
-			"K2":"TextWritable",
-			"V2":"IntWritable"
-		}
-	},
-	"MAPPERCLASS":"WordCountMapper",
-	"REDUCERCLASS":"WordCountReducer"
+	}]
 }

@@ -7,13 +7,21 @@ public class DoubleWritable extends Writable<Double> {
 	private static final long serialVersionUID = 1L;
 	private double i;
 	
+	public DoubleWritable() {
+	}
+	
 	public DoubleWritable(double i) {
 		this.i = i;
 	}
 	
 	@Override
-	public Double parse() {
-		return null;
+	public DoubleWritable parseFromString(String s) {
+		try {
+			this.i = Double.parseDouble(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return this;
 	}
 	
 	public double getValue() {
@@ -28,6 +36,4 @@ public class DoubleWritable extends Writable<Double> {
 	public String toString() {
 		return ((Double) i).toString();
 	}
-	
-	
 }

@@ -1,4 +1,4 @@
-package mapper;
+package test;
 
 import interfaces.Mapper;
 
@@ -22,5 +22,9 @@ public class WordCountMapper implements
 		}
 		
 		return context;
+	}
+
+	@Override
+	public void init() {
 	}
 }
