@@ -2,11 +2,20 @@ package lib;
 
 import interfaces.InputFormat;
 
+/**
+ * An input format. This type assumes that key and value are both TextWritable objects.
+ * To parse a string into this type of format, the line should be split by a tab
+ * character.
+ *
+ */
 public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable> {
 
 	private TextWritable value;
 	private TextWritable key;
 
+	/**
+	 * Parse a string into a key value input type. Split by tab character
+	 */
 	@Override
 	public void parse(String str) {
 		String[] contents = str.split("\\t");
@@ -17,21 +26,33 @@ public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable>
 		key = new TextWritable(contents[0]);
 	}
 
+	/**
+	 * Get key
+	 */
 	@Override
 	public TextWritable getKey() {
 		return key;
 	}
 
+	/**
+	 * Get value
+	 */
 	@Override
 	public TextWritable getValue() {
 		return value;
 	}
 
+	/**
+	 * Get key type
+	 */
 	@Override
 	public String getKeyType() {
 		return TextWritable.class.getName();
 	}
-
+	
+	/**
+	 * Get value type
+	 */
 	@Override
 	public String getValueType() {
 		return TextWritable.class.getName();

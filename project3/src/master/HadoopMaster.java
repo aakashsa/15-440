@@ -45,7 +45,7 @@ public class HadoopMaster {
 		String inputFile = args[0];
 
 		// Parse the JSON config file
-		ConstantsParser cp = new ConstantsParser();
+		ConstantsParser cp = new ConstantsParser("lib/Constants.json");
 		long recordSize = cp.getRecordSize();
 		long chunkSize = cp.getChunkSize();
 		HashMap<Integer, WorkerInfo> allWorkers = cp.getAllWorkers();
@@ -126,7 +126,7 @@ public class HadoopMaster {
 					int newWorker = 0;
 					chunkJob = chunkQueue.remove();
 					MapTask task = new MapTask(chunkJob,
-							job.getFileInputFormatClass(), job.getMapperClass());
+							job.getFileInputFormatClass(), job.getMapperClass(), cp);
 					newWorker = freeWorkers.remove();
 					busyWorkerMap.put(newWorker, chunkJob);
 					t_array[i] = new Thread(new ServiceMapThread(task,

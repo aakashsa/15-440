@@ -5,8 +5,15 @@ import java.lang.reflect.ParameterizedType;
 
 import interfaces.InputFormat;
 
+/**
+ * A Utils class that has useful utils functions.
+ */
 public class Utils {
 
+	/**
+	 * A function that performs sanity checks on the configurations of a given job
+	 * @param job - job to check
+	 */
 	public static void performJobSanityChecks(Job job) {
 		Job newJob = new Job();
 
@@ -68,14 +75,10 @@ public class Utils {
 		pt = (ParameterizedType) newJob.getReducerClass()
 				.getGenericInterfaces()[0];
 
-		String reducerK1 = ((Class<?>) pt.getActualTypeArguments()[0])
-				.getName();
-		String reducerV1 = ((Class<?>) pt.getActualTypeArguments()[1])
-				.getName();
-		String reducerK2 = ((Class<?>) pt.getActualTypeArguments()[2])
-				.getName();
-		String reducerV2 = ((Class<?>) pt.getActualTypeArguments()[3])
-				.getName();
+		String reducerK1 = ((Class<?>) pt.getActualTypeArguments()[0]).getName();
+		String reducerV1 = ((Class<?>) pt.getActualTypeArguments()[1]).getName();
+		String reducerK2 = ((Class<?>) pt.getActualTypeArguments()[2]).getName();
+		String reducerV2 = ((Class<?>) pt.getActualTypeArguments()[3]).getName();
 
 		try {
 			// Check if mapper input types match that required by file input
@@ -84,12 +87,7 @@ public class Utils {
 					.getFileInputFormatClass().newInstance();
 			if (!(format.getKeyType().equals(mapK1) && format.getValueType()
 					.equals(mapV1))) {
-				throw new IllegalArgumentException(
-						"File input format key value type ("
-								+ format.getKeyType()
-								+ ", "
-								+ format.getValueType()
-								+ ") don't match input key value types of mapper");
+				throw new IllegalArgumentException("File input format key value type (" + format.getKeyType() + ", " + format.getValueType() + ") don't match input key value types of mapper");
 			}
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -140,6 +138,11 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * A function to remove a directory and files in it.
+	 * @param directory - directory to remove
+	 * @return whether the directory was deleted successfully or not
+	 */
 	public static boolean removeDirectory(File directory) {
 
 		// System.out.println("removeDirectory " + directory);

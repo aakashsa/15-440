@@ -1,5 +1,10 @@
 package lib;
 
+/**
+ * A type that represents a job. This is used by the user
+ * to set certain configurations before starting the map reduce job
+ *
+ */
 public class Job {
 
 	private String jobName = null;
@@ -19,6 +24,9 @@ public class Job {
 		
 	}
 
+	/**
+	 * Getters and setters for all fields
+	 */
 	public String getJobName() {
 		return jobName;
 	}

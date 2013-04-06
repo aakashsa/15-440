@@ -13,9 +13,8 @@ import interfaces.Writable;
 
 public class Partitioner {
 
-	public static void partitiondata(Writable<?> key, Writable<?> value) {
+	public static void partitiondata(Writable<?> key, Writable<?> value, ConstantsParser cp) {
 		try {
-			ConstantsParser cp = new ConstantsParser();
 			int numReducers = (int) cp.getNumReducers();
 			int reducerNumber = (key.toString().hashCode() % numReducers);
 			if (reducerNumber < 0) {

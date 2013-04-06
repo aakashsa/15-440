@@ -98,7 +98,7 @@ public class Worker {
 						}
 						ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
 						for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
-							Partitioner.partitiondata(kv.getKey(), kv.getValue());
+							Partitioner.partitiondata(kv.getKey(), kv.getValue(), task.cp);
 						}
 						cx.clear();
 					}
