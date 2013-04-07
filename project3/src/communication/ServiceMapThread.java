@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import master.HadoopMasterNew;
 import master.JobThread;
 
 public class ServiceMapThread implements Runnable {
@@ -16,37 +15,38 @@ public class ServiceMapThread implements Runnable {
 	private String host;
 	private int port;
 	private int workerNumber;
-	private MapTask task;
+	private Message msg;
 
-	public ServiceMapThread(MapTask task, int workerNumber, WorkerInfo wi) {
+	public ServiceMapThread(Message msg, int workerNumber, WorkerInfo wi) {
 		this.host = wi.getHost();
 		this.port = wi.getPort();
 		this.workerNumber = workerNumber;
-		this.task = task;
+		this.msg = msg;
 	}
 
 	@Override
 	public void run() {
 		// Opening a Socket and sending a request to map a chunk
 		try {
-			//System.out.println("Port number = " + port);
 			JobThread.workerSockets[workerNumber] = new Socket(host, port);
-			OutputStream output = JobThread.workerSockets[workerNumber]
-					.getOutputStream();
+			OutputStream output = JobThread.workerSockets[workerNumber].getOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(output);
 			out.flush();
-			out.writeObject(task);
-			InputStream input = JobThread.workerSockets[workerNumber]
-					.getInputStream();
+			MapTask task = (MapTask) msg.task;
+			out.writeObject(msg);
+			InputStream input = JobThread.workerSockets[workerNumber].getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
-			int read = (Integer) in.readObject();
-			synchronized (JobThread.OBJ_LOCK) {
-				JobThread.fileSizeRead += read;
-				//System.out.println("new File Size  = " + HadoopMaster.fileSizeRead);
-				JobThread.freeWorkers.add(workerNumber);
-				JobThread.busyWorkerMap.remove(workerNumber);
-				JobThread.chunkWorkerMap.remove(task.chunk);
-				JobThread.mapsDone++;
+			Message msg = (Message) in.readObject();
+			
+			if (msg.type == MessageType.DONE_MAP) {
+				synchronized (JobThread.OBJ_LOCK) {
+					JobThread.freeWorkers.add(workerNumber);
+					JobThread.busyWorkerMap.remove(workerNumber);
+					JobThread.chunkWorkerMap.remove(task.chunk);
+					JobThread.mapsDone++;
+				}
+			} else if (msg.type == MessageType.EXCEPTION) {
+				msg.e.printStackTrace();
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

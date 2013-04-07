@@ -1,15 +1,16 @@
 {
 	"RECORD_SIZE":17,
 	"CHUNK_SIZE":68,
-	"NUMBER_MAPPERS":2,
 	"NUMBER_REDUCERS":2,
 	"WORKERS":[
 	{
 		"host":"localhost",
-		"port":9045
+		"ports":[9045, 9046],
+		"numcores":2
 	},
 	{
 		"host":"localhost",
-		"port":9056
+		"ports":[9055, 9056],
+		"numcores":2
 	}]
 }

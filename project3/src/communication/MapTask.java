@@ -19,6 +19,7 @@ public class MapTask extends Task implements Serializable {
 	public Class<?> fileInputFormat;
 	public Class<?> mapperClass;
 	public ConstantsParser cp;
+	public String jobName;
 	
 	/**
 	 * Constructor
@@ -27,11 +28,12 @@ public class MapTask extends Task implements Serializable {
 	 * @param mapperClass - mapper class
 	 * @param cp - constants parser object
 	 */
-	public MapTask(ChunkObject chunk, Class<?> fileInputFormatClass, Class<?> mapperClass, ConstantsParser cp) {
+	public MapTask(ChunkObject chunk, Class<?> fileInputFormatClass, Class<?> mapperClass, ConstantsParser cp, String jobName) {
 		this.chunk = chunk;
 		this.fileInputFormat = fileInputFormatClass;
 		this.mapperClass = mapperClass;
 		this.cp = cp;
+		this.jobName = jobName;
 	}
 
 	/**

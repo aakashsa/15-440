@@ -17,18 +17,19 @@ import communication.WorkerInfo;
  * A helper class to parse the config file and do sanity checks
  * 
  */
-public class ConstantsParser implements Serializable{
+public class ConstantsParser implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	// map from worker number of worker info (worker numbers start at 0)
 	private HashMap<Integer, WorkerInfo> allWorkers = new HashMap<Integer, WorkerInfo>();
 	
 	private long recordSize = -1;
 	private long chunkSize = -1;
-	private long numMappers = -1;
 	private long numReducers = -1;
 
 //	public static void main(String[] args) {
-//		new ConstantsParser();
+//		new ConstantsParser("src/lib/Constants.json");
 //	}
 
 	/**
@@ -58,10 +59,6 @@ public class ConstantsParser implements Serializable{
 			if (chunkSize < recordSize)
 				throw new IllegalArgumentException("Chunk size must be at least the record size");
 			
-			numMappers = (Long) o.get("NUMBER_MAPPERS");
-			if (numMappers <= 0)
-				throw new IllegalArgumentException("Number of mappers <= 0");
-
 			numReducers = (Long) o.get("NUMBER_REDUCERS");
 			if (numReducers <= 0)
 				throw new IllegalArgumentException("Number of reducers <= 0");
@@ -71,18 +68,28 @@ public class ConstantsParser implements Serializable{
 			JSONArray workers = (JSONArray) o.get("WORKERS");
 			for (Object obj : workers) {
 				JSONObject worker = (JSONObject) obj;
-				long port = (Long) worker.get("port");
-				if (port < 1024 || port > 49151) {
-					throw new IllegalArgumentException(
-							"Port number must be >= 1024 and <= 49151 (Registered port numbers range)");
+				JSONArray ports = (JSONArray) worker.get("ports");
+				long numCores = (Long) worker.get("numcores");
+				if (numCores <= 0)
+					throw new IllegalArgumentException("Num cores <= 0");
+				
+				if (numCores != ports.size()) {
+					throw new IllegalArgumentException("Num ports must be equal to the number of cores");
 				}
 				String host = (String) worker.get("host");
-				allWorkers.put(workerNum, new WorkerInfo(workerNum, host,
-						(int) port));
-				workerNum++;
+				for (Object p : ports) {
+					long port = (Long) p;
+					if (port < 1024 || port > 49151) {
+						throw new IllegalArgumentException("Port number must be >= 1024 and <= 49151 (Registered port numbers range)");
+					}
+					allWorkers.put(workerNum, new WorkerInfo(workerNum, host, (int) port));
+					workerNum++;
+				}
 			}
-
-
+			
+			if (numReducers > allWorkers.size())
+				throw new IllegalArgumentException("Num reducers > num workers");
+			
 		} catch (FileNotFoundException e1) {
 			System.out.println("ERROR: Couldn't find config file (" + filePath + ")");
 			e1.printStackTrace();
@@ -114,13 +121,6 @@ public class ConstantsParser implements Serializable{
 	 */
 	public long getChunkSize() {
 		return chunkSize;
-	}
-
-	/**
-	 * Getter for number of mappers
-	 */
-	public long getNumMappers() {
-		return numMappers;
 	}
 
 	/**

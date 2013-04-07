@@ -9,7 +9,7 @@ import interfaces.InputFormat;
  * A Utils class that has useful utils functions.
  */
 public class Utils {
-
+	
 	/**
 	 * A function that performs sanity checks on the configurations of a given job
 	 * @param job - job to check
@@ -19,10 +19,10 @@ public class Utils {
 
 		// Check if all needed things are provided
 		if (job.getJobName() == null)
-			newJob.setJobName("job");
+			throw new IllegalArgumentException("No job name provided");
 		else
 			newJob.setJobName(job.getJobName());
-
+		
 		if (job.getMapperClass() == null)
 			throw new IllegalArgumentException("No mapper class provided");
 		else
@@ -145,8 +145,6 @@ public class Utils {
 	 */
 	public static boolean removeDirectory(File directory) {
 
-		// System.out.println("removeDirectory " + directory);
-
 		if (directory == null)
 			return false;
 		if (!directory.exists())
@@ -173,4 +171,70 @@ public class Utils {
 		return directory.delete();
 	}
 
+	/**
+	 * Get partition directory name
+	 * @return partition dir name
+	 */
+	public static String getPartitionDirName(String jobName) {
+		return jobName + "_partition";
+	}
+	
+	/**
+	 * Return a folder name for a particular reducer task
+	 * @param reducerNumber
+	 * @return folder name (partition/reducer_i)
+	 */
+	public static String getReducerFolderName(int i, String jobName) {
+		return (getPartitionDirName(jobName) + "/reducer_" + i);
+	}
+	
+	/**
+	 * Return file name for a key
+	 * @param key
+	 * @return file name for key (key_k.txt)
+	 */
+	public static String getKeyFileName(String k) {
+		return ("key_" + k + ".txt");
+	}
+	
+	/**
+	 * Get key name from key file name
+	 * @param fileName
+	 * @return key name
+	 */
+	public static String getKeyNameFromFilename(String fileName) {
+		String[] contents = fileName.split("_");
+		String[] keyarray = contents[1].split("\\.");
+		String keyName = keyarray[0];
+		return keyName;
+	}
+	
+	/**
+	 * Get absolute location of key file
+	 * @param reducerNumber
+	 * @param jobName
+	 * @param keyFileName
+	 * @return absolute location
+	 */
+	public static String getKeyFileAbsoluteLocation(int reducerNumber, String jobName, String keyFileName) {
+		return Utils.getReducerFolderName(reducerNumber, jobName) + "/" + keyFileName;
+	}
+	
+	/**
+	 * Return name of reduce output file
+	 * @param reducerNumber
+	 * @param outputDir
+	 * @return reduce output file name (outputDir/part_i.txt)
+	 */
+	public static String getReduceOutputFileName(int reducerNumber, String outputDir) {
+		return outputDir + "/part_" + reducerNumber + ".txt";
+	}
+	
+	/**
+	 * Get name of final answers directory
+	 * @return final answers dir 
+	 */
+	public static String getFinalAnswersDir() {
+		return "final_answers";
+	}
 }

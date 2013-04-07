@@ -1,11 +1,7 @@
 package master;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -17,8 +13,11 @@ import test.JobConfiguration;
 
 import communication.ChunkObject;
 import communication.MapTask;
+import communication.Message;
+import communication.MessageType;
 import communication.ReduceTask;
 import communication.ServiceMapThread;
+import communication.ServiceReduceThread;
 import communication.WorkerInfo;
 
 public class JobThread implements Runnable {
@@ -29,18 +28,20 @@ public class JobThread implements Runnable {
 	public static ConcurrentLinkedQueue<Integer> freeWorkers;
 	public static ConcurrentHashMap<ChunkObject, Integer> chunkWorkerMap;
 	public static ConcurrentHashMap<Integer, ChunkObject> busyWorkerMap;
+	public static ConcurrentLinkedQueue<MessageType> reduceDoneMessages;
 
 	public static final Object OBJ_LOCK = new Object();
 	public static int fileSizeRead = 0;
 	public static int mapsDone = 0;
 
-	private String jobConfClassName; 
-	
+	private String jobConfigDir;
 	private String inputFile;
+	private String configFile;
 	
-	public JobThread(String jobConfClassName,String fileName){
-		inputFile = fileName;	
-		this.jobConfClassName = jobConfClassName;	
+	public JobThread(String inputFile, String configFile, String jobConfigDir){
+		this.inputFile = inputFile;	
+		this.jobConfigDir = jobConfigDir;
+		this.configFile = configFile;
 	}
 	
 	@Override
@@ -54,7 +55,7 @@ public class JobThread implements Runnable {
 
 
 		// Parse the JSON config file
-		ConstantsParser cp = new ConstantsParser("lib/Constants.json");
+		ConstantsParser cp = new ConstantsParser(configFile);
 		long recordSize = cp.getRecordSize();
 		long chunkSize = cp.getChunkSize();
 		HashMap<Integer, WorkerInfo> allWorkers = cp.getAllWorkers();
@@ -63,22 +64,27 @@ public class JobThread implements Runnable {
 		// Get jobs and do sanity checks
 		Job job = null;
 		try {
-			Class<?> jobConfClass = Class.forName(jobConfClassName);
-			JobConfiguration jConf = (JobConfiguration) jobConfClass
-					.newInstance();
+			Class<?> jobConfClass = Class.forName(jobConfigDir + ".JobConfiguration");
+			JobConfiguration jConf = (JobConfiguration) jobConfClass.newInstance();
 			Job[] jobs = jConf.setup();
 			job = jobs[0];
 			Utils.performJobSanityChecks(job);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+			System.exit(0);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
+			System.exit(0);
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
+			System.exit(0);
 		} catch (IllegalArgumentException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
+			System.exit(0);
 		}
 
+		System.out.println("[INFO] Starting job " + job.getJobName());
+		
 		// Get input file name and size
 		System.out.println("File Path = " + inputFile);
 		File f = new File(inputFile);
@@ -116,16 +122,32 @@ public class JobThread implements Runnable {
 			chunkWorkerMap.put(chunKey, -1);
 		}
 
-		Thread[] t_array = new Thread[(int) numChunks];
-		int i = 0;
-
-		File theDir = new File("partition/");
-
-		// if the directory does not exist, create it
+		// Map setup. Check if the partition folder exists
+		File theDir = new File(Utils.getPartitionDirName(job.getJobName()));
 		if (!theDir.exists()) {
-			System.out.println("creating directory: " + "partition/");
+			System.out.println("[INFO] Creating directory: " + Utils.getPartitionDirName(job.getJobName()));
 			theDir.mkdir();
 		}
+		
+		// Reduce Set up - Checking if all the reduce folders exist
+		for (int j = 0; j < cp.getNumReducers(); j++) {
+			theDir = new File(Utils.getReducerFolderName(j, job.getJobName()));
+			if (!theDir.exists()) {
+				System.out.println("[INFO] Creating directory: " + Utils.getReducerFolderName(j, job.getJobName()));
+				theDir.mkdir();
+			}
+		}
+		
+		// Create reduce output directory if doesn't exist
+		theDir = new File(Utils.getFinalAnswersDir());
+		if (!theDir.exists()) {
+			System.out.println("[INFO] Creating directory: " + Utils.getFinalAnswersDir());
+			theDir.mkdir();
+		}
+		
+		Thread[] t_array = new Thread[(int) numChunks];
+		int i = 0;
+		
 		// Mapping
 		while (!chunkWorkerMap.isEmpty() && !chunkQueue.isEmpty()) {
 			synchronized (OBJ_LOCK) {
@@ -133,74 +155,46 @@ public class JobThread implements Runnable {
 					ChunkObject chunkJob = null;
 					int newWorker = 0;
 					chunkJob = chunkQueue.remove();
-					MapTask task = new MapTask(chunkJob,
-							job.getFileInputFormatClass(),
-							job.getMapperClass(), cp);
+					MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(), cp, job.getJobName());
+					Message mapMessage = new Message(MessageType.START_MAP, task);
 					newWorker = freeWorkers.remove();
 					busyWorkerMap.put(newWorker, chunkJob);
-					t_array[i] = new Thread(new ServiceMapThread(task,
-							newWorker, allWorkers.get(newWorker)));
+					t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, allWorkers.get(newWorker)));
 					t_array[i].start();
 					i++;
 				}
 			}
 		}
 
-		System.out.println("[INFO] Sent mapping Commands. Starting reduce tasks...");
-
-		// Reduce Set up - Checking if all the reduce folders exist
-
-		for (int j = 0; j < cp.getNumReducers(); j++) {
-			File theDir1 = new File("partition/reducer_" + j);
-
-			// if the directory does not exist, create it
-			if (!theDir1.exists()) {
-				System.out.println("creating directory: " + "reducer_" + j);
-				theDir1.mkdir();
-			}
-		}
-
-		Socket reduceSocket;
-		OutputStream output;
-		ObjectOutputStream out;
-
+		System.out.println("[INFO] Done Map. Starting reduce tasks...");
+		reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
+		
 		while (true) {
 			int temp;
-			// NEED TO LOCK THE 
-			synchronized ( JobThread.OBJ_LOCK) {
+			synchronized (JobThread.OBJ_LOCK) {
 				temp = JobThread.mapsDone;
 			}
 			if (temp == numChunks) {
-				synchronized ( JobThread.OBJ_LOCK) {
-					JobThread.mapsDone =0;
+				synchronized (JobThread.OBJ_LOCK) {
+					JobThread.mapsDone = 0;
 				}
-				System.out.println("[INFO] Sending Reduce Commands.");
-				for (WorkerInfo info : allWorkers.values()) {
-					try {
-						reduceSocket = new Socket(info.getHost(),
-								info.getPort());
-						output = reduceSocket.getOutputStream();
-						out = new ObjectOutputStream(output);
-						out.flush();
-						ReduceTask task = new ReduceTask(info.getWorkerNum(),
-								job.getReducerClass(),
-								job.getMapperOutputKeyClass(),
-								job.getMapperOutputValueClass(),
-								"final_answers/");
-						out.writeObject(task);
-					} catch (UnknownHostException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+				System.out.println("[INFO] Sending reduce commands to " + cp.getNumReducers() + " reducers");
+				for (int j = 0; j < cp.getNumReducers(); j++) {
+					WorkerInfo info = allWorkers.get(j);
+					ReduceTask task = new ReduceTask(info.getWorkerNum(), job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(), job.getJobName());
+					Message reduceMsg = new Message(MessageType.START_REDUCE, task);
+					new Thread(new ServiceReduceThread(info, reduceMsg)).start();
 				}
 				break;
 			}
 		}
-		System.out.println("[INFO] Sent Reduce Commands.");
-		// Utils.removeDirectory(new File("partition/"));
-
-		// FileUtils.deleteDirectory(new File("directory"));
-	
+		
+		while (true) {
+			if (reduceDoneMessages.size() == cp.getNumReducers()) {
+				Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
+				break;
+			}
+		}
+		System.out.println("[INFO] Done " + job.getJobName() + " job");
 	}	
 }

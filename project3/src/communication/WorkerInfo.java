@@ -47,5 +47,16 @@ public class WorkerInfo implements Serializable {
 	 */
 	public int getPort() {
 		return port;
-	}	
+	}
+	
+	/**
+	 * Equals method for a worker information
+	 */
+	@Override
+	public boolean equals(Object wi) {
+		if (wi == null) return false;
+		if (!(wi.getClass().getName().equals(WorkerInfo.class.getName()))) return false;
+		WorkerInfo w = (WorkerInfo) wi;
+		return (this.port == w.getPort() && this.host.equals(w.getHost()) && this.workerNum == w.getWorkerNum());
+	}
 }
