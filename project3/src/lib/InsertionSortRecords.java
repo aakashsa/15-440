@@ -5,8 +5,6 @@ import interfaces.Writable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class InsertionSortRecords {
 
@@ -20,7 +18,7 @@ public class InsertionSortRecords {
 	 * @param fileName - Name of File to be Sorted
 	 */
 
-	public InsertionSortRecords(Class<?> keyClass, int recordSize,String fileName) {
+	public InsertionSortRecords(Class<?> keyClass, int recordSize, String fileName) {
 		this.keyClass = keyClass;
 		this.recordSize = recordSize;
 		this.fileName = fileName;

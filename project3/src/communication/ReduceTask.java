@@ -19,6 +19,7 @@ public class ReduceTask extends Task implements Serializable {
 	public Class<?> reducerInputValueClass;
 	public String outputDir;
 	public String jobName;
+	public long mapperOutputSize;
 	
 	/**
 	 * Constructor
@@ -28,13 +29,14 @@ public class ReduceTask extends Task implements Serializable {
 	 * @param reducerInputValueClass - input value type
 	 * @param outputDir - directory to put results of reduce in
 	 */
-	public ReduceTask(int reducerNumber, Class<?> reducerClass, Class<?> reducerInputKeyClass, Class<?> reducerInputValueClass, String outputDir, String jobName) {
+	public ReduceTask(int reducerNumber, Class<?> reducerClass, Class<?> reducerInputKeyClass, Class<?> reducerInputValueClass, String outputDir, String jobName, long mapperOutputSize) {
 		this.reducerClass = reducerClass;
 		this.reducerNumber = reducerNumber;
 		this.reducerInputKeyClass = reducerInputKeyClass;
 		this.reducerInputValueClass = reducerInputValueClass;
 		this.outputDir = outputDir;
 		this.jobName = jobName;
+		this.mapperOutputSize = mapperOutputSize;
 	}
 	
 	/**

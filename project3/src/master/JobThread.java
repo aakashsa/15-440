@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import lib.ConstantsParser;
+import lib.InsertionSortRecords;
 import lib.Job;
 import lib.Partitioner;
 import lib.Utils;
@@ -176,11 +177,7 @@ public class JobThread implements Runnable {
 		
 		Partitioner.partitionMapOutputData(HadoopMaster.cp, job.getJobName());
 		
-		System.out.println("[INFO] Done partitioning. Starting sort...");
-		
-		
-		
-		System.out.println("[INFO] Starting reduce tasks...");
+		System.out.println("[INFO] Done partitioning. Starting reduce tasks...");
 		reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
 		
 		synchronized (this.MAPCOUNTER_LOCK) {
@@ -199,7 +196,7 @@ public class JobThread implements Runnable {
 					if (HadoopMaster.freeWorkers.size()>0){
 						newReducer = HadoopMaster.freeWorkers.remove();	
 						WorkerInfo info = HadoopMaster.allWorkers.get(newReducer);
-						ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(), job.getJobName());
+						ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(), job.getJobName(), HadoopMaster.cp.getMapperOutputSize());
 						Message reduceMsg = new Message(MessageType.START_REDUCE, task);
 						new Thread(new ServiceReduceThread(info, reduceMsg)).start();
 						j++;

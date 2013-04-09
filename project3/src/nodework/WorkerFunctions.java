@@ -18,7 +18,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import lib.InsertionSortRecords;
 import lib.Utils;
+import master.HadoopMaster;
 
 import communication.MapTask;
 import communication.Message;
@@ -70,14 +72,14 @@ public class WorkerFunctions {
 			}
 			ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
 			for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
-				// If key\tvalue string is shorter than mapper output record size, pad it with tab characters
+				// If key\tvalue string is shorter than mapper output record size - 1, pad it with tab characters
 				String mapped = kv.getKey() + "\t" + kv.getValue();
-				if (mapped.length() < task.cp.getMapperOutputSize()) {
-					long charsToPad = task.cp.getMapperOutputSize() - mapped.length(); 
+				if (mapped.length() < (task.cp.getMapperOutputSize() - 1)) {
+					long charsToPad = task.cp.getMapperOutputSize() - 1 - mapped.length(); 
 					for (int i = 0; i < charsToPad; i++) {
 						mapped = mapped + "\t";
 					}
-				} else if (mapped.length() > task.cp.getMapperOutputSize()) {
+				} else if (mapped.length() > (task.cp.getMapperOutputSize() - 1)) {
 					try {
 						out.writeObject(new Message(MessageType.EXCEPTION, new IllegalArgumentException("Mapper output concatenation of key and value is bigger than mapper output record size")));
 						return;
@@ -107,8 +109,19 @@ public class WorkerFunctions {
 		
 		if (!inputFile.exists()) {
 			System.out.println("[INFO] No Reducer input file found (" + inputFile.getName() + ")");
-			out.writeObject(new Message(MessageType.DONE_REDUCE));
+			try {
+				out.writeObject(new Message(MessageType.DONE_REDUCE));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
+		// Sort the reducer input file
+		InsertionSortRecords sorter = new InsertionSortRecords(task.reducerInputKeyClass, (int) task.mapperOutputSize, inputFile.getPath());
+		sorter.sort();
+		
+		// Renew the pointer to the input file, just in case
+		inputFile = new File(Utils.getReduceInputFileName(task.reducerNumber, task.jobName));
 		
 		// Initialize Reducer instance
 		Reducer<Writable<?>, Writable<?>, Writable<?>, Writable<?>> reducer = null;
@@ -134,53 +147,73 @@ public class WorkerFunctions {
 		outWriter = new PrintWriter(outputFile, true);
 		
 		// Do reduce on input file
-		Writable<?> keyInstance = (Writable<?>) task.reducerInputKeyClass.newInstance();
-		Writable<?> valueInstance = (Writable<?>) task.reducerInputValueClass.newInstance();
+		Writable<?> keyInstance = null;
+		Writable<?> valueInstance = null;
+		try {
+			keyInstance = (Writable<?>) task.reducerInputKeyClass.newInstance();
+			valueInstance = (Writable<?>) task.reducerInputValueClass.newInstance();
+		} catch (InstantiationException e1) {
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			e1.printStackTrace();
+		}
+
 		Iterator<Writable<?>> valueItr = null;
 		ArrayList<Writable<?>> l = new ArrayList<Writable<?>>();
 		
-		FileInputStream fis = new FileInputStream(inputFile);
-		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-		String line;
-		Writable<?> prevKey;
+		FileInputStream fis;
+		BufferedReader br = null;
+		try {
+			fis = new FileInputStream(inputFile);
+			br = new BufferedReader(new InputStreamReader(fis));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
 		
-		while ((line = br.readLine()) != null) {
-			String[] lineContents = line.split("\\t");
-			String key = lineContents[0];
-			String value = lineContents[1];
-			
-			if (prevKey != null) {
-				keyInstance = keyInstance.parseFromString(key);
+		String line;
+		Writable<?> prevKey = null;
+		
+		try {
+			while ((line = br.readLine()) != null) {
+				String[] lineContents = line.split("\\t");
+				String key = lineContents[0];
+				String value = lineContents[1];
 				
-				// If current key is same as before, accumulate value and update previous key
-				if (prevKey.compareTo(keyInstance) == 0) {
-					valueInstance = valueInstance.parseFromString(value);
-					l.add(valueInstance);
-					prevKey = keyInstance;
-				} 
-				// Came across a different key. Reduce previous key
-				else {
-					valueItr = l.iterator();
-					reducer.reduce(prevKey, valueItr, cx);
+				if (prevKey != null) {
+					keyInstance = keyInstance.parseFromString(key);
 					
-					// Write results of reduce to file
-					ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
-					for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
-						outWriter.println(kv.getKey() + "\t" + kv.getValue());
+					// If current key is same as before, accumulate value and update previous key
+					if (prevKey.compareTo(keyInstance) == 0) {
+						valueInstance = valueInstance.parseFromString(value);
+						l.add(valueInstance);
+						prevKey = keyInstance;
+					} 
+					// Came across a different key. Reduce previous key
+					else {
+						valueItr = l.iterator();
+						reducer.reduce(prevKey, valueItr, cx);
+						
+						// Write results of reduce to file
+						ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
+						for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
+							outWriter.println(kv.getKey() + "\t" + kv.getValue());
+						}
+						
+						// Clear iterators for previous key and start fresh for new key
+						cx.clear();
+						l.clear();
+						prevKey = keyInstance;
+						valueInstance = valueInstance.parseFromString(value);
+						l.add(valueInstance);
 					}
-					
-					// Clear iterators for previous key and start fresh for new key
-					cx.clear();
-					l.clear();
-					prevKey = keyInstance;
+				} else {
+					prevKey = keyInstance.parseFromString(key);
 					valueInstance = valueInstance.parseFromString(value);
 					l.add(valueInstance);
 				}
-			} else {
-				prevKey = keyInstance.parseFromString(key);
-				valueInstance = valueInstance.parseFromString(value);
-				l.add(valueInstance);
 			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 		// Do the last edge case reduce and write to file
 		valueItr = l.iterator();
