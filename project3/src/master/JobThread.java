@@ -162,11 +162,11 @@ public class JobThread implements Runnable {
 					ChunkObject chunkJob = null;
 					int newWorker = 0;
 					chunkJob = chunkQueue.remove();
-					MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName());
+					MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 					Message mapMessage = new Message(MessageType.START_MAP, task);
 					newWorker = HadoopMaster.freeWorkers.remove();
 					HadoopMaster.busyWorkerMap.put(newWorker, chunkJob);
-					t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker),this));
+					t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this));
 					t_array[i].start();
 					i++;
 				}

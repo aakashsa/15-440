@@ -54,4 +54,9 @@ public class TextWritable extends Writable<String> {
 	public String toString() {
 		return s;
 	}
+
+	@Override
+	public int compareTo(Writable<String> o) {
+		return s.compareTo(o.getValue());
+	}
 }

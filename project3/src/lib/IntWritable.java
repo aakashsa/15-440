@@ -29,7 +29,8 @@ public class IntWritable extends Writable<Integer> {
 	 * Getter for value of writable
 	 * @return value
 	 */
-	public int getValue() {
+	@Override
+	public Integer getValue() {
 		return i;
 	}
 	
@@ -60,6 +61,13 @@ public class IntWritable extends Writable<Integer> {
 			e.printStackTrace();
 		}
 		return this;
+	}
+
+	@Override
+	public int compareTo(Writable<Integer> o) {
+		if (i < o.getValue()) return -1;
+		if (i > o.getValue()) return 1;
+		return 0;
 	}
 
 }

@@ -42,7 +42,8 @@ public class LongWritable extends Writable<Long> {
 	 * Getter for value of writable
 	 * @return value
 	 */
-	public long getValue() {
+	@Override
+	public Long getValue() {
 		return i;
 	}
 	
@@ -60,5 +61,12 @@ public class LongWritable extends Writable<Long> {
 	@Override
 	public String toString() {
 		return ((Long) i).toString();
+	}
+
+	@Override
+	public int compareTo(Writable<Long> o) {
+		if (i < o.getValue()) return -1;
+		if (i > o.getValue()) return 1;
+		return 0;
 	}	
 }

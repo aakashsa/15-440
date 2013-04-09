@@ -42,7 +42,8 @@ public class DoubleWritable extends Writable<Double> {
 	 * Getter for value of writable
 	 * @return value
 	 */
-	public double getValue() {
+	@Override
+	public Double getValue() {
 		return i;
 	}
 	
@@ -60,5 +61,12 @@ public class DoubleWritable extends Writable<Double> {
 	@Override
 	public String toString() {
 		return ((Double) i).toString();
+	}
+
+	@Override
+	public int compareTo(Writable<Double> arg0) {
+		if (i < arg0.getValue()) return -1;
+		if (i > arg0.getValue()) return 1;
+		return 0;
 	}
 }

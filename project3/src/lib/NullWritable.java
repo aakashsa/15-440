@@ -42,4 +42,10 @@ public class NullWritable extends Writable<String> {
 	public String toString() {
 		return "NULL";
 	}
+
+	@Override
+	public int compareTo(Writable<String> o) {
+		return 0;
+	}
+	
 }

@@ -9,7 +9,7 @@ import java.util.Set;
  *
  * @param <T> Type to support
  */
-public abstract class Writable<T> implements Serializable {
+public abstract class Writable<T> implements Serializable, Comparable<Writable<T>> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -40,4 +40,6 @@ public abstract class Writable<T> implements Serializable {
 	 */
 	@Override
 	public abstract String toString();
+	
+	public abstract T getValue();
 }
