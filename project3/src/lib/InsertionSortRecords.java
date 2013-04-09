@@ -30,7 +30,7 @@ public class InsertionSortRecords {
 	 */
 	// Function to Compare two K2,V2 record strings
 	public int compareRecords(String record1, String record2) {
-
+		
 		// Splitting Records to Key Value
 		String[] keyValue1 = record1.split("\\t");
 		String[] keyValue2 = record2.split("\\t");
@@ -56,7 +56,7 @@ public class InsertionSortRecords {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new InsertionSortRecords(IntWritable.class, 10, "src/tabSample.txt").sort();
+		new InsertionSortRecords(TextWritable.class, 9, "src/wordcount_partition/reducer_1.txt").sort();
 	}
 
 	public void sort() {

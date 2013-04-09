@@ -52,7 +52,7 @@ public class ServiceMapThread implements Runnable {
 					synchronized (jb.getMapCounterLock()) {
 						jb.incrementMapCounter();
 						if (jb.getMapCounter() == jb.getNumChunks()){
-							System.out.println(" Notifying Done with Maps!!");
+							System.out.println("All Maps Acknowledged");
 							jb.getMapCounterLock().notify();
 						}	
 					}

@@ -1,4 +1,5 @@
 all:
+	make clean
 	javac -cp json-simple-1.1.1.jar ./*/*.java
 
 masterNode:
@@ -12,3 +13,5 @@ worker2:
 
 clean:
 	rm -r final_answers/
+	rm -r wordcount_worker/
+	rm -r wordcount_partition/

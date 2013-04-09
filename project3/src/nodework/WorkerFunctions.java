@@ -70,13 +70,14 @@ public class WorkerFunctions {
 				}
 			}
 			ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
+			
 			for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
 				// If key\tvalue string is shorter than mapper output record size - 1, pad it with tab characters
 				String mapped = kv.getKey() + "\t" + kv.getValue();
 				if (mapped.length() < (task.cp.getMapperOutputSize() - 1)) {
 					long charsToPad = task.cp.getMapperOutputSize() - 1 - mapped.length(); 
 					for (int i = 0; i < charsToPad; i++) {
-						mapped = mapped + "\t";
+						mapped = mapped + "~";
 					}
 				} else if (mapped.length() > (task.cp.getMapperOutputSize() - 1)) {
 					try {
@@ -149,9 +150,11 @@ public class WorkerFunctions {
 		// Do reduce on input file
 		Writable<?> keyInstance = null;
 		Writable<?> valueInstance = null;
+		Writable<?> prevKey = null;
 		try {
 			keyInstance = (Writable<?>) task.reducerInputKeyClass.newInstance();
 			valueInstance = (Writable<?>) task.reducerInputValueClass.newInstance();
+			prevKey = (Writable<?>) task.reducerInputKeyClass.newInstance();;
 		} catch (InstantiationException e1) {
 			e1.printStackTrace();
 		} catch (IllegalAccessException e1) {
@@ -171,43 +174,48 @@ public class WorkerFunctions {
 		}
 		
 		String line;
-		Writable<?> prevKey = null;
-		
+		int i = 0;
 		try {
 			while ((line = br.readLine()) != null) {
 				String[] lineContents = line.split("\\t");
 				String key = lineContents[0];
-				String value = lineContents[1];
-				
-				if (prevKey != null) {
-					keyInstance = keyInstance.parseFromString(key);
-					
+				String value = null;
+				if (line.endsWith("~")){
+					value = (lineContents[1].split("~"))[0];
+				}
+				else
+					value = lineContents[1];
+								
+				if (i != 0) {
+					keyInstance = keyInstance.parseFromString(key);			
 					// If current key is same as before, accumulate value and update previous key
 					if (prevKey.compareTo(keyInstance.getValue()) == 0) {
 						valueInstance = valueInstance.parseFromString(value);
 						l.add(valueInstance);
-						prevKey = keyInstance;
 					} 
 					// Came across a different key. Reduce previous key
 					else {
-						valueItr = l.iterator();
-						reducer.reduce(prevKey, valueItr, cx);
-						
-						// Write results of reduce to file
-						ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
-						for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
-							outWriter.println(kv.getKey() + "\t" + kv.getValue());
-						}
-						
-						// Clear iterators for previous key and start fresh for new key
-						cx.clear();
-						l.clear();
-						prevKey = keyInstance;
-						valueInstance = valueInstance.parseFromString(value);
-						l.add(valueInstance);
+						// Skype the First Prev = NULL key
+							valueItr = l.iterator();
+							reducer.reduce(prevKey, valueItr, cx);
+							// Write results of reduce to file
+							ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
+							for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
+								outWriter.println(kv.getKey() + "\t" + kv.getValue());
+								outWriter.flush();
+							}
+							
+							// Clear iterators for previous key and start fresh for new key
+							cx.clear();
+							l.clear();
+							prevKey = prevKey.parseFromString(key);
+							valueInstance = valueInstance.parseFromString(value);
+							l.add(valueInstance);	
 					}
 				} else {
-					prevKey = keyInstance.parseFromString(key);
+					i=1;
+					keyInstance = keyInstance.parseFromString(key);
+					prevKey = prevKey.parseFromString(key);
 					valueInstance = valueInstance.parseFromString(value);
 					l.add(valueInstance);
 				}

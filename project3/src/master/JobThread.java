@@ -1,13 +1,9 @@
 package master;
 
 import java.io.File;
-import java.net.Socket;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import lib.ConstantsParser;
-import lib.InsertionSortRecords;
 import lib.Job;
 import lib.Partitioner;
 import lib.Utils;
@@ -33,7 +29,6 @@ public class JobThread implements Runnable {
 	// Per Job Thread
 	public static ConcurrentLinkedQueue<MessageType> reduceDoneMessages;
 	
-	private int fileSizeRead = 0;
 	private int mapsDone = 0;
 	private long numChunks = 0;
 	
@@ -173,21 +168,18 @@ public class JobThread implements Runnable {
 			}
 		}
 
-		System.out.println("[INFO] Done Map. Starting data partitioning...");
-		
-		Partitioner.partitionMapOutputData(HadoopMaster.cp, job.getJobName());
-		
-		System.out.println("[INFO] Done partitioning. Starting reduce tasks...");
+		System.out.println("[INFO] Done Map. Starting data partitioning...");		
 		reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
 		
 		synchronized (this.MAPCOUNTER_LOCK) {
 			try {
-				System.out.println(" Waiting In Job Thread for reduce Command!!");
+				System.out.println("[INFO] Waiting In Job Thread for Map Commands to Finish.");
 				this.MAPCOUNTER_LOCK.wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Notified counter = " + this.mapsDone);
+			System.out.println("[INFO] Done partitioning. Starting reduce tasks...");
+			Partitioner.partitionMapOutputData(HadoopMaster.cp, job.getJobName());
 			System.out.println("[INFO] Sending reduce commands to " + HadoopMaster.numReducers + " reducers");
 			int j = 0;
 			int newReducer = 0;
