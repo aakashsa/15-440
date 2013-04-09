@@ -2,6 +2,7 @@
 	"RECORD_SIZE":17,
 	"CHUNK_SIZE":187,
 	"NUMBER_REDUCERS":2,
+	"MAPPER_OUTPUT_SIZE":20,
 	"WORKERS":[
 	{
 		"host":"localhost",

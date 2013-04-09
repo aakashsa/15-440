@@ -32,3 +32,15 @@ Worker
 	 
 	 
 Why is max port 49151 ?
+
+
+
+File writes:
+
+* Each map worker writes output to jobname_worker/workeri.txt
+* Partitioner reads worker files and writes to jobname_partition/reducer_i.txt
+* Reducer reads its file and writes to final_answers/part_i.txt
+
+
+
+

@@ -28,6 +28,7 @@ public class ConstantsParser implements Serializable {
 	private long recordSize = -1;
 	private long chunkSize = -1;
 	private long numReducers = -1;
+	private long mapperOutputSize = -1;
 
 //	public static void main(String[] args) {
 //		new ConstantsParser("src/lib/Constants.json");
@@ -64,6 +65,10 @@ public class ConstantsParser implements Serializable {
 			if (numReducers <= 0)
 				throw new IllegalArgumentException("Number of reducers <= 0");
 
+			mapperOutputSize = (Long) o.get("MAPPER_OUTPUT_SIZE");
+			if (mapperOutputSize <= 0)
+				throw new IllegalArgumentException("Mapper output key value size <= 0");
+			
 			// parse all workers
 			int workerNum = 0;
 			JSONArray workers = (JSONArray) o.get("WORKERS");
@@ -129,5 +134,12 @@ public class ConstantsParser implements Serializable {
 	 */
 	public long getNumReducers() {
 		return numReducers;
+	}
+	
+	/**
+	 * Getter for mapper output size
+	 */
+	public long getMapperOutputSize() {
+		return mapperOutputSize;
 	}
 }

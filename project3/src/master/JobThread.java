@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import lib.ConstantsParser;
 import lib.Job;
+import lib.Partitioner;
 import lib.Utils;
 import test.JobConfiguration;
 
@@ -136,15 +137,13 @@ public class JobThread implements Runnable {
 			theDir.mkdir();
 		}
 		
-		// Reduce Set up - Checking if all the reduce folders exist
-		for (int j = 0; j < HadoopMaster.numReducers; j++) {
-			theDir = new File(Utils.getReducerFolderName(j, job.getJobName()));
-			if (!theDir.exists()) {
-				System.out.println("[INFO] Creating directory: " + Utils.getReducerFolderName(j, job.getJobName()));
-				theDir.mkdir();
-			}
+		// Check if temporary worker output folder exists
+		theDir = new File(Utils.getWorkerOutputFilesDirName(job.getJobName()));
+		if (!theDir.exists()) {
+			System.out.println("[INFO] Creating directory: " + Utils.getWorkerOutputFilesDirName(job.getJobName()));
+			theDir.mkdir();
 		}
-		
+				
 		// Create reduce output directory if doesn't exist
 		theDir = new File(Utils.getFinalAnswersDir());
 		if (!theDir.exists()) {
@@ -173,36 +172,41 @@ public class JobThread implements Runnable {
 			}
 		}
 
-		System.out.println("[INFO] Done Map. Starting reduce tasks...");
+		System.out.println("[INFO] Done Map. Starting data partitioning...");
+		
+		Partitioner.partitionMapOutputData(HadoopMaster.cp, job.getJobName());
+		
+		System.out.println("[INFO] Done partitioning. Starting sort...");
+		
+		
+		
+		System.out.println("[INFO] Starting reduce tasks...");
 		reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
 		
-			synchronized (this.MAPCOUNTER_LOCK) {
-				try {
-					System.out.println(" Waiting In Job Thread for reduce Command!!");
-					this.MAPCOUNTER_LOCK.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				// TODO Auto-generated catch block
-				System.out.println("Notified counter = " + this.mapsDone);
-				System.out.println("[INFO] Sending reduce commands to " + HadoopMaster.numReducers + " reducers");
-				int j =0;
-				int newReducer =0;
-				while( j < HadoopMaster.numReducers) {
-					synchronized (HadoopMaster.QUEUE_LOCK) {
-						if (HadoopMaster.freeWorkers.size()>0){
-							newReducer = HadoopMaster.freeWorkers.remove();	
-							WorkerInfo info = HadoopMaster.allWorkers.get(newReducer);
-							ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(), job.getJobName());
-							Message reduceMsg = new Message(MessageType.START_REDUCE, task);
-							new Thread(new ServiceReduceThread(info, reduceMsg)).start();
-							j++;
-						}
+		synchronized (this.MAPCOUNTER_LOCK) {
+			try {
+				System.out.println(" Waiting In Job Thread for reduce Command!!");
+				this.MAPCOUNTER_LOCK.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Notified counter = " + this.mapsDone);
+			System.out.println("[INFO] Sending reduce commands to " + HadoopMaster.numReducers + " reducers");
+			int j = 0;
+			int newReducer = 0;
+			while( j < HadoopMaster.numReducers) {
+				synchronized (HadoopMaster.QUEUE_LOCK) {
+					if (HadoopMaster.freeWorkers.size()>0){
+						newReducer = HadoopMaster.freeWorkers.remove();	
+						WorkerInfo info = HadoopMaster.allWorkers.get(newReducer);
+						ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(), job.getJobName());
+						Message reduceMsg = new Message(MessageType.START_REDUCE, task);
+						new Thread(new ServiceReduceThread(info, reduceMsg)).start();
+						j++;
 					}
 				}
-			}	
-			
-		
+			}
+		}	
 		
 		while (true) {
 			if (reduceDoneMessages.size() == HadoopMaster.numReducers) {

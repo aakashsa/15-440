@@ -178,46 +178,15 @@ public class Utils {
 	public static String getPartitionDirName(String jobName) {
 		return jobName + "_partition";
 	}
-	
+				
 	/**
-	 * Return a folder name for a particular reducer task
-	 * @param reducerNumber
-	 * @return folder name (partition/reducer_i)
-	 */
-	public static String getReducerFolderName(int i, String jobName) {
-		return (getPartitionDirName(jobName) + "/reducer_" + i);
-	}
-	
-	/**
-	 * Return file name for a key
-	 * @param key
-	 * @return file name for key (key_k.txt)
-	 */
-	public static String getKeyFileName(String k) {
-		return ("key_" + k + ".txt");
-	}
-	
-	/**
-	 * Get key name from key file name
-	 * @param fileName
-	 * @return key name
-	 */
-	public static String getKeyNameFromFilename(String fileName) {
-		String[] contents = fileName.split("_");
-		String[] keyarray = contents[1].split("\\.");
-		String keyName = keyarray[0];
-		return keyName;
-	}
-	
-	/**
-	 * Get absolute location of key file
+	 * Get location of reducer's input file name
 	 * @param reducerNumber
 	 * @param jobName
-	 * @param keyFileName
-	 * @return absolute location
+	 * @return input file name of reducer
 	 */
-	public static String getKeyFileAbsoluteLocation(int reducerNumber, String jobName, String keyFileName) {
-		return Utils.getReducerFolderName(reducerNumber, jobName) + "/" + keyFileName;
+	public static String getReduceInputFileName(int reducerNumber, String jobName) {
+		return getPartitionDirName(jobName) + "/reducer_" + reducerNumber + ".txt";
 	}
 	
 	/**
@@ -236,5 +205,24 @@ public class Utils {
 	 */
 	public static String getFinalAnswersDir() {
 		return "final_answers";
+	}
+	
+	/**
+	 * Get directory name of output files of workers
+	 * @param jobName
+	 * @return directory name of worker output files
+	 */
+	public static String getWorkerOutputFilesDirName(String jobName) {
+		return jobName + "_worker";
+	}
+	
+	/**
+	 * Get file name of worker
+	 * @param workerNum
+	 * @param jobName
+	 * @return file name of worker
+	 */
+	public static String getWorkerOutputFileName(int workerNum, String jobName) {
+		return getWorkerOutputFilesDirName(jobName) + "/worker" + workerNum + ".txt";
 	}
 }
