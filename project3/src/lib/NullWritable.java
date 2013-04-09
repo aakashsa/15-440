@@ -42,9 +42,13 @@ public class NullWritable extends Writable<String> {
 	public String toString() {
 		return "NULL";
 	}
-
+	
+	/**
+	 * Compare the value of this object to the value of callee
+	 * @Object arg0 - argument to be compared with
+	 */
 	@Override
-	public int compareTo(Writable<String> o) {
+	public int compareTo(Object o) {
 		return 0;
 	}
 	

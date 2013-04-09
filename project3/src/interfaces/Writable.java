@@ -9,7 +9,7 @@ import java.util.Set;
  *
  * @param <T> Type to support
  */
-public abstract class Writable<T> implements Serializable, Comparable<Writable<T>> {
+public abstract class Writable<T> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -42,4 +42,11 @@ public abstract class Writable<T> implements Serializable, Comparable<Writable<T
 	public abstract String toString();
 	
 	public abstract T getValue();
+	
+	/**
+	 * Compare the value of this object to the value of callee
+	 * @Object arg0 - argument to be compared with
+	 */
+	public abstract int compareTo(Object arg0);
+
 }

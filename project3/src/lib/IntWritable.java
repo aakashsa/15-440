@@ -62,12 +62,19 @@ public class IntWritable extends Writable<Integer> {
 		}
 		return this;
 	}
-
+	/**
+	 * Compare the value of this object to the value of callee
+	 * @Object arg0 - argument to be compared with
+	 */
 	@Override
-	public int compareTo(Writable<Integer> o) {
-		if (i < o.getValue()) return -1;
-		if (i > o.getValue()) return 1;
-		return 0;
+	public int compareTo(Object o) {
+		if (o instanceof Integer){
+			if (i < (Integer)o) return -1;
+			if (i > (Integer)o) return 1;
+			return 0;
+		}
+		else 
+			throw new IllegalArgumentException("Wrong Type Comparison");
 	}
 
 }

@@ -2,6 +2,8 @@ package lib;
 
 import java.io.File;
 import java.lang.reflect.ParameterizedType;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import interfaces.InputFormat;
 
@@ -202,11 +204,13 @@ public class Utils {
 	 * @param fileName
 	 * @return key name
 	 */
-	public static String getKeyNameFromFilename(String fileName) {
-		String[] contents = fileName.split("_");
-		String[] keyarray = contents[1].split("\\.");
-		String keyName = keyarray[0];
-		return keyName;
+	public static String getKeyNameFromFilename(String fileName) {		
+		Pattern p = Pattern.compile("[^_]_(.+).txt$");
+		Matcher m = p.matcher(fileName);
+		if (m.find()) {
+			System.out.println(m.group(1));
+		}
+		return m.group(1);
 	}
 	
 	/**
