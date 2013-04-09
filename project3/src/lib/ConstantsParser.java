@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,7 +23,7 @@ public class ConstantsParser implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	// map from worker number of worker info (worker numbers start at 0)
-	private HashMap<Integer, WorkerInfo> allWorkers = new HashMap<Integer, WorkerInfo>();
+	private ConcurrentHashMap<Integer, WorkerInfo> allWorkers = new ConcurrentHashMap<Integer, WorkerInfo>();
 	
 	private long recordSize = -1;
 	private long chunkSize = -1;
@@ -105,7 +106,7 @@ public class ConstantsParser implements Serializable {
 	/**
 	 * Getter for all workers map
 	 */
-	public HashMap<Integer, WorkerInfo> getAllWorkers() {
+	public ConcurrentHashMap<Integer, WorkerInfo> getAllWorkers() {
 		return allWorkers;
 	}
 

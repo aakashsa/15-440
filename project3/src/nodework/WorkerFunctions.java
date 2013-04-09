@@ -159,7 +159,7 @@ public class WorkerFunctions {
 					}
 					cx.clear();
 				}
-			}
+			} 
 			
 			// Done reducing all keys. Close writers
 			try {

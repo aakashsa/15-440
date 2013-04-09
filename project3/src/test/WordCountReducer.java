@@ -17,6 +17,13 @@ public class WordCountReducer implements
 		while (values.hasNext()) {
 			sum += values.next().getValue();
 		}
+		System.out.println(" SLEEPING");
+		try {
+			new Thread().sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//System.out.println("Key = " + key.getValue() + " Value = " + sum);
 		context.write(key, new IntWritable(sum));
 	}

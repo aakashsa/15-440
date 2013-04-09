@@ -8,6 +8,9 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import com.sun.codemodel.internal.fmt.JBinaryFile;
+
+import master.HadoopMaster;
 import master.JobThread;
 
 public class ServiceMapThread implements Runnable {
@@ -16,34 +19,43 @@ public class ServiceMapThread implements Runnable {
 	private int port;
 	private int workerNumber;
 	private Message msg;
+	private JobThread jb;
 
-	public ServiceMapThread(Message msg, int workerNumber, WorkerInfo wi) {
+	public ServiceMapThread(Message msg, int workerNumber, WorkerInfo wi,JobThread jb) {
 		this.host = wi.getHost();
 		this.port = wi.getPort();
 		this.workerNumber = workerNumber;
 		this.msg = msg;
+		this.jb = jb;
 	}
 
 	@Override
 	public void run() {
+		Socket mapSocket;
 		// Opening a Socket and sending a request to map a chunk
 		try {
-			JobThread.workerSockets[workerNumber] = new Socket(host, port);
-			OutputStream output = JobThread.workerSockets[workerNumber].getOutputStream();
+			mapSocket = new Socket(host, port);
+			OutputStream output = mapSocket.getOutputStream();
 			ObjectOutputStream out = new ObjectOutputStream(output);
 			out.flush();
 			MapTask task = (MapTask) msg.task;
 			out.writeObject(msg);
-			InputStream input = JobThread.workerSockets[workerNumber].getInputStream();
+			InputStream input = mapSocket.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
 			Message msg = (Message) in.readObject();
-			
+
 			if (msg.type == MessageType.DONE_MAP) {
-				synchronized (JobThread.OBJ_LOCK) {
-					JobThread.freeWorkers.add(workerNumber);
-					JobThread.busyWorkerMap.remove(workerNumber);
+				synchronized (HadoopMaster.QUEUE_LOCK) {
+					HadoopMaster.freeWorkers.add(workerNumber);
+					HadoopMaster.busyWorkerMap.remove(workerNumber);
 					JobThread.chunkWorkerMap.remove(task.chunk);
-					JobThread.mapsDone++;
+					synchronized (jb.getMapCounterLock()) {
+						jb.incrementMapCounter();
+						if (jb.getMapCounter() == jb.getNumChunks()){
+							System.out.println(" Notifying Done with Maps!!");
+							jb.getMapCounterLock().notify();
+						}	
+					}
 				}
 			} else if (msg.type == MessageType.EXCEPTION) {
 				msg.e.printStackTrace();

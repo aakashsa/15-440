@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import master.HadoopMaster;
 import master.JobThread;
 
 public class ServiceReduceThread implements Runnable {
@@ -35,6 +36,10 @@ public class ServiceReduceThread implements Runnable {
 			if (msg.type == MessageType.DONE_REDUCE) {
 				JobThread.reduceDoneMessages.add(msg.type);
 				System.out.println("[INFO] Done Reduce by worker " + wi.getWorkerNum());
+				synchronized (HadoopMaster.QUEUE_LOCK) {
+					HadoopMaster.freeWorkers.add(wi.getWorkerNum());
+					HadoopMaster.busyWorkerMap.remove(wi.getWorkerNum());
+				}
 			} else if (msg.type == MessageType.EXCEPTION) {
 				msg.e.printStackTrace();
 			}

@@ -20,7 +20,12 @@ public class WordCountMapper implements
 		for(String s : contents) {
 			context.write(new TextWritable(s), new IntWritable(1));
 		}
-		
+		try {
+			new Thread().sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return context;
 	}
 

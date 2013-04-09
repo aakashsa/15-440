@@ -29,3 +29,6 @@ and then to run the job
 
 Worker 
 	 java -classpath .:json-simple-1.1.1.jar nodework/Worker 9045
+	 
+	 
+Why is max port 49151 ?
