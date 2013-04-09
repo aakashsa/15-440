@@ -1,0 +1,5 @@
+9050	mama
+9060	indi
+9070	papa
+9080	nana
+9090	lala

@@ -54,9 +54,16 @@ public class TextWritable extends Writable<String> {
 	public String toString() {
 		return s;
 	}
-
+	
+	/**
+	 * Compare the value of this object to the value of callee
+	 * @Object arg0 - argument to be compared with
+	 */
 	@Override
-	public int compareTo(Writable<String> o) {
-		return s.compareTo(o.getValue());
+	public int compareTo(Object o) {
+		if (o instanceof String)
+			return s.compareTo((String)o);
+		else
+			throw new IllegalArgumentException("Wrong Type Comparison");			
 	}
 }

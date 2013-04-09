@@ -178,7 +178,7 @@ public class Utils {
 	public static String getPartitionDirName(String jobName) {
 		return jobName + "_partition";
 	}
-				
+
 	/**
 	 * Get location of reducer's input file name
 	 * @param reducerNumber

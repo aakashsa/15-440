@@ -62,11 +62,21 @@ public class DoubleWritable extends Writable<Double> {
 	public String toString() {
 		return ((Double) i).toString();
 	}
-
+	
+	/**
+	 * Compare the value of this object to the value of callee
+	 * @Object arg0 - argument to be compared with
+	 */
 	@Override
-	public int compareTo(Writable<Double> arg0) {
-		if (i < arg0.getValue()) return -1;
-		if (i > arg0.getValue()) return 1;
-		return 0;
+	public int compareTo(Object arg0) {
+		if (arg0 instanceof Double){
+			if (i < (Double) arg0) return -1;
+			if (i > (Double) arg0) return 1;
+			return 0;
+		}
+		else {
+			throw new IllegalArgumentException("Wrong Type Comparison");
+		}
+			
 	}
 }
