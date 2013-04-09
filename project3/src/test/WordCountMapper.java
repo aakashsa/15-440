@@ -18,13 +18,8 @@ public class WordCountMapper implements
 		String[] contents = v.split("\\s");
 		
 		for(String s : contents) {
-			context.write(new TextWritable(s), new IntWritable(1));
-		}
-		try {
-			new Thread().sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (s.length() > 0)
+				context.write(new TextWritable(s), new IntWritable(1));
 		}
 		return context;
 	}

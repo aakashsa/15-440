@@ -205,12 +205,13 @@ public class JobThread implements Runnable {
 			}
 		}	
 		
-		while (true) {
-			if (reduceDoneMessages.size() == HadoopMaster.numReducers) {
-				Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
-				break;
-			}
-		}
+//		while (true) {
+//			if (reduceDoneMessages.size() == HadoopMaster.numReducers) {
+//				Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
+//				Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));
+//				break;
+//			}
+//		}
 		System.out.println("[INFO] Done " + job.getJobName() + " job");
 	}	
 }

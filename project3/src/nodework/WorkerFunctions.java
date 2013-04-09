@@ -20,7 +20,6 @@ import java.util.Iterator;
 
 import lib.InsertionSortRecords;
 import lib.Utils;
-import master.HadoopMaster;
 
 import communication.MapTask;
 import communication.Message;
@@ -115,10 +114,11 @@ public class WorkerFunctions {
 				e.printStackTrace();
 			}
 		}
-		
+		System.out.println("[INFO] Starting sort on reducer " + task.reducerNumber + "...");
 		// Sort the reducer input file
 		InsertionSortRecords sorter = new InsertionSortRecords(task.reducerInputKeyClass, (int) task.mapperOutputSize, inputFile.getPath());
 		sorter.sort();
+		System.out.println("[INFO] Done sorting.");
 		
 		// Renew the pointer to the input file, just in case
 		inputFile = new File(Utils.getReduceInputFileName(task.reducerNumber, task.jobName));
@@ -183,7 +183,7 @@ public class WorkerFunctions {
 					keyInstance = keyInstance.parseFromString(key);
 					
 					// If current key is same as before, accumulate value and update previous key
-					if (prevKey.compareTo(keyInstance) == 0) {
+					if (prevKey.compareTo(keyInstance.getValue()) == 0) {
 						valueInstance = valueInstance.parseFromString(value);
 						l.add(valueInstance);
 						prevKey = keyInstance;
