@@ -8,8 +8,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import com.sun.codemodel.internal.fmt.JBinaryFile;
-
 import master.HadoopMaster;
 import master.JobThread;
 

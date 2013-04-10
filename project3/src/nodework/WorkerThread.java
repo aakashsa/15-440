@@ -42,12 +42,12 @@ public class WorkerThread implements Runnable {
 				// Map request
 				if (msg.type == MessageType.START_MAP) {
 					MapTask task = (MapTask) msg.task;
-					WorkerFunctions.doMap(task, out);
+					new Thread(new WorkerFunctions(msg.type, task, out)).start();
 				}
 				// Reduce request
 				else if (msg.type == MessageType.START_REDUCE) {
 					ReduceTask task = (ReduceTask) msg.task;
-					WorkerFunctions.doReduce(task, out);
+					new Thread(new WorkerFunctions(msg.type, task, out)).start();
 				}
 				// Ping request
 				else if (msg.type == MessageType.PING_REQUEST) {
