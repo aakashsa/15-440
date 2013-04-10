@@ -67,14 +67,16 @@ public class IntWritable extends Writable<Integer> {
 	 * @Object arg0 - argument to be compared with
 	 */
 	@Override
-	public int compareTo(Object o) {
-		if (o instanceof Integer){
-			if (i < (Integer)o) return -1;
-			if (i > (Integer)o) return 1;
+	public int compareTo(Object arg0) {
+		if (arg0 == null)
+			throw new IllegalArgumentException("Can't compare null object");
+		if (arg0 instanceof Integer){
+			if (i < (Integer)arg0) return -1;
+			if (i > (Integer)arg0) return 1;
 			return 0;
 		}
 		else 
-			throw new IllegalArgumentException("Wrong Type Comparison");
+			throw new IllegalArgumentException("Expected: Double; Actual: " + arg0.getClass().getName());
 	}
 
 }

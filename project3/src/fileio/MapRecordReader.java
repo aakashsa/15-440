@@ -1,45 +1,51 @@
-package nodework;
-
-import interfaces.InputFormat;
-import interfaces.Writable;
+package fileio;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Iterator;
+import interfaces.Writable;
+import interfaces.InputFormat;
 
 import communication.ChunkObject;
 
 /**
- * A class that represents a record reader from input file
+ * This class represents a record reader to map input.
  *
  */
-public class RecordReader {
+public class MapRecordReader {
 
-	private static RandomAccessFile rin;
-	public static int read = 0;
-	private static Class<?> inputFormatClass;
-
-	public RecordReader(Class<?> fileInputFormatClass) {
-		inputFormatClass = fileInputFormatClass;
+	private RandomAccessFile rin;
+	public int read = 0;
+	private Class<?> inputFormatClass;
+	
+	/**
+	 * Map records need to be formatted according to input format
+	 * @param fileInputFormat Formatting for map input records
+	 */
+	public MapRecordReader(Class<?> fileInputFormat) {
+		this.inputFormatClass = fileInputFormat;
 	}
 	
 	/**
-	 * Reading a Particular Chunk from a particular file with a given path and
-	 * recordSize
+	 * Read the records in a given chunk and return an iterator over those records
+	 * @param chunk Chunk to read
+	 * @return iterator over records in chunk
 	 */
+	@SuppressWarnings("unchecked")
 	public Iterator<InputFormat<Writable<?>, Writable<?>>> readChunk(ChunkObject chunk) {
-		read = 0;
+		this.read = 0;
 		ArrayList<InputFormat<Writable<?>, Writable<?>>> records = new ArrayList<InputFormat<Writable<?>, Writable<?>>>();
-
+		
 		try {
 			rin = new RandomAccessFile(chunk.getFileName(), "r");
 			byte[] recordBytes = new byte[chunk.getRecordSize()];
-			System.out.println("Doing Map chunk Number " + chunk.getChunkNumber());
+			System.out.println("[INFO] Reading Map chunk Number " + chunk.getChunkNumber());
 
 			int temp = 0;
 			for (int i = 0; i < chunk.getNumRecordsChunk(); i++) {
+				// Seek to the needed record
 				rin.seek(chunk.getChunkNumber() * chunk.getNumRecordsChunk()
 						* chunk.getRecordSize() + chunk.getRecordSize() * i);
 
@@ -49,7 +55,7 @@ public class RecordReader {
 				read+= temp;
 				// Check for Encoding Characters
 				String value = new String(recordBytes);
-				@SuppressWarnings("unchecked")
+				
 				InputFormat<Writable<?>, Writable<?>> iFormat = (InputFormat<Writable<?>, Writable<?>>) inputFormatClass.newInstance();
 				iFormat.parse(value);
 				records.add(iFormat);
@@ -65,4 +71,5 @@ public class RecordReader {
 		}
 		return records.iterator();
 	}
+	
 }

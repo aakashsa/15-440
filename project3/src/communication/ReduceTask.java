@@ -28,6 +28,8 @@ public class ReduceTask extends Task implements Serializable {
 	 * @param reducerInputKeyClass - input key type
 	 * @param reducerInputValueClass - input value type
 	 * @param outputDir - directory to put results of reduce in
+	 * @param jobName - job name to which this reduce task belongs to
+	 * @param mapperOutputSize - record size of concatenation of key and value of mapper output
 	 */
 	public ReduceTask(int reducerNumber, Class<?> reducerClass, Class<?> reducerInputKeyClass, Class<?> reducerInputValueClass, String outputDir, String jobName, long mapperOutputSize) {
 		this.reducerClass = reducerClass;
@@ -37,14 +39,5 @@ public class ReduceTask extends Task implements Serializable {
 		this.outputDir = outputDir;
 		this.jobName = jobName;
 		this.mapperOutputSize = mapperOutputSize;
-	}
-	
-	/**
-	 * Get the task type of this task, i.e. reduce
-	 */
-	@Override
-	public TaskType getTaskType() {
-		return TaskType.REDUCE;
-	}
-
+	}	
 }

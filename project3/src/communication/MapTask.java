@@ -28,6 +28,8 @@ public class MapTask extends Task implements Serializable {
 	 * @param fileInputFormatClass
 	 * @param mapperClass - mapper class
 	 * @param cp - constants parser object
+	 * @param jobName - job name that this map task is for
+	 * @param wi - worker info of worker to which this task is given
 	 */
 	public MapTask(ChunkObject chunk, Class<?> fileInputFormatClass, Class<?> mapperClass, ConstantsParser cp, String jobName, WorkerInfo wi) {
 		this.chunk = chunk;
@@ -36,14 +38,6 @@ public class MapTask extends Task implements Serializable {
 		this.cp = cp;
 		this.jobName = jobName;
 		this.wi = wi;
-	}
-
-	/**
-	 * This function returns the type of this task
-	 */
-	@Override
-	public TaskType getTaskType() {
-		return TaskType.MAP;
 	}
 	
 }

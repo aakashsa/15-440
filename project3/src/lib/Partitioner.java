@@ -48,6 +48,7 @@ public class Partitioner {
 				while ((line = br.readLine()) != null) {
 					String[] lineContents = line.split("\\t");
 					
+					// Hash key to find out which reducer this key should be sent to
 					int reducerNumber = (lineContents[0].hashCode() % numReducers);
 					if (reducerNumber < 0) {
 						reducerNumber += numReducers;

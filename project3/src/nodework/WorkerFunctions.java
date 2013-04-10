@@ -18,7 +18,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import lib.InsertionSortRecords;
+import lib.Context;
+import lib.KeyValue;
 import lib.Utils;
 
 import communication.MapTask;
@@ -117,7 +118,7 @@ public class WorkerFunctions {
 		}
 		System.out.println("[INFO] Starting sort on reducer " + task.reducerNumber + "...");
 		// Sort the reducer input file
-		InsertionSortRecords sorter = new InsertionSortRecords(task.reducerInputKeyClass, (int) task.mapperOutputSize, inputFile.getPath());
+		InsertionSortRecords sorter = new InsertionSortRecords(task.reducerInputKeyClass, (int) task.mapperOutputSize, "\t", inputFile.getPath());
 		sorter.sort();
 		System.out.println("[INFO] Done sorting.");
 		

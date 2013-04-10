@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.simple.JSONArray;
@@ -29,10 +28,6 @@ public class ConstantsParser implements Serializable {
 	private long chunkSize = -1;
 	private long numReducers = -1;
 	private long mapperOutputSize = -1;
-
-//	public static void main(String[] args) {
-//		new ConstantsParser("src/lib/Constants.json");
-//	}
 
 	/**
 	 * Constructor that parses the file
@@ -75,6 +70,10 @@ public class ConstantsParser implements Serializable {
 			for (Object obj : workers) {
 				JSONObject worker = (JSONObject) obj;
 				JSONArray ports = (JSONArray) worker.get("ports");
+				
+				if (ports.size() <= 0)
+					throw new IllegalArgumentException("Each worker must have at least one port");
+				
 				long numCores = (Long) worker.get("numcores");
 				if (numCores <= 0)
 					throw new IllegalArgumentException("Num cores <= 0");

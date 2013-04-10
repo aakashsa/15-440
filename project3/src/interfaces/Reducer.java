@@ -2,7 +2,8 @@ package interfaces;
 
 import java.util.Iterator;
 
-import nodework.Context;
+import lib.Context;
+
 
 /**
  * The reducer interface.

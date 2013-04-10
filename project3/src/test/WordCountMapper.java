@@ -2,11 +2,11 @@ package test;
 
 import interfaces.Mapper;
 
+import lib.Context;
 import lib.IntWritable;
 import lib.NullWritable;
 import lib.TextWritable;
 
-import nodework.Context;
 
 public class WordCountMapper implements
 		Mapper<NullWritable, TextWritable, TextWritable, IntWritable> {

@@ -2,7 +2,7 @@ package test;
 
 import java.util.Iterator;
 
-import nodework.Context;
+import lib.Context;
 import lib.IntWritable;
 import lib.TextWritable;
 import interfaces.Reducer;

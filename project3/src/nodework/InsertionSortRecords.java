@@ -1,4 +1,4 @@
-package lib;
+package nodework;
 
 import interfaces.Writable;
 
@@ -6,34 +6,37 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import lib.TextWritable;
+
 public class InsertionSortRecords {
 
 	private Class<?> keyClass = null;
 	private int recordSize;
 	private String fileName;
+	private String kvDelimiter;
 
 	/**
 	 * @param keyClass - Class of Key's Written 
 	 * @param recordSize  - Record Size
 	 * @param fileName - Name of File to be Sorted
 	 */
-
-	public InsertionSortRecords(Class<?> keyClass, int recordSize, String fileName) {
+	public InsertionSortRecords(Class<?> keyClass, int recordSize, String kvDelimiter, String fileName) {
 		this.keyClass = keyClass;
 		this.recordSize = recordSize;
 		this.fileName = fileName;
+		this.kvDelimiter = kvDelimiter;
 	}
 
 	/**
+	 * Function to Compare two K2,V2 record strings
 	 * @param record1 - Record number 1 
 	 * @param record2 - Record number 2 
 	 */
-	// Function to Compare two K2,V2 record strings
 	public int compareRecords(String record1, String record2) {
 		
 		// Splitting Records to Key Value
-		String[] keyValue1 = record1.split("\\t");
-		String[] keyValue2 = record2.split("\\t");
+		String[] keyValue1 = record1.split(this.kvDelimiter);
+		String[] keyValue2 = record2.split(this.kvDelimiter);
 		Writable<?> key1 = null;
 		Writable<?> key2 = null;
 		try {
@@ -56,7 +59,7 @@ public class InsertionSortRecords {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new InsertionSortRecords(TextWritable.class, 9, "src/wordcount_partition/reducer_1.txt").sort();
+		new InsertionSortRecords(TextWritable.class, 9, "src/wordcount_partition/reducer_1.txt", "\t").sort();
 	}
 
 	public void sort() {
@@ -102,7 +105,5 @@ public class InsertionSortRecords {
 				e.printStackTrace();
 			}
 		}
-
 	}
-
 }

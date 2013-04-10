@@ -48,7 +48,7 @@ public class NullWritable extends Writable<String> {
 	 * @Object arg0 - argument to be compared with
 	 */
 	@Override
-	public int compareTo(Object o) {
+	public int compareTo(Object arg0) {
 		return 0;
 	}
 	

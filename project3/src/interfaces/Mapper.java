@@ -1,6 +1,6 @@
 package interfaces;
 
-import nodework.Context;
+import lib.Context;
 
 /**
  * Mapper interface

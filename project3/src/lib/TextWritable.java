@@ -60,10 +60,12 @@ public class TextWritable extends Writable<String> {
 	 * @Object arg0 - argument to be compared with
 	 */
 	@Override
-	public int compareTo(Object o) {
-		if (o instanceof String)
-			return s.compareTo((String)o);
+	public int compareTo(Object arg0) {
+		if (arg0 == null)
+			throw new IllegalArgumentException("Can't compare null object");
+		if (arg0 instanceof String)
+			return s.compareTo((String)arg0);
 		else
-			throw new IllegalArgumentException("Wrong Type Comparison");			
+			throw new IllegalArgumentException("Expected: Double; Actual: " + arg0.getClass().getName());			
 	}
 }
