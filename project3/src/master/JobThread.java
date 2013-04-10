@@ -29,7 +29,7 @@ public class JobThread implements Runnable {
 	// Per Job Thread
 	public static ConcurrentLinkedQueue<MessageType> reduceDoneMessages;
 	
-	private int mapsDone = 0;
+	private int mapsDone;
 	private long numChunks = 0;
 	
 	private String jobConfigDir;
@@ -67,8 +67,6 @@ public class JobThread implements Runnable {
 	@Override
 	public void run() {
 		mapsDone = 0;
-		// Initialize status data structures
-
 
 		// Get jobs and do sanity checks
 		Job job = null;
@@ -125,7 +123,7 @@ public class JobThread implements Runnable {
 			chunkQueue.add(chunKey);
 			chunkWorkerMap.put(chunKey, -1);
 		}
-
+		System.out.println(" Job Name = " + job.getJobName());
 		// Map setup. Check if the partition folder exists
 		File theDir = new File(Utils.getPartitionDirName(job.getJobName()));
 		if (!theDir.exists()) {
@@ -141,9 +139,9 @@ public class JobThread implements Runnable {
 		}
 				
 		// Create reduce output directory if doesn't exist
-		theDir = new File(Utils.getFinalAnswersDir());
+		theDir = new File(Utils.getFinalAnswersDir( job.getJobName()));
 		if (!theDir.exists()) {
-			System.out.println("[INFO] Creating directory: " + Utils.getFinalAnswersDir());
+			System.out.println("[INFO] Creating directory: " + Utils.getFinalAnswersDir( job.getJobName()));
 			theDir.mkdir();
 		}
 		
@@ -157,9 +155,9 @@ public class JobThread implements Runnable {
 					ChunkObject chunkJob = null;
 					int newWorker = 0;
 					chunkJob = chunkQueue.remove();
+					newWorker = HadoopMaster.freeWorkers.remove();
 					MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 					Message mapMessage = new Message(MessageType.START_MAP, task);
-					newWorker = HadoopMaster.freeWorkers.remove();
 					HadoopMaster.busyWorkerMap.put(newWorker, chunkJob);
 					t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this));
 					t_array[i].start();
@@ -188,7 +186,7 @@ public class JobThread implements Runnable {
 					if (HadoopMaster.freeWorkers.size()>0){
 						newReducer = HadoopMaster.freeWorkers.remove();	
 						WorkerInfo info = HadoopMaster.allWorkers.get(newReducer);
-						ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(), job.getJobName(), HadoopMaster.cp.getMapperOutputSize());
+						ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(job.getJobName()), job.getJobName(), HadoopMaster.cp.getMapperOutputSize());
 						Message reduceMsg = new Message(MessageType.START_REDUCE, task);
 						new Thread(new ServiceReduceThread(info, reduceMsg)).start();
 						j++;
@@ -197,13 +195,13 @@ public class JobThread implements Runnable {
 			}
 		}	
 		
-//		while (true) {
-//			if (reduceDoneMessages.size() == HadoopMaster.numReducers) {
-//				Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
-//				Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));
-//				break;
-//			}
-//		}
+		while (true) {
+			if (reduceDoneMessages.size() == HadoopMaster.numReducers) {
+				//Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
+				//Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));				
+				break;
+			}
+		}
 		System.out.println("[INFO] Done " + job.getJobName() + " job");
 	}	
 }

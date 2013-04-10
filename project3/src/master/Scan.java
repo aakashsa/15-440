@@ -56,6 +56,7 @@ public class Scan implements Runnable {
 							String jobConfigDir = cliArgs.get(2);
 							String inputFile = cliArgs.get(0);
 							String configFile = cliArgs.get(1);
+							HadoopMaster.counter++;
 							new Thread(new JobThread(inputFile, configFile, jobConfigDir)).start();
 						}
 					}

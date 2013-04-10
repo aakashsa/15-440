@@ -30,7 +30,7 @@ public class WorkerFunctions {
 
 	@SuppressWarnings("unchecked")
 	public static void doMap(MapTask task, ObjectOutputStream out) {
-		System.out.println("[INFO] Received map task. Performing map...");
+		//System.out.println("[INFO] Received map task. Performing map...");
 		
 		// Use file input format to read records from file
 		RecordReader recordReader = new RecordReader(task.fileInputFormat);
@@ -91,7 +91,7 @@ public class WorkerFunctions {
 			}
 			cx.clear();
 		}
-		System.out.println("[INFO] Finished map task.");
+		//System.out.println("[INFO] Finished map task.");
 		try {
 			out.writeObject(new Message(MessageType.DONE_MAP));
 			out.flush();

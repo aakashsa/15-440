@@ -1,5 +1,7 @@
 package lib;
 
+import master.HadoopMaster;
+
 /**
  * A type that represents a job. This is used by the user
  * to set certain configurations before starting the map reduce job
@@ -32,7 +34,7 @@ public class Job {
 	}
 
 	public void setJobName(String jobName) {
-		this.jobName = jobName;
+		this.jobName = jobName+"_"+HadoopMaster.counter;
 	}
 
 	public Class<?> getFileInputFormatClass() {

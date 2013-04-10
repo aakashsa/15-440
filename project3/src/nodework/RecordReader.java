@@ -34,11 +34,15 @@ public class RecordReader {
 			byte[] recordBytes = new byte[chunk.getRecordSize()];
 			System.out.println("Doing Map chunk Number " + chunk.getChunkNumber());
 
+			int temp = 0;
 			for (int i = 0; i < chunk.getNumRecordsChunk(); i++) {
 				rin.seek(chunk.getChunkNumber() * chunk.getNumRecordsChunk()
 						* chunk.getRecordSize() + chunk.getRecordSize() * i);
 
-				read += rin.read(recordBytes, 0, chunk.getRecordSize());
+				temp = rin.read(recordBytes, 0, chunk.getRecordSize());
+				if (temp==-1)
+					break;
+				read+= temp;
 				// Check for Encoding Characters
 				String value = new String(recordBytes);
 				@SuppressWarnings("unchecked")

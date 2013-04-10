@@ -203,8 +203,8 @@ public class Utils {
 	 * Get name of final answers directory
 	 * @return final answers dir 
 	 */
-	public static String getFinalAnswersDir() {
-		return "final_answers";
+	public static String getFinalAnswersDir(String jobName) {
+		return jobName+"_final_answers";
 	}
 	
 	/**

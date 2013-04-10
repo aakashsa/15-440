@@ -14,7 +14,9 @@ public class HadoopMaster {
 
 
 	public static final Object QUEUE_LOCK = new Object();
-
+	
+	// Initialize status data structures
+	public static int counter = 0;
 	public static ConcurrentLinkedQueue<Integer> freeWorkers;
 	public static ConcurrentHashMap<Integer, ChunkObject> busyWorkerMap;
 	public static ConcurrentHashMap<Integer, WorkerInfo> allWorkers;
