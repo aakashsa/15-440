@@ -51,10 +51,6 @@ public class ServiceMapThread implements Runnable {
 					JobThread.chunkWorkerMap.remove(task.chunk);
 					synchronized (jb.getMapCounterLock()) {
 						jb.incrementMapCounter();
-						if (jb.getMapCounter() == jb.getNumChunks()){
-							System.out.println("All Maps Acknowledged");
-							jb.getMapCounterLock().notify();
-						}	
 					}
 				}
 			} else if (msg.type == MessageType.EXCEPTION) {

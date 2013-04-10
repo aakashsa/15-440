@@ -1,6 +1,7 @@
 package master;
 
 import java.io.File;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -149,51 +150,78 @@ public class JobThread implements Runnable {
 		int i = 0;
 		
 		// Mapping
+		int newWorker = 0;
+
+		// Initially sending Chunks to workers
 		while (!chunkWorkerMap.isEmpty() && !chunkQueue.isEmpty()) {
 			synchronized (HadoopMaster.QUEUE_LOCK) {
 				if (!HadoopMaster.freeWorkers.isEmpty() && !chunkQueue.isEmpty()) {
-					ChunkObject chunkJob = null;
-					int newWorker = 0;
-					chunkJob = chunkQueue.remove();
-					newWorker = HadoopMaster.freeWorkers.remove();
-					MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
-					Message mapMessage = new Message(MessageType.START_MAP, task);
-					HadoopMaster.busyWorkerMap.put(newWorker, chunkJob);
-					t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this));
-					t_array[i].start();
-					i++;
+						ChunkObject chunkJob = null;
+						chunkJob = chunkQueue.remove();
+						newWorker = HadoopMaster.freeWorkers.remove();
+						MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
+						Message mapMessage = new Message(MessageType.START_MAP, task);
+						HadoopMaster.busyWorkerMap.put(newWorker, chunkJob);
+						t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this));
+						t_array[i].start();
+						i++;
+				}
+			}
+		}
+		// Checking if any of the workers died with a chunk and then we resend it to another worker
+		while (true){
+			synchronized (this.MAPCOUNTER_LOCK) {
+				if (getMapCounter()==numChunks){
+					System.out.println(" All Maps Done ");
+					break;
+				}	
+			}
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			synchronized (HadoopMaster.QUEUE_LOCK) {
+				if (!HadoopMaster.busyWorkerMap.isEmpty() &&  !chunkWorkerMap.isEmpty()) {
+					Set<ChunkObject> chunkJob = chunkWorkerMap.keySet();
+					for (ChunkObject chunk : chunkJob){
+						if (!HadoopMaster.freeWorkers.isEmpty()){
+							System.out.println(" Sending Chunk Again = " + chunk.getChunkNumber());
+							newWorker = HadoopMaster.freeWorkers.remove();
+							MapTask task = new MapTask(chunk, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
+							HadoopMaster.busyWorkerMap.put(newWorker, chunk);
+							Message mapMessage = new Message(MessageType.START_MAP, task);
+							new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this)).start();
+						}
+						else
+							break;
+					}
+				}
+			}
+			
+		}
+		
+		System.out.println("[INFO] Done Map. Starting data partitioning...");		
+		reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
+		
+		System.out.println("[INFO] Done partitioning. Starting reduce tasks...");
+		Partitioner.partitionMapOutputData(HadoopMaster.cp, job.getJobName());
+		System.out.println("[INFO] Sending reduce commands to " + HadoopMaster.numReducers + " reducers");
+		int j = 0;
+		int newReducer = 0;
+		while( j < HadoopMaster.numReducers) {
+			synchronized (HadoopMaster.QUEUE_LOCK) {
+				if (HadoopMaster.freeWorkers.size()>0){
+					newReducer = HadoopMaster.freeWorkers.remove();	
+					WorkerInfo info = HadoopMaster.allWorkers.get(newReducer);
+					ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(job.getJobName()), job.getJobName(), HadoopMaster.cp.getMapperOutputSize());
+					Message reduceMsg = new Message(MessageType.START_REDUCE, task);
+					new Thread(new ServiceReduceThread(info, reduceMsg)).start();
+					j++;
 				}
 			}
 		}
 
-		System.out.println("[INFO] Done Map. Starting data partitioning...");		
-		reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
-		
-		synchronized (this.MAPCOUNTER_LOCK) {
-			try {
-				System.out.println("[INFO] Waiting In Job Thread for Map Commands to Finish.");
-				this.MAPCOUNTER_LOCK.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			System.out.println("[INFO] Done partitioning. Starting reduce tasks...");
-			Partitioner.partitionMapOutputData(HadoopMaster.cp, job.getJobName());
-			System.out.println("[INFO] Sending reduce commands to " + HadoopMaster.numReducers + " reducers");
-			int j = 0;
-			int newReducer = 0;
-			while( j < HadoopMaster.numReducers) {
-				synchronized (HadoopMaster.QUEUE_LOCK) {
-					if (HadoopMaster.freeWorkers.size()>0){
-						newReducer = HadoopMaster.freeWorkers.remove();	
-						WorkerInfo info = HadoopMaster.allWorkers.get(newReducer);
-						ReduceTask task = new ReduceTask(j, job.getReducerClass(), job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), Utils.getFinalAnswersDir(job.getJobName()), job.getJobName(), HadoopMaster.cp.getMapperOutputSize());
-						Message reduceMsg = new Message(MessageType.START_REDUCE, task);
-						new Thread(new ServiceReduceThread(info, reduceMsg)).start();
-						j++;
-					}
-				}
-			}
-		}	
 		
 		while (true) {
 			if (reduceDoneMessages.size() == HadoopMaster.numReducers) {
