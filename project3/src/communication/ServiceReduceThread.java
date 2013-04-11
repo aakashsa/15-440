@@ -11,6 +11,13 @@ import java.net.UnknownHostException;
 import master.HadoopMaster;
 import master.JobThread;
 
+
+
+/**
+ * ServiceReduceThread is the thread spawned by the JobThread for servicing a particular Reduce task.
+ * Sends a reduce command to a worker
+ * Upon getting the Ack it updates the reduceDone Map
+ */
 public class ServiceReduceThread implements Runnable {
 
 	private Message msg;
@@ -34,8 +41,8 @@ public class ServiceReduceThread implements Runnable {
 			ObjectInputStream in = new ObjectInputStream(input);
 			Message msg = (Message) in.readObject();
 			if (msg.type == MessageType.DONE_REDUCE) {
-				JobThread.reduceDoneMessages.add(msg.type);
 				System.out.println("[INFO] Done Reduce by worker " + wi.getWorkerNum());
+				JobThread.reduceDoneMessages.add(msg.type);
 				synchronized (HadoopMaster.QUEUE_LOCK) {
 					HadoopMaster.freeWorkers.add(wi.getWorkerNum());
 					HadoopMaster.busyWorkerMap.remove(wi.getWorkerNum());

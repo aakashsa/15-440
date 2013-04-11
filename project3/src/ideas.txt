@@ -42,5 +42,5 @@ File writes:
 * Reducer reads its file and writes to final_answers/part_i.txt
 
 
-
-
+*
+*

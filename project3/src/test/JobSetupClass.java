@@ -1,11 +1,12 @@
 package test;
 
+import interfaces.JobConfiguration;
 import lib.IntWritable;
 import lib.Job;
 import lib.TextInputFormat;
 import lib.TextWritable;
 
-public class JobConfiguration {
+public class JobSetupClass implements JobConfiguration{
 
 	public Job[] setup() {
 		

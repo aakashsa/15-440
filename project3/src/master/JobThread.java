@@ -5,10 +5,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import nodework.JobThreadSharedFields;
+
 import lib.Job;
 import lib.Partitioner;
 import lib.Utils;
-import test.JobConfiguration;
 
 import communication.ChunkObject;
 import communication.MapTask;
@@ -21,75 +22,38 @@ import communication.WorkerInfo;
 
 public class JobThread implements Runnable {
 
-	private final Object MAPCOUNTER_LOCK;
 	
 	// Chunk to Worker mapping for the Job
-	public static ConcurrentLinkedQueue<ChunkObject> chunkQueue;
-	public static ConcurrentHashMap<ChunkObject, Integer> chunkWorkerMap;
+	private ConcurrentLinkedQueue<ChunkObject> chunkQueue;
+	private ConcurrentHashMap<ChunkObject, Integer> chunkWorkerMap;
 	
 	// Per Job Thread
 	public static ConcurrentLinkedQueue<MessageType> reduceDoneMessages;
 	
-	private int mapsDone;
 	private long numChunks = 0;
 	
-	private String jobConfigDir;
+	public Job job;
 	private String inputFile;
-	private String configFile;
 	
-	public int getMapCounter (){
-		return mapsDone;
-	}
-	public void setMapCounter(int set){
-		this.mapsDone = set;
-	}
-	public void incrementMapCounter(){
-		this.mapsDone++;
-	}
-	
-	
-	public Object getMapCounterLock(){
-		return MAPCOUNTER_LOCK;
-	}
+	private JobThreadSharedFields sharedData;
 	
 	public long getNumChunks(){
 		return numChunks;
 	}
 	
-	public JobThread(String inputFile, String configFile, String jobConfigDir){
+	public JobThread(String inputFile, Job job){
+
 		this.inputFile = inputFile;	
-		this.jobConfigDir = jobConfigDir;
-		this.configFile = configFile;
-		this.MAPCOUNTER_LOCK = new Object();
+		this.job = job;
 		chunkQueue = new ConcurrentLinkedQueue<ChunkObject>();
 		chunkWorkerMap = new ConcurrentHashMap<ChunkObject, Integer>();
+		this.sharedData = new JobThreadSharedFields(chunkQueue,chunkWorkerMap);
 	}
 	
 	@Override
 	public void run() {
-		mapsDone = 0;
 
 		// Get jobs and do sanity checks
-		Job job = null;
-		try {
-			Class<?> jobConfClass = Class.forName(jobConfigDir + ".JobConfiguration");
-			JobConfiguration jConf = (JobConfiguration) jobConfClass.newInstance();
-			Job[] jobs = jConf.setup();
-			job = jobs[0];
-			Utils.performJobSanityChecks(job);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.exit(0);
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-			System.exit(0);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			System.exit(0);
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			System.exit(0);
-		}
 
 		System.out.println("[INFO] Starting job " + job.getJobName());
 		
@@ -119,6 +83,7 @@ public class JobThread implements Runnable {
 
 		// Add all chunks to chunk queue, and assign to null workers initially
 		for (int i = 0; i < numChunks; i++) {
+			
 			ChunkObject chunKey = new ChunkObject(i, i * numRecordsPerChunk,
 					numRecordsPerChunk, (int) HadoopMaster.recordSize, inputFile);
 			chunkQueue.add(chunKey);
@@ -162,7 +127,7 @@ public class JobThread implements Runnable {
 						MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 						Message mapMessage = new Message(MessageType.START_MAP, task);
 						HadoopMaster.busyWorkerMap.put(newWorker, chunkJob);
-						t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this));
+						t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this,sharedData));
 						t_array[i].start();
 						i++;
 				}
@@ -170,17 +135,18 @@ public class JobThread implements Runnable {
 		}
 		// Checking if any of the workers died with a chunk and then we resend it to another worker
 		while (true){
-			synchronized (this.MAPCOUNTER_LOCK) {
-				if (getMapCounter()==numChunks){
+			synchronized (sharedData.getMapCounterLock()) {
+				if (sharedData.getMapCounter()==numChunks){
 					System.out.println(" All Maps Done ");
 					break;
 				}	
 			}
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			// Fault Tolerance Resending Failed Tasks
 			synchronized (HadoopMaster.QUEUE_LOCK) {
 				if (!HadoopMaster.busyWorkerMap.isEmpty() &&  !chunkWorkerMap.isEmpty()) {
 					Set<ChunkObject> chunkJob = chunkWorkerMap.keySet();
@@ -191,7 +157,7 @@ public class JobThread implements Runnable {
 							MapTask task = new MapTask(chunk, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 							HadoopMaster.busyWorkerMap.put(newWorker, chunk);
 							Message mapMessage = new Message(MessageType.START_MAP, task);
-							new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this)).start();
+							new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this,sharedData)).start();
 						}
 						else
 							break;
@@ -200,7 +166,7 @@ public class JobThread implements Runnable {
 			}
 			
 		}
-		
+		// Done with Maps 
 		System.out.println("[INFO] Done Map. Starting data partitioning...");		
 		reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
 		
@@ -222,14 +188,17 @@ public class JobThread implements Runnable {
 			}
 		}
 
-		
+		// Done with all Reducing Jobs
 		while (true) {
 			if (reduceDoneMessages.size() == HadoopMaster.numReducers) {
-				//Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
-				//Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));				
+				Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
+				Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));				
 				break;
 			}
 		}
+
 		System.out.println("[INFO] Done " + job.getJobName() + " job");
+		int id = Integer.parseInt((job.getJobName().split("_"))[1]);
+		HadoopMaster.jobMap.remove(id);
 	}	
 }
