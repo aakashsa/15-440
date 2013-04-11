@@ -13,6 +13,7 @@ import interfaces.Writable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -94,6 +95,9 @@ public class WorkerFunctions implements Runnable {
 			e1.printStackTrace();
 		}
 		
+		// Call the mapper init function
+		mapper.init();
+		
 		// Map each line; write it to worker output file
 		while (itr.hasNext()) {
 			InputFormat<?, ?> iformat = itr.next();
@@ -101,7 +105,13 @@ public class WorkerFunctions implements Runnable {
 			ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
 			
 			for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
-				recordWriter.writeRecord(kv, "\t", "~");
+				try {
+					recordWriter.writeRecord(kv, "\t", "~");
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
 			}
 			cx.clear();
 		}
@@ -125,7 +135,7 @@ public class WorkerFunctions implements Runnable {
 				
 		System.out.println("[INFO] Starting sort on reducer " + task.reducerNumber);
 		// Sort the reducer input file
-		InsertionSortRecords sorter = new InsertionSortRecords(task.reducerInputKeyClass, (int) task.mapperOutputSize, "\t", Utils.getReduceInputFileName(task.reducerNumber, task.jobName));
+		InsertionSortRecords sorter = new InsertionSortRecords(task.reducerInputKeyClass, (int) task.mapperOutputSize, "\t", Utils.getReduceInputFileName(task.reducerInputFileNumber, task.jobName));
 		sorter.sort();
 		System.out.println("[INFO] Done sorting on reducer " + task.reducerNumber);
 		

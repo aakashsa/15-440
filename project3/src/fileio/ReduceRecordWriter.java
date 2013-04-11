@@ -28,7 +28,7 @@ public class ReduceRecordWriter {
 	 * @throws FileNotFoundException If the output file is not found
 	 */
 	public ReduceRecordWriter(ReduceTask task) throws FileNotFoundException {
-		OutputStream outputFile = new FileOutputStream(Utils.getReduceOutputFileName(task.reducerNumber, task.outputDir), true);;
+		OutputStream outputFile = new FileOutputStream(Utils.getReduceOutputFileName(task.reducerInputFileNumber, task.outputDir), true);
 		this.outWriter = new PrintWriter(outputFile, true);
 	}
 	

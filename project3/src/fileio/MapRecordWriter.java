@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import lib.KeyValue;
 import lib.Utils;
@@ -42,11 +43,12 @@ public class MapRecordWriter {
 	 * necessary padding to make sure output records are of the expected size.
 	 * @param kv Key value to write
 	 * @param kvDelimiter Delimiter for the provided key and value
-	 * @param padString String to pad any left over bytes of the record with
+	 * @param padString String of size 1 byte to pad any left over bytes of the record with
 	 * @throws IllegalArgumentException If the record size is too small for key and value when concatenated with the delimiter
+	 * @throws UnsupportedEncodingException If there is an error in calculating the byte length of pad string
 	 */
-	public void writeRecord(KeyValue<Writable<?>, Writable<?>> kv, String kvDelimiter, String padString) throws IllegalArgumentException {
-		if (padString.length() != 1)
+	public void writeRecord(KeyValue<Writable<?>, Writable<?>> kv, String kvDelimiter, String padString) throws IllegalArgumentException, UnsupportedEncodingException {
+		if (padString.getBytes("UTF-8").length != 1)
 			throw new IllegalArgumentException("Pad string length is not 1 byte");
 		
 		String record = kv.getKey() + kvDelimiter + kv.getValue();

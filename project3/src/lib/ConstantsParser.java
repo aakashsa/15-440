@@ -55,10 +55,16 @@ public class ConstantsParser implements Serializable {
 	 * @param filePath File to parse
 	 */
 	private void parseConstants(String filePath) {
+		String[] provided = {"RECORD_SIZE", "CHUNK_SIZE", "NUMBER_REDUCERS", "MAPPER_OUTPUT_SIZE", "WORKERS"};
 		JSONParser parser = new JSONParser();
 		try {
 			JSONObject o = (JSONObject) parser.parse(new FileReader(filePath));
 
+			for (String s : provided) {
+				if (o.get(s) == null)
+					throw new IllegalArgumentException("No " + s + " provided");
+			}
+			
 			recordSize = (Long) o.get("RECORD_SIZE");
 			if (recordSize <= 0)
 				throw new IllegalArgumentException("Record size <= 0");
@@ -86,10 +92,16 @@ public class ConstantsParser implements Serializable {
 			JSONArray workers = (JSONArray) o.get("WORKERS");
 			for (Object obj : workers) {
 				JSONObject worker = (JSONObject) obj;
+				if (worker.get("ports") == null)
+					throw new IllegalArgumentException("No ports provided for at least one worker");
+				
 				JSONArray ports = (JSONArray) worker.get("ports");
 				
 				if (ports.size() <= 0)
 					throw new IllegalArgumentException("Each worker must have at least one port");
+				
+				if (worker.get("numcores") == null)
+					throw new IllegalArgumentException("No cores provided for at least one worker");
 				
 				long numCores = (Long) worker.get("numcores");
 				if (numCores <= 0)
@@ -98,6 +110,8 @@ public class ConstantsParser implements Serializable {
 				if (numCores != ports.size()) {
 					throw new IllegalArgumentException("Num ports must be equal to the number of cores");
 				}
+				if (worker.get("host") == null)
+					throw new IllegalArgumentException("No host provided for at least one worker");
 				String host = (String) worker.get("host");
 				for (Object p : ports) {
 					long port = (Long) p;

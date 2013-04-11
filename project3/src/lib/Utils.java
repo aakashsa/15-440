@@ -4,17 +4,27 @@ import java.io.File;
 import java.lang.reflect.ParameterizedType;
 
 import interfaces.InputFormat;
+import interfaces.Mapper;
+import interfaces.Reducer;
 
 /**
  * A Utils class that has useful utils functions.
  */
 public class Utils {
-	
+
 	/**
-	 * A function that performs sanity checks on the configurations of a given job
-	 * @param job Job to check
+	 * A function that performs sanity checks on the configurations of a given
+	 * job
+	 * 
+	 * @param job
+	 *            Job to check
+	 * @throws IllegalAccessException
+	 *             If there is an error in instantiating input format
+	 * @throws InstantiationException
+	 *             If there is an error in instantiating input format
 	 */
-	public static void performJobSanityChecks(Job job) {
+	public static void performJobSanityChecks(Job job)
+			throws InstantiationException, IllegalAccessException {
 		Job newJob = new Job();
 
 		// Check if all needed things are provided
@@ -22,7 +32,7 @@ public class Utils {
 			throw new IllegalArgumentException("No job name provided");
 		else
 			newJob.setJobName(job.getJobName());
-		
+
 		if (job.getMapperClass() == null)
 			throw new IllegalArgumentException("No mapper class provided");
 		else
@@ -63,6 +73,17 @@ public class Utils {
 		else
 			newJob.setReducerOutputValueClass(job.getReducerOutputValueClass());
 
+		// Check if mapper and reducer classes are actually mapper and reducer
+		// This check also ensures that the parameterized types are Writables
+		if (!Mapper.class.isAssignableFrom(newJob.getMapperClass())) {
+			throw new IllegalArgumentException(
+					"Mapper class provided does not implement mapper interface");
+		}
+		if (!Reducer.class.isAssignableFrom(newJob.getReducerClass())) {
+			throw new IllegalArgumentException(
+					"Reducer class provided does not implement reducer interface");
+		}
+
 		// Get types of actual Mapper and Reducer
 		ParameterizedType pt = (ParameterizedType) newJob.getMapperClass()
 				.getGenericInterfaces()[0];
@@ -75,34 +96,33 @@ public class Utils {
 		pt = (ParameterizedType) newJob.getReducerClass()
 				.getGenericInterfaces()[0];
 
-		String reducerK1 = ((Class<?>) pt.getActualTypeArguments()[0]).getName();
-		String reducerV1 = ((Class<?>) pt.getActualTypeArguments()[1]).getName();
-		String reducerK2 = ((Class<?>) pt.getActualTypeArguments()[2]).getName();
-		String reducerV2 = ((Class<?>) pt.getActualTypeArguments()[3]).getName();
+		String reducerK1 = ((Class<?>) pt.getActualTypeArguments()[0])
+				.getName();
+		String reducerV1 = ((Class<?>) pt.getActualTypeArguments()[1])
+				.getName();
+		String reducerK2 = ((Class<?>) pt.getActualTypeArguments()[2])
+				.getName();
+		String reducerV2 = ((Class<?>) pt.getActualTypeArguments()[3])
+				.getName();
 
-		try {
-			// Check if mapper input types match that required by file input
-			// format
-			InputFormat<?, ?> format = (InputFormat<?, ?>) job
-					.getFileInputFormatClass().newInstance();
-			if (!(format.getKeyType().equals(mapK1) && format.getValueType()
-					.equals(mapV1))) {
-				throw new IllegalArgumentException("File input format key value type (" + format.getKeyType() + ", " + format.getValueType() + ") don't match input key value types of mapper");
-			}
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+		// Check if mapper input types match that required by file input
+		// format
+		InputFormat<?, ?> format = (InputFormat<?, ?>) job
+				.getFileInputFormatClass().newInstance();
+		if (!(format.getKeyType().equals(mapK1) && format.getValueType()
+				.equals(mapV1))) {
+			throw new IllegalArgumentException(
+					"File input format key value type (" + format.getKeyType()
+							+ ", " + format.getValueType()
+							+ ") don't match input key value types of mapper");
 		}
-
 		// Check if the types user specified are the same as the actual mapper
 		// and reducer
 		if (!(mapK2.equals(newJob.getMapperOutputKeyClass().getName()))) {
 			throw new IllegalArgumentException(
 					"Actual Mapper output key type and that provided in configuration don't match. Expected: "
 							+ mapK2
-							+ "; Actual: "
-							+ "lib."
+							+ "; Actual: lib."
 							+ newJob.getMapperOutputKeyClass().getName());
 		}
 		if (!(mapV2.equals(newJob.getMapperOutputValueClass().getName()))) {
@@ -140,6 +160,7 @@ public class Utils {
 
 	/**
 	 * A function to remove a directory and files in it.
+	 * 
 	 * @param directory Directory to remove
 	 * @return Whether the directory was deleted successfully or not
 	 */
@@ -173,6 +194,7 @@ public class Utils {
 
 	/**
 	 * Get partition directory name
+	 * 
 	 * @return Partition dir name
 	 */
 	public static String getPartitionDirName(String jobName) {
@@ -181,48 +203,64 @@ public class Utils {
 
 	/**
 	 * Get location of reducer's input file name
-	 * @param reducerNumber ID of reducer
-	 * @param jobName Name of job
+	 * 
+	 * @param reducerNumber
+	 *            ID of reducer
+	 * @param jobName
+	 *            Name of job
 	 * @return Input file name for reducer
 	 */
-	public static String getReduceInputFileName(int reducerNumber, String jobName) {
-		return getPartitionDirName(jobName) + "/reducer_" + reducerNumber + ".txt";
+	public static String getReduceInputFileName(int reducerNumber,
+			String jobName) {
+		return getPartitionDirName(jobName) + "/reducer_" + reducerNumber
+				+ ".txt";
 	}
-	
+
 	/**
 	 * Return name of reduce output file
-	 * @param reducerNumber ID of reducer
-	 * @param outputDir Output file directory
+	 * 
+	 * @param reducerNumber
+	 *            ID of reducer
+	 * @param outputDir
+	 *            Output file directory
 	 * @return Reduce output file name (e.g. outputDir/part_i.txt)
 	 */
-	public static String getReduceOutputFileName(int reducerNumber, String outputDir) {
+	public static String getReduceOutputFileName(int reducerNumber,
+			String outputDir) {
 		return outputDir + "/part_" + reducerNumber + ".txt";
 	}
-	
+
 	/**
 	 * Get name of final answers directory
-	 * @return Final answers directory 
+	 * 
+	 * @return Final answers directory
 	 */
 	public static String getFinalAnswersDir(String jobName) {
-		return jobName+"_final_answers";
+		return jobName + "_final_answers";
 	}
-	
+
 	/**
 	 * Get directory name of output files of workers
-	 * @param jobName Name of job
+	 * 
+	 * @param jobName
+	 *            Name of job
 	 * @return Directory name of worker output files
 	 */
 	public static String getWorkerOutputFilesDirName(String jobName) {
 		return jobName + "_worker";
 	}
-	
+
 	/**
 	 * Get file name of worker
-	 * @param workerNum ID or worker
-	 * @param jobName Name of job
+	 * 
+	 * @param workerNum
+	 *            ID or worker
+	 * @param jobName
+	 *            Name of job
 	 * @return File name for worker to write to
 	 */
 	public static String getWorkerOutputFileName(int workerNum, String jobName) {
-		return getWorkerOutputFilesDirName(jobName) + "/worker" + workerNum + ".txt";
+		return getWorkerOutputFilesDirName(jobName) + "/worker" + workerNum
+				+ ".txt";
 	}
 }

@@ -40,7 +40,7 @@ public class ReduceRecordReader {
 	 * @throws IllegalAccessException If there is an error in initializing support key,value
 	 */
 	public ReduceRecordReader(ReduceTask task) throws FileNotFoundException, InstantiationException, IllegalAccessException {		
-		File inputFile = new File(Utils.getReduceInputFileName(task.reducerNumber, task.jobName));
+		File inputFile = new File(Utils.getReduceInputFileName(task.reducerInputFileNumber, task.jobName));
 		FileInputStream fis;
 		fis = new FileInputStream(inputFile);
 		this.br = new BufferedReader(new InputStreamReader(fis));

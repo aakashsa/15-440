@@ -41,6 +41,10 @@ public class ReduceTask extends Task implements Serializable {
 	 * Record size of concatenation of key and value of mapper output
 	 */
 	public long mapperOutputSize;
+	/**
+	 * File number of reducer input file
+	 */
+	public int reducerInputFileNumber;
 	
 	/**
 	 * Constructor
@@ -52,7 +56,7 @@ public class ReduceTask extends Task implements Serializable {
 	 * @param jobName Job name to which this reduce task belongs to
 	 * @param mapperOutputSize Record size of concatenation of key and value of mapper output
 	 */
-	public ReduceTask(int reducerNumber, Class<?> reducerClass, Class<?> reducerInputKeyClass, Class<?> reducerInputValueClass, String outputDir, String jobName, long mapperOutputSize) {
+	public ReduceTask(int reducerNumber, Class<?> reducerClass, Class<?> reducerInputKeyClass, Class<?> reducerInputValueClass, String outputDir, String jobName, long mapperOutputSize, int reduceInputFileNumber) {
 		this.reducerClass = reducerClass;
 		this.reducerNumber = reducerNumber;
 		this.reducerInputKeyClass = reducerInputKeyClass;
@@ -60,5 +64,6 @@ public class ReduceTask extends Task implements Serializable {
 		this.outputDir = outputDir;
 		this.jobName = jobName;
 		this.mapperOutputSize = mapperOutputSize;
+		this.reducerInputFileNumber = reduceInputFileNumber;
 	}	
 }

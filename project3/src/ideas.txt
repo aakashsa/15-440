@@ -41,9 +41,3 @@ File writes:
 * Partitioner reads worker files and writes to jobname_partition/reducer_i.txt
 * Reducer reads its file and writes to final_answers/part_i.txt
 
-Check if the mapper class is an instance of Mapper type. Similarly for reducer.
-Add a call to init() in map tasks
-PadString size check in map record writer
-Check if map works without returning the context
-
-

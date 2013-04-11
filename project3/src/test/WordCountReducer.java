@@ -7,9 +7,15 @@ import lib.IntWritable;
 import lib.TextWritable;
 import interfaces.Reducer;
 
+/**
+ * Word count reducer
+ */
 public class WordCountReducer implements
 		Reducer<TextWritable, IntWritable, TextWritable, IntWritable> {
 
+	/**
+	 * Word count reducer function
+	 */
 	@Override
 	public void reduce(TextWritable key, Iterator<IntWritable> values,
 			Context<TextWritable, IntWritable> context) {

@@ -1,16 +1,21 @@
 package test;
 
+import interfaces.JobConfiguration;
 import lib.IntWritable;
 import lib.Job;
 import lib.TextInputFormat;
 import lib.TextWritable;
 
-public class JobConfiguration {
+/**
+ * A setup class for the word count job
+ */
+public class JobSetupClass implements JobConfiguration{
 
-	public Job[] setup() {
-		
-		Job[] jobs = new Job[1];
-		
+	/**
+	 * Setup function for wordcount job
+	 */
+	public Job setup() {
+				
 		Job job = new Job();
 		job.setJobName("wordcount");
 		
@@ -24,9 +29,7 @@ public class JobConfiguration {
 		job.setReducerOutputKeyClass(TextWritable.class);
 		job.setReducerOutputValueClass(IntWritable.class);
 		
-		jobs[0] = job;
-		
-		return jobs;
+		return job;
 	}
 	
 }

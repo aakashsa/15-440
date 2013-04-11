@@ -7,10 +7,15 @@ import lib.IntWritable;
 import lib.NullWritable;
 import lib.TextWritable;
 
-
+/**
+ * Word count mapper
+ */
 public class WordCountMapper implements
 		Mapper<NullWritable, TextWritable, TextWritable, IntWritable> {
 
+	/**
+	 * Word count map function
+	 */
 	@Override
 	public void map(NullWritable key, TextWritable value, Context<TextWritable, IntWritable> context) {
 
@@ -23,6 +28,9 @@ public class WordCountMapper implements
 		}
 	}
 
+	/**
+	 * Word count init function. Does nothing as we don't need any initializing
+	 */
 	@Override
 	public void init() {
 	}

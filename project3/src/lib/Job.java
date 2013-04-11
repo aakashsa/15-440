@@ -33,7 +33,7 @@ public class Job {
 	}
 
 	public void setJobName(String jobName) {
-		this.jobName = jobName+"_"+HadoopMaster.counter;
+		this.jobName = jobName + "_" + HadoopMaster.jobCounter;
 	}
 
 	public Class<?> getFileInputFormatClass() {
