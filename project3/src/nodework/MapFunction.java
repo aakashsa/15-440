@@ -45,8 +45,10 @@ public class MapFunction {
 			mapper = (Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>>) task.mapperClass.newInstance();
 		} catch (InstantiationException e2) {
 			out.writeObject(new Message(MessageType.EXCEPTION,e2));		
+			return;
 		} catch (IllegalAccessException e2) {
 			out.writeObject(new Message(MessageType.EXCEPTION,e2));	
+			return;
 		}
 		
 		Context<Writable<?>, Writable<?>> cx = new Context<Writable<?>, Writable<?>>();
@@ -56,7 +58,8 @@ public class MapFunction {
 		try {
 			recordWriter = new MapRecordWriter(task);
 		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+			out.writeObject(new Message(MessageType.EXCEPTION,e1));	
+			return;
 		}
 		
 		// Call the mapper init function
@@ -72,9 +75,11 @@ public class MapFunction {
 				try {
 					recordWriter.writeRecord(kv, "\t", "~");
 				} catch (IllegalArgumentException e) {
-					out.writeObject(new Message(MessageType.EXCEPTION,e));				
+					out.writeObject(new Message(MessageType.EXCEPTION,e));	
+					return;
 				} catch (UnsupportedEncodingException e) {
 					out.writeObject(new Message(MessageType.EXCEPTION,e));
+					return;
 				}
 			}
 			cx.clear();

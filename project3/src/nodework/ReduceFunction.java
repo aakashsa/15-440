@@ -53,10 +53,13 @@ public class ReduceFunction {
 			reducer = (Reducer<Writable<?>, Writable<?>, Writable<?>, Writable<?>>) task.reducerClass.newInstance();
 		} catch (FileNotFoundException e2) {
 			out.writeObject(new Message(MessageType.EXCEPTION, e2));
+			return;
 		} catch (InstantiationException e2) {
 			out.writeObject(new Message(MessageType.EXCEPTION, e2));
+			return;
 		} catch (IllegalAccessException e2) {
 			out.writeObject(new Message(MessageType.EXCEPTION, e2));
+			return;
 		}
 
 		// Create new context
@@ -68,8 +71,10 @@ public class ReduceFunction {
 			prevKey = (Writable<?>) task.reducerInputKeyClass.newInstance();
 		} catch (InstantiationException e1) {
 			out.writeObject(new Message(MessageType.EXCEPTION, e1));
+			return;
 		} catch (IllegalAccessException e1) {
 			out.writeObject(new Message(MessageType.EXCEPTION, e1));
+			return;
 		}
 
 		Iterator<Writable<?>> valueItr = null;
