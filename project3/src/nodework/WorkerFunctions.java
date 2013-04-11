@@ -1,6 +1,8 @@
 package nodework;
 
 import interfaces.Task;
+
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import communication.MapTask;
@@ -34,11 +36,15 @@ public class WorkerFunctions implements Runnable {
 	 */
 	@Override
 	public void run() {
-		if (this.type == MessageType.START_MAP) {
-			MapFunction.doMap((MapTask) this.task, this.out);
-		} else if (this.type == MessageType.START_REDUCE) {
-			ReduceFunction.doReduce((ReduceTask) this.task, this.out);
-		}
+		try {
+			if (this.type == MessageType.START_MAP) {
+				MapFunction.doMap((MapTask) this.task, this.out);
+			} else if (this.type == MessageType.START_REDUCE) {				
+				ReduceFunction.doReduce((ReduceTask) this.task, this.out);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 	
 }	

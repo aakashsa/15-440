@@ -12,7 +12,11 @@ import communication.MapTask;
 import communication.Message;
 import communication.MessageType;
 import communication.ReduceTask;
-
+/**
+ * Main Clas begins the Execution of the Worker Class
+ * @author aakashsabharwal
+ *
+ */
 public class WorkerThread implements Runnable {
 
 	private int port;
