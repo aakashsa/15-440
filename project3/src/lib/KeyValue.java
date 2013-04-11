@@ -21,12 +21,17 @@ public class KeyValue<K,V> {
 		this.value = value;
 	}
 	/**
-	 * Getters for key and value
+	 * Get key
+	 * @return Key
 	 */
 	public K getKey() {
 		return key;
 	}
 	
+	/**
+	 * Get value
+	 * @return Value
+	 */
 	public V getValue() {
 		return value;
 	}

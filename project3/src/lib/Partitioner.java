@@ -10,13 +10,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
+/**
+ * Class to do the partitioning of mapper output
+ */
 public class Partitioner {
 
 	/**
 	 * A function that takes output from each map worker and
 	 * hashes each key in those worker files to a particular reducer file
-	 * @param cp
-	 * @param jobName
+	 * @param cp Constants parser object
+	 * @param jobName Name of job running partitioning
 	 */
 	public static void partitionMapOutputData(ConstantsParser cp, String jobName) {
 		

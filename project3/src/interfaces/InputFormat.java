@@ -25,31 +25,31 @@ public abstract class InputFormat<K extends Writable<?>, V extends Writable<?>> 
 	
 	/**
 	 * An abstract function to parse key and value for a particular input format
-	 * @param str
+	 * @param str String to parse
 	 */
 	public abstract void parse(String str);
 	
 	/**
 	 * Get key of input format
-	 * @return key
+	 * @return Key
 	 */
 	public abstract K getKey();
 	
 	/**
 	 * Get value of input format
-	 * @return value
+	 * @return Value
 	 */
 	public abstract V getValue();
 	
 	/**
 	 * Get type of key
-	 * @return key type
+	 * @return Key type
 	 */
 	public abstract String getKeyType();
 	
 	/**
 	 * Get value type
-	 * @return value type
+	 * @return Value type
 	 */
 	public abstract String getValueType();
 }

@@ -6,8 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import lib.TextWritable;
-
+/**
+ * Class that performs insertion sort on a file with fixed structure.
+ */
 public class InsertionSortRecords {
 
 	private Class<?> keyClass = null;
@@ -16,9 +17,9 @@ public class InsertionSortRecords {
 	private String kvDelimiter;
 
 	/**
-	 * @param keyClass - Class of Key's Written 
-	 * @param recordSize  - Record Size
-	 * @param fileName - Name of File to be Sorted
+	 * @param keyClass Class of Key's Written 
+	 * @param recordSize  Record Size
+	 * @param fileName Name of File to be Sorted
 	 */
 	public InsertionSortRecords(Class<?> keyClass, int recordSize, String kvDelimiter, String fileName) {
 		this.keyClass = keyClass;
@@ -29,8 +30,8 @@ public class InsertionSortRecords {
 
 	/**
 	 * Function to Compare two K2,V2 record strings
-	 * @param record1 - Record number 1 
-	 * @param record2 - Record number 2 
+	 * @param record1 Record number 1 
+	 * @param record2 Record number 2 
 	 */
 	public int compareRecords(String record1, String record2) {
 		
@@ -56,12 +57,8 @@ public class InsertionSortRecords {
 	}
 
 	/**
-	 * @param args
+	 * The sort function
 	 */
-	public static void main(String[] args) {
-		new InsertionSortRecords(TextWritable.class, 9, "src/wordcount_partition/reducer_1.txt", "\t").sort();
-	}
-
 	public void sort() {
 		RandomAccessFile rin = null;
 		try {

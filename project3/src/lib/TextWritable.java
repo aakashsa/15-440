@@ -16,7 +16,7 @@ public class TextWritable extends Writable<String> {
 	
 	/**
 	 * Constructor that sets a string
-	 * @param i
+	 * @param s String to set in this text writable
 	 */
 	public TextWritable(String s) {
 		this.s = s;
@@ -24,6 +24,7 @@ public class TextWritable extends Writable<String> {
 	
 	/**
 	 * A function that parses a string from string
+	 * @param s String to parse
 	 */
 	@Override
 	public TextWritable parseFromString(String s) {
@@ -33,7 +34,7 @@ public class TextWritable extends Writable<String> {
 	
 	/**
 	 * Getter for value of writable
-	 * @return value
+	 * @return Value
 	 */
 	public String getValue() {
 		return s;
@@ -41,7 +42,7 @@ public class TextWritable extends Writable<String> {
 	
 	/**
 	 * Setter for value of writable
-	 * @param i - value to set
+	 * @param s Value to set
 	 */
 	public void setValue(String s) {
 		this.s = s;
@@ -49,6 +50,7 @@ public class TextWritable extends Writable<String> {
 
 	/**
 	 * To string function
+	 * @return String representation of this writable
 	 */
 	@Override
 	public String toString() {
@@ -57,7 +59,7 @@ public class TextWritable extends Writable<String> {
 	
 	/**
 	 * Compare the value of this object to the value of callee
-	 * @Object arg0 - argument to be compared with
+	 * @param arg0 Argument to be compared with
 	 */
 	@Override
 	public int compareTo(Object arg0) {

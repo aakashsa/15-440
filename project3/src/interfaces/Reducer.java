@@ -17,9 +17,9 @@ public interface Reducer <K1 extends Writable<?>, V1 extends Writable<?>, K2 ext
 
 	/**
 	 * The reduce function
-	 * @param key - key
-	 * @param values - value iterator
-	 * @param context - context to write results of reduce to
+	 * @param key Key
+	 * @param values Value iterator of values associated to the key
+	 * @param context Context to write results of reduce to
 	 */
 	public void reduce(K2 key, Iterator<V2> values, Context<K2, V2> context);
 

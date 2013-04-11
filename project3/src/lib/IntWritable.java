@@ -19,7 +19,7 @@ public class IntWritable extends Writable<Integer> {
 	
 	/**
 	 * Constructor that sets an integer value
-	 * @param i
+	 * @param i Value to set
 	 */
 	public IntWritable(int i) {
 		this.i = i;
@@ -27,7 +27,7 @@ public class IntWritable extends Writable<Integer> {
 		
 	/**
 	 * Getter for value of writable
-	 * @return value
+	 * @return Value
 	 */
 	@Override
 	public Integer getValue() {
@@ -35,15 +35,8 @@ public class IntWritable extends Writable<Integer> {
 	}
 	
 	/**
-	 * Setter for value of writable
-	 * @param i - value to set
-	 */
-	public void setValue(int i) {
-		this.i = i;
-	}
-
-	/**
 	 * To string function
+	 * @return String representation of this writable
 	 */
 	@Override
 	public String toString() {
@@ -52,6 +45,7 @@ public class IntWritable extends Writable<Integer> {
 
 	/**
 	 * A function that parses an integer writable from string
+	 * @return Writable parsed from given string
 	 */
 	@Override
 	public IntWritable parseFromString(String s) {
@@ -64,7 +58,7 @@ public class IntWritable extends Writable<Integer> {
 	}
 	/**
 	 * Compare the value of this object to the value of callee
-	 * @Object arg0 - argument to be compared with
+	 * @param arg0 Argument to be compared with
 	 */
 	@Override
 	public int compareTo(Object arg0) {

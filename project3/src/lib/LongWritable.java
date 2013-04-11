@@ -19,7 +19,7 @@ public class LongWritable extends Writable<Long> {
 	
 	/**
 	 * Constructor that sets a long value
-	 * @param i
+	 * @param i Value to set
 	 */
 	public LongWritable(long i) {
 		this.i = i;
@@ -27,6 +27,7 @@ public class LongWritable extends Writable<Long> {
 	
 	/**
 	 * A function that parses a long writable from string
+	 * @param s String to parse
 	 */
 	@Override
 	public LongWritable parseFromString(String s) {
@@ -40,7 +41,7 @@ public class LongWritable extends Writable<Long> {
 	
 	/**
 	 * Getter for value of writable
-	 * @return value
+	 * @return Value
 	 */
 	@Override
 	public Long getValue() {
@@ -49,7 +50,7 @@ public class LongWritable extends Writable<Long> {
 	
 	/**
 	 * Setter for value of writable
-	 * @param i - value to set
+	 * @param i Value to set
 	 */
 	public void setValue(long i) {
 		this.i = i;
@@ -65,7 +66,7 @@ public class LongWritable extends Writable<Long> {
 
 	/**
 	 * Compare the value of this object to the value of callee
-	 * @Object arg0 - argument to be compared with
+	 * @param arg0 Argument to be compared with
 	 */
 	@Override
 	public int compareTo(Object arg0) {

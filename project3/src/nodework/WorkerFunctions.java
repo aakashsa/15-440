@@ -25,18 +25,31 @@ import communication.Message;
 import communication.MessageType;
 import communication.ReduceTask;
 
+/**
+ * Class that contains the map and reduce functions to perform
+ */
 public class WorkerFunctions implements Runnable {
 
 	private MessageType type;
 	private Task task;
 	private ObjectOutputStream out;
 	
+	/**
+	 * Constructor for a new map/reduce function performer
+	 * @param type Type of message
+	 * @param task Task to perform
+	 * @param out Output stream to write results to
+	 */
 	public WorkerFunctions(MessageType type, Task task, ObjectOutputStream out) {
 		this.type = type;
 		this.task = task;
 		this.out = out;
 	}
 	
+	/**
+	 * The run method of this runnable. It just checks
+	 * if it needs to perform a map or reduce, and calls the appropriate function.
+	 */
 	@Override
 	public void run() {
 		if (this.type == MessageType.START_MAP) {
@@ -46,23 +59,31 @@ public class WorkerFunctions implements Runnable {
 		}
 	}
 	
+	/**
+	 * The function that carries out map operation
+	 * @param task The map task
+	 * @param out Output stream to write acknowledgement to
+	 */
 	@SuppressWarnings("unchecked")
 	public static void doMap(MapTask task, ObjectOutputStream out) {
 		System.out.println("[INFO] Received map task on " + task.wi.getWorkerNum());
 		
 		// Use file input format to read records from file
 		MapRecordReader recordReader = new MapRecordReader(task.fileInputFormat);
-		Iterator<InputFormat<Writable<?>, Writable<?>>> itr = recordReader.readChunk(task.chunk);
-		
+		Iterator<InputFormat<Writable<?>, Writable<?>>> itr = null;
 		// Initialize Mapper instance
 		Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>> mapper = null;
 		try {
+			itr = recordReader.readChunk(task.chunk);
 			mapper = (Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>>) task.mapperClass.newInstance();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+		} catch (InstantiationException e2) {
+			e2.printStackTrace();
+		} catch (IllegalAccessException e2) {
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			e2.printStackTrace();
 		}
+		
 		Context<Writable<?>, Writable<?>> cx = new Context<Writable<?>, Writable<?>>();
 		
 		// Initialize record writer
@@ -93,6 +114,11 @@ public class WorkerFunctions implements Runnable {
 		}
 	}
 	
+	/**
+	 * The function that carries out reduce operation
+	 * @param task The reduce task
+	 * @param out Output stream to write acknowledgement to	 
+	 */
 	@SuppressWarnings({ "unchecked" })
 	public static void doReduce(ReduceTask task, ObjectOutputStream out) {
 		System.out.println("[INFO] Received reduce task on reducer " + task.reducerNumber);

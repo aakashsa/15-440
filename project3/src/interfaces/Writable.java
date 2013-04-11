@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * An interface that represents all writable types supported by the map-reduce facility
  *
- * @param <T> Type to support
+ * @param <T> Type to support as writable
  */
 public abstract class Writable<T> implements Serializable {
 
@@ -15,7 +15,7 @@ public abstract class Writable<T> implements Serializable {
 	
 	/**
 	 * A function to parse the writable type from string
-	 * @param s - string to parse
+	 * @param s String to parse
 	 * @return Writable type object
 	 */
 	public abstract Writable<T> parseFromString(String s);
@@ -24,7 +24,7 @@ public abstract class Writable<T> implements Serializable {
 
 	/**
 	 * A function to get all the writable types supported by the facility
-	 * @return set of supported formats
+	 * @return Set of supported formats
 	 */
 	public static Set<String> validInputFormats() {
 		validFormats.add("IntWritable");
@@ -41,11 +41,15 @@ public abstract class Writable<T> implements Serializable {
 	@Override
 	public abstract String toString();
 	
+	/**
+	 * A function that gets the value in this writable
+	 * @return Value in this writable
+	 */
 	public abstract T getValue();
 	
 	/**
 	 * Compare the value of this object to the value of callee
-	 * @Object arg0 - argument to be compared with
+	 * @param arg0 Argument to be compared with
 	 */
 	public abstract int compareTo(Object arg0);
 

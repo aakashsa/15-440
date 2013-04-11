@@ -1,6 +1,5 @@
 package fileio;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -11,13 +10,18 @@ import interfaces.InputFormat;
 import communication.ChunkObject;
 
 /**
- * This class represents a record reader to map input.
+ * This class represents a record reader to mapper input.
  *
  */
 public class MapRecordReader {
 
+	/**
+	 * Pointer to file to read from
+	 */
 	private RandomAccessFile rin;
-	public int read = 0;
+	/**
+	 * File input format type
+	 */
 	private Class<?> inputFormatClass;
 	
 	/**
@@ -29,46 +33,39 @@ public class MapRecordReader {
 	}
 	
 	/**
-	 * Read the records in a given chunk and return an iterator over those records
+	 * Read the records in a given chunk.
 	 * @param chunk Chunk to read
-	 * @return iterator over records in chunk
+	 * @return Iterator over records in chunk
+	 * @throws IllegalAccessException If there is a problem in instantiating the input format
+	 * @throws InstantiationException If there is a problem in instantiating the input format
+	 * @throws IOException If there is an error in reading from file
 	 */
 	@SuppressWarnings("unchecked")
-	public Iterator<InputFormat<Writable<?>, Writable<?>>> readChunk(ChunkObject chunk) {
-		this.read = 0;
+	public Iterator<InputFormat<Writable<?>, Writable<?>>> readChunk(ChunkObject chunk) throws InstantiationException, IllegalAccessException, IOException {
 		ArrayList<InputFormat<Writable<?>, Writable<?>>> records = new ArrayList<InputFormat<Writable<?>, Writable<?>>>();
 		
-		try {
-			rin = new RandomAccessFile(chunk.getFileName(), "r");
-			byte[] recordBytes = new byte[chunk.getRecordSize()];
-			System.out.println("[INFO] Reading Map chunk Number " + chunk.getChunkNumber());
+		rin = new RandomAccessFile(chunk.getFileName(), "r");
+		byte[] recordBytes = new byte[chunk.getRecordSize()];
+		System.out.println("[INFO] Reading Map chunk Number " + chunk.getChunkNumber());
 
-			int temp = 0;
-			for (int i = 0; i < chunk.getNumRecordsChunk(); i++) {
-				// Seek to the needed record
-				rin.seek(chunk.getChunkNumber() * chunk.getNumRecordsChunk()
-						* chunk.getRecordSize() + chunk.getRecordSize() * i);
+		int temp = 0;
+		for (int i = 0; i < chunk.getNumRecordsChunk(); i++) {
+			// Seek to the needed record
+			rin.seek(chunk.getChunkNumber() * chunk.getNumRecordsChunk()
+					* chunk.getRecordSize() + chunk.getRecordSize() * i);
 
-				temp = rin.read(recordBytes, 0, chunk.getRecordSize());
-				if (temp==-1)
-					break;
-				read+= temp;
-				// Check for Encoding Characters
-				String value = new String(recordBytes);
-				
-				InputFormat<Writable<?>, Writable<?>> iFormat = (InputFormat<Writable<?>, Writable<?>>) inputFormatClass.newInstance();
-				iFormat.parse(value);
-				records.add(iFormat);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			temp = rin.read(recordBytes, 0, chunk.getRecordSize());
+			if (temp==-1)
+				break;
+
+			// Check for Encoding Characters
+			String value = new String(recordBytes);
+			
+			InputFormat<Writable<?>, Writable<?>> iFormat = (InputFormat<Writable<?>, Writable<?>>) inputFormatClass.newInstance();
+			iFormat.parse(value);
+			records.add(iFormat);
 		}
+		
 		return records.iterator();
 	}
 	

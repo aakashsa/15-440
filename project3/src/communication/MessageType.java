@@ -5,11 +5,32 @@ package communication;
  * between worker and master
  */
 public enum MessageType {
-	START_MAP,     // type to start a map task
-	START_REDUCE,  // type to start a reduce task
-	DONE_MAP,      // type to indicate a finished map task
-	DONE_REDUCE,   // type to indicate a finished reduce task
-	EXCEPTION,     // type to indicate an exception
-	PING_REQUEST,  // type to indicate a ping request from master to worker
-	PING_REPLY;    // type to indicate a ping reply from worker to master
+	/**
+	 * Type to instruct to start a map task
+	 */
+	START_MAP,
+	/**
+	 * Type to instruct to start a reduce task
+	 */
+	START_REDUCE,
+	/**
+	 * Type to indicate a finished map task
+	 */
+	DONE_MAP,
+	/**
+	 * Type to indicate a finished reduce task
+	 */
+	DONE_REDUCE,
+	/**
+	 * Type to indicate an exception
+	 */
+	EXCEPTION,
+	/**
+	 * Type to indicate a ping request from master to worker
+	 */
+	PING_REQUEST,
+	/**
+	 * Type to indicate a ping reply from worker to master
+	 */
+	PING_REPLY;
 }

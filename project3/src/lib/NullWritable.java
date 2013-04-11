@@ -21,6 +21,7 @@ public class NullWritable extends Writable<String> {
 	
 	/**
 	 * A function that parses a null object
+	 * @return String to parse
 	 */
 	@Override
 	public NullWritable parseFromString(String s) {
@@ -36,7 +37,7 @@ public class NullWritable extends Writable<String> {
 	}
 
 	/**
-	 * A string representation of null
+	 * @return String representation of null
 	 */
 	@Override
 	public String toString() {
@@ -45,7 +46,7 @@ public class NullWritable extends Writable<String> {
 	
 	/**
 	 * Compare the value of this object to the value of callee
-	 * @Object arg0 - argument to be compared with
+	 * @param arg0 Argument to be compared with
 	 */
 	@Override
 	public int compareTo(Object arg0) {

@@ -18,8 +18,17 @@ import communication.ReduceTask;
  */
 public class ReduceRecordReader {
 
+	/**
+	 * Pointer to the buffered reader
+	 */
 	private BufferedReader br;
+	/**
+	 * An instance of current key
+	 */
 	private Writable<?> keyInstance;
+	/**
+	 * An instance of current value
+	 */
 	private Writable<?> valueInstance;
 	
 	/**
@@ -27,8 +36,8 @@ public class ReduceRecordReader {
 	 * key and value instances
 	 * @param task The reduce task this reader concerns
 	 * @throws FileNotFoundException If input file is not found
-	 * @throws InstantiationException When initializing support key,value
-	 * @throws IllegalAccessException When initializing support key,value
+	 * @throws InstantiationException If there is an error in initializing support key,value
+	 * @throws IllegalAccessException If there is an error in initializing support key,value
 	 */
 	public ReduceRecordReader(ReduceTask task) throws FileNotFoundException, InstantiationException, IllegalAccessException {		
 		File inputFile = new File(Utils.getReduceInputFileName(task.reducerNumber, task.jobName));

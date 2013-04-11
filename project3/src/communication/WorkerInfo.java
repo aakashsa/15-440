@@ -3,21 +3,30 @@ package communication;
 import java.io.Serializable;
 
 /**
- * A type to store all information for a particular worker node
- *
+ * A type to store all information for a particular worker node.
+ * This class is serializable.
  */
 public class WorkerInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	/**
+	 * ID of worker
+	 */
 	private int workerNum;
+	/**
+	 * Host of worker
+	 */
 	private String host;
+	/**
+	 * Port the worker is listening on
+	 */
 	private int port;
 	
 	/**
 	 * Constructor
-	 * @param workerNum - id of worker
-	 * @param host - host of worker
-	 * @param port - port the worker is listening on
+	 * @param workerNum ID of worker
+	 * @param host Host of worker
+	 * @param port Port the worker is listening on
 	 */
 	public WorkerInfo(int workerNum, String host, int port) {
 		this.workerNum = workerNum;
@@ -51,6 +60,7 @@ public class WorkerInfo implements Serializable {
 	
 	/**
 	 * Equals method for a worker information
+	 * @param wi Other worker info to compare to
 	 */
 	@Override
 	public boolean equals(Object wi) {

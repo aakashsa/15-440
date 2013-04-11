@@ -13,6 +13,7 @@ public class TextInputFormat extends InputFormat<NullWritable, TextWritable> {
 	
 	/**
 	 * Parse a string into this input format
+	 * @param str String to parse
 	 */
 	@Override
 	public void parse(String str) {
@@ -21,6 +22,7 @@ public class TextInputFormat extends InputFormat<NullWritable, TextWritable> {
 	
 	/**
 	 * Get key
+	 * @return Key
 	 */
 	public NullWritable getKey() {
 		return key;
@@ -28,6 +30,7 @@ public class TextInputFormat extends InputFormat<NullWritable, TextWritable> {
 	
 	/**
 	 * Get value
+	 * @return Value
 	 */
 	public TextWritable getValue() {
 		return value;
@@ -35,6 +38,7 @@ public class TextInputFormat extends InputFormat<NullWritable, TextWritable> {
 
 	/**
 	 * Get key type
+	 * @return String name of key type
 	 */
 	@Override
 	public String getKeyType() {
@@ -43,6 +47,7 @@ public class TextInputFormat extends InputFormat<NullWritable, TextWritable> {
 
 	/**
 	 * Get value type
+	 * @return String name of value type
 	 */
 	@Override
 	public String getValueType() {

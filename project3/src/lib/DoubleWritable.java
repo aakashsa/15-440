@@ -4,11 +4,13 @@ import interfaces.Writable;
 
 /**
  * A writable type that represents a double number
- *
  */
 public class DoubleWritable extends Writable<Double> {
 
 	private static final long serialVersionUID = 1L;
+	/**
+	 * Value in this writable
+	 */
 	private double i;
 	
 	/**
@@ -19,7 +21,7 @@ public class DoubleWritable extends Writable<Double> {
 	
 	/**
 	 * Constructor that sets a double value
-	 * @param i
+	 * @param i Value to set
 	 */
 	public DoubleWritable(double i) {
 		this.i = i;
@@ -27,6 +29,7 @@ public class DoubleWritable extends Writable<Double> {
 	
 	/**
 	 * A function that parses a double writable from string
+	 * @return The double writable that is parsed from this string
 	 */
 	@Override
 	public DoubleWritable parseFromString(String s) {
@@ -40,7 +43,7 @@ public class DoubleWritable extends Writable<Double> {
 	
 	/**
 	 * Getter for value of writable
-	 * @return value
+	 * @return Value
 	 */
 	@Override
 	public Double getValue() {
@@ -48,15 +51,8 @@ public class DoubleWritable extends Writable<Double> {
 	}
 	
 	/**
-	 * Setter for value of writable
-	 * @param i - value to set
-	 */
-	public void setValue(double i) {
-		this.i = i;
-	}
-
-	/**
 	 * To string function
+	 * @return String representation of double number
 	 */
 	@Override
 	public String toString() {
@@ -65,7 +61,7 @@ public class DoubleWritable extends Writable<Double> {
 	
 	/**
 	 * Compare the value of this object to the value of callee
-	 * @Object arg0 - argument to be compared with
+	 * @param arg0 Argument to be compared with
 	 */
 	@Override
 	public int compareTo(Object arg0) {

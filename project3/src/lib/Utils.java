@@ -12,7 +12,7 @@ public class Utils {
 	
 	/**
 	 * A function that performs sanity checks on the configurations of a given job
-	 * @param job - job to check
+	 * @param job Job to check
 	 */
 	public static void performJobSanityChecks(Job job) {
 		Job newJob = new Job();
@@ -140,8 +140,8 @@ public class Utils {
 
 	/**
 	 * A function to remove a directory and files in it.
-	 * @param directory - directory to remove
-	 * @return whether the directory was deleted successfully or not
+	 * @param directory Directory to remove
+	 * @return Whether the directory was deleted successfully or not
 	 */
 	public static boolean removeDirectory(File directory) {
 
@@ -173,7 +173,7 @@ public class Utils {
 
 	/**
 	 * Get partition directory name
-	 * @return partition dir name
+	 * @return Partition dir name
 	 */
 	public static String getPartitionDirName(String jobName) {
 		return jobName + "_partition";
@@ -181,9 +181,9 @@ public class Utils {
 
 	/**
 	 * Get location of reducer's input file name
-	 * @param reducerNumber
-	 * @param jobName
-	 * @return input file name of reducer
+	 * @param reducerNumber ID of reducer
+	 * @param jobName Name of job
+	 * @return Input file name for reducer
 	 */
 	public static String getReduceInputFileName(int reducerNumber, String jobName) {
 		return getPartitionDirName(jobName) + "/reducer_" + reducerNumber + ".txt";
@@ -191,9 +191,9 @@ public class Utils {
 	
 	/**
 	 * Return name of reduce output file
-	 * @param reducerNumber
-	 * @param outputDir
-	 * @return reduce output file name (outputDir/part_i.txt)
+	 * @param reducerNumber ID of reducer
+	 * @param outputDir Output file directory
+	 * @return Reduce output file name (e.g. outputDir/part_i.txt)
 	 */
 	public static String getReduceOutputFileName(int reducerNumber, String outputDir) {
 		return outputDir + "/part_" + reducerNumber + ".txt";
@@ -201,7 +201,7 @@ public class Utils {
 	
 	/**
 	 * Get name of final answers directory
-	 * @return final answers dir 
+	 * @return Final answers directory 
 	 */
 	public static String getFinalAnswersDir(String jobName) {
 		return jobName+"_final_answers";
@@ -209,8 +209,8 @@ public class Utils {
 	
 	/**
 	 * Get directory name of output files of workers
-	 * @param jobName
-	 * @return directory name of worker output files
+	 * @param jobName Name of job
+	 * @return Directory name of worker output files
 	 */
 	public static String getWorkerOutputFilesDirName(String jobName) {
 		return jobName + "_worker";
@@ -218,9 +218,9 @@ public class Utils {
 	
 	/**
 	 * Get file name of worker
-	 * @param workerNum
-	 * @param jobName
-	 * @return file name of worker
+	 * @param workerNum ID or worker
+	 * @param jobName Name of job
+	 * @return File name for worker to write to
 	 */
 	public static String getWorkerOutputFileName(int workerNum, String jobName) {
 		return getWorkerOutputFilesDirName(jobName) + "/worker" + workerNum + ".txt";

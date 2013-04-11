@@ -15,22 +15,35 @@ import communication.WorkerInfo;
 
 /**
  * A helper class to parse the config file and do sanity checks
- * 
  */
 public class ConstantsParser implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	// map from worker number of worker info (worker numbers start at 0)
+	/**
+	 * Map from worker number to worker info (worker numbers start at 0)
+	 */
 	private ConcurrentHashMap<Integer, WorkerInfo> allWorkers = new ConcurrentHashMap<Integer, WorkerInfo>();
-	
+	/**
+	 * Record size in input file (in bytes)
+	 */
 	private long recordSize = -1;
+	/**
+	 * Chunk size (in bytes)
+	 */
 	private long chunkSize = -1;
+	/**
+	 * Number of reducer instances
+	 */
 	private long numReducers = -1;
+	/**
+	 * Size, in bytes, of concatenating key and value output from mapper using a delimiter
+	 */
 	private long mapperOutputSize = -1;
 
 	/**
 	 * Constructor that parses the file
+	 * @param filePath File to parse
 	 */
 	public ConstantsParser(String filePath) {
 		parseConstants(filePath);
@@ -39,6 +52,7 @@ public class ConstantsParser implements Serializable {
 	/**
 	 * A function that parses the constants file and does sanity checking. It
 	 * stores the parsed things in variables
+	 * @param filePath File to parse
 	 */
 	private void parseConstants(String filePath) {
 		JSONParser parser = new JSONParser();
@@ -55,6 +69,9 @@ public class ConstantsParser implements Serializable {
 
 			if (chunkSize < recordSize)
 				throw new IllegalArgumentException("Chunk size must be at least the record size");
+			
+			if (chunkSize % recordSize != 0)
+				throw new IllegalArgumentException("Chunk size must be a multiple of record size");
 			
 			numReducers = (Long) o.get("NUMBER_REDUCERS");
 			if (numReducers <= 0)

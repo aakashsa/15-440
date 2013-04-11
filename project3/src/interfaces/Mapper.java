@@ -14,15 +14,14 @@ public interface Mapper<K1 extends Writable<?>, V1 extends Writable<?>, K2 exten
 	
 	/**
 	 * The map function
-	 * @param key - key
-	 * @param value - value
-	 * @param context - a context to write map to
-	 * @return the modified context
+	 * @param key Key
+	 * @param value Value 
+	 * @param context A context to write the mapped key,value pairs to
 	 */
-	Context<K2,V2> map(K1 key, V1 value, Context<K2,V2> context);
+	void map(K1 key, V1 value, Context<K2,V2> context);
 	
 	/**
-	 * An init function for convenience. This is called at the start of each map task
+	 * An init function for convenience. This is called at the start of each map task.
 	 */
 	void init();
 	

@@ -15,6 +15,7 @@ public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable>
 
 	/**
 	 * Parse a string into a key value input type. Split by tab character
+	 * @param str String to parse
 	 */
 	@Override
 	public void parse(String str) {
@@ -28,6 +29,7 @@ public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable>
 
 	/**
 	 * Get key
+	 * @return Key
 	 */
 	@Override
 	public TextWritable getKey() {
@@ -36,6 +38,7 @@ public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable>
 
 	/**
 	 * Get value
+	 * @return Value
 	 */
 	@Override
 	public TextWritable getValue() {
@@ -44,6 +47,7 @@ public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable>
 
 	/**
 	 * Get key type
+	 * @return String name of key type
 	 */
 	@Override
 	public String getKeyType() {
@@ -52,6 +56,7 @@ public class KeyValueInputFormat extends InputFormat<TextWritable, TextWritable>
 	
 	/**
 	 * Get value type
+	 * @return String name of value type
 	 */
 	@Override
 	public String getValueType() {

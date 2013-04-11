@@ -12,7 +12,7 @@ public class WordCountMapper implements
 		Mapper<NullWritable, TextWritable, TextWritable, IntWritable> {
 
 	@Override
-	public Context<TextWritable, IntWritable> map(NullWritable key, TextWritable value, Context<TextWritable, IntWritable> context) {
+	public void map(NullWritable key, TextWritable value, Context<TextWritable, IntWritable> context) {
 
 		String v = value.getValue();
 		String[] contents = v.split("\\s");
@@ -21,7 +21,6 @@ public class WordCountMapper implements
 			if (s.length() > 0)
 				context.write(new TextWritable(s), new IntWritable(1));
 		}
-		return context;
 	}
 
 	@Override

@@ -4,35 +4,47 @@ import java.io.Serializable;
 
 /**
  * A class that encapsulates a chunk of the input file for each
- * map task.
+ * map task. This object is serializable.
  */
-public class ChunkObject implements Serializable{
+public class ChunkObject implements Serializable {
 	
-	// serial ID
+	/**
+	 * serial ID
+	 */
 	private static final long serialVersionUID = 265849063821656550L;
 
-	// number of this chunk (like a chunk ID)
+	/**
+	 * Number of this chunk (like a chunk ID)
+	 */
 	private int chunkNumber;
 	
-	// record this chunk starts at
+	/**
+	 * Record this chunk starts at
+	 */
 	private long startingRecord;
 	
-	// number of records in this chunk
+	/**
+	 * Number of records in this chunk
+	 */
 	private long numRecordsChunk;
 	
-	// size of each record
+	/**
+	 * Size of each record
+	 */
 	private int recordSize;
 	
-	// filename to read chunks from
+	/**
+	 * Filename to read chunks from
+	 */
 	private String fileName;
 
 	/**
 	 * Constructor that makes private copies of arguments.
-	 * @param chunkNumber
-	 * @param l
-	 * @param numRecordsPerChunk
-	 * @param recordSize
-	 * @param fileName
+	 * @param chunkNumber Chunk ID
+	 * @param l Starting record number
+	 * @param numRecordsPerChunk Number of records in this chunk
+	 * @param recordSize Size of each record (in bytes)
+	 * @param fileName File name
 	 */
 	public ChunkObject(int chunkNumber, long l,
 			long numRecordsPerChunk, int recordSize, String fileName) {
@@ -45,6 +57,7 @@ public class ChunkObject implements Serializable{
 
 	/**
 	 * Check if two chunks are equal
+	 * @param obj Other chunk to compare to
 	 */
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ChunkObject))
@@ -65,6 +78,7 @@ public class ChunkObject implements Serializable{
 	}
 
 	/**
+	 * Get the starting record number
 	 * @return the startingRecord
 	 */
 	public long getStartingRecord() {
@@ -72,13 +86,7 @@ public class ChunkObject implements Serializable{
 	}
 
 	/**
-	 * @param startingRecord
-	 */
-	public void setStartingRecord(int startingRecord) {
-		this.startingRecord = startingRecord;
-	}
-
-	/**
+	 * Get number of records in this chunk
 	 * @return the numRecordsChunk
 	 */
 	public long getNumRecordsChunk() {
@@ -86,13 +94,7 @@ public class ChunkObject implements Serializable{
 	}
 
 	/**
-	 * @param numRecordsChunk
-	 */
-	public void setNumRecordsChunk(int numRecordsChunk) {
-		this.numRecordsChunk = numRecordsChunk;
-	}
-
-	/**
+	 * Get the record size
 	 * @return the recordSize
 	 */
 	public int getRecordSize() {
@@ -100,13 +102,7 @@ public class ChunkObject implements Serializable{
 	}
 
 	/**
-	 * @param recordSize
-	 */
-	public void setRecordSize(int recordSize) {
-		this.recordSize = recordSize;
-	}
-
-	/**
+	 * Get the file name that this chunk belongs to
 	 * @return the fileName
 	 */
 	public String getFileName() {
@@ -114,23 +110,10 @@ public class ChunkObject implements Serializable{
 	}
 
 	/**
-	 * @param fileName
-	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	/**
+	 * Get the chunk number of this chunk
 	 * @return the chunkNumber
 	 */
 	public int getChunkNumber() {
 		return chunkNumber;
-	}
-
-	/**
-	 * @param chunkNumber
-	 */
-	public void setChunkNumber(int chunkNumber) {
-		this.chunkNumber = chunkNumber;
 	}
 }

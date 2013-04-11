@@ -17,7 +17,13 @@ import communication.MapTask;
  */
 public class MapRecordWriter {
 
+	/**
+	 * Map task dealing with
+	 */
 	private MapTask task;
+	/**
+	 * Output writer pointer
+	 */
 	private PrintWriter outWriter;
 
 	/**
@@ -33,9 +39,11 @@ public class MapRecordWriter {
 	
 	/**
 	 * This method writes a record to the output file. It deals with the
-	 * necessary padding to make sure output records are of the expected size
-	 * @param record Record to write
-	 * @throws IllegalArgumentException If the record size is too small for key and value
+	 * necessary padding to make sure output records are of the expected size.
+	 * @param kv Key value to write
+	 * @param kvDelimiter Delimiter for the provided key and value
+	 * @param padString String to pad any left over bytes of the record with
+	 * @throws IllegalArgumentException If the record size is too small for key and value when concatenated with the delimiter
 	 */
 	public void writeRecord(KeyValue<Writable<?>, Writable<?>> kv, String kvDelimiter, String padString) throws IllegalArgumentException {
 		if (padString.length() != 1)

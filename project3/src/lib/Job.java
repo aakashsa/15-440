@@ -4,8 +4,7 @@ import master.HadoopMaster;
 
 /**
  * A type that represents a job. This is used by the user
- * to set certain configurations before starting the map reduce job
- *
+ * to set certain configurations before starting the map reduce job.
  */
 public class Job {
 
@@ -92,6 +91,4 @@ public class Job {
 	public void setReducerOutputValueClass(Class<?> reducerOutputValueClass) {
 		this.reducerOutputValueClass = reducerOutputValueClass;
 	}
-
-
 }
