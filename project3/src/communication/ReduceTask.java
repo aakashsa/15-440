@@ -66,4 +66,7 @@ public class ReduceTask extends Task implements Serializable {
 		this.mapperOutputSize = mapperOutputSize;
 		this.reducerInputFileNumber = reduceInputFileNumber;
 	}	
+	public boolean equals(Object a){
+		return this.equals(a);
+	}
 }

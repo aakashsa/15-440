@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import nodework.JobThreadSharedFields;
+
 import master.HadoopMaster;
 import master.JobThread;
 
@@ -22,10 +24,12 @@ public class ServiceReduceThread implements Runnable {
 
 	private Message msg;
 	private WorkerInfo wi;
-	
-	public ServiceReduceThread(WorkerInfo wi, Message msg) {
+	private JobThreadSharedFields sharedData;
+
+	public ServiceReduceThread(WorkerInfo wi, Message msg,JobThreadSharedFields sharedData) {
 		this.msg = msg;
 		this.wi = wi;
+		this.sharedData = sharedData;
 	}
 	
 	@Override
@@ -39,16 +43,19 @@ public class ServiceReduceThread implements Runnable {
 			out.writeObject(msg);
 			InputStream input = reduceSocket.getInputStream();
 			ObjectInputStream in = new ObjectInputStream(input);
-			Message msg = (Message) in.readObject();
-			if (msg.type == MessageType.DONE_REDUCE) {
+			Message msg1 = (Message) in.readObject();
+			if (msg1.type == MessageType.DONE_REDUCE) {
 				System.out.println("[INFO] Done Reduce by worker " + wi.getWorkerNum());
-				JobThread.reduceDoneMessages.add(msg.type);
+				// Reduce Done Add the Ack for it 
+				sharedData.getReduceDoneMap().add(msg1.type);
 				synchronized (HadoopMaster.QUEUE_LOCK) {
+					// Free the Worker
 					HadoopMaster.freeWorkers.add(wi.getWorkerNum());
-					HadoopMaster.busyWorkerMap.remove(wi.getWorkerNum());
 				}
-			} else if (msg.type == MessageType.EXCEPTION) {
-				msg.e.printStackTrace();
+				// Remove the worker from Reduce Map As its free now
+				sharedData.getReduceWorkerMap().remove(msg.task);
+			} else if (msg1.type == MessageType.EXCEPTION) {
+				msg1.e.printStackTrace();
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
