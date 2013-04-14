@@ -33,6 +33,14 @@ public class HadoopMaster {
 	 */
 	public static ConcurrentHashMap<Integer, ChunkObject> busyWorkerMap;
 	/**
+	 *  Map from job ID to JobThread Object
+	 */
+	public static ConcurrentHashMap<Integer, JobThread> jobThreadObjectMap;
+	/**
+	 *  Map from job ID to the actual Thread object running the Job
+	 */
+	public static ConcurrentHashMap<Integer, Thread> jobThreadMap;
+	/**
 	 * Map from worker number to its WorkerInfo
 	 */
 	public static ConcurrentHashMap<Integer, WorkerInfo> allWorkers;
@@ -66,7 +74,9 @@ public class HadoopMaster {
 		freeWorkers = new ConcurrentLinkedQueue<Integer>();
 		busyWorkerMap = new ConcurrentHashMap<Integer, ChunkObject>();
 		jobMap = new ConcurrentHashMap<Integer, Job>();
-		
+		jobThreadMap = new ConcurrentHashMap<Integer, Thread>();;
+		jobThreadObjectMap = new ConcurrentHashMap<Integer, JobThread>();
+
 		// Parse the JSON config file
 		if (args.length != 1) {
 			System.out.println("Usage: HadoopMaster <configFilePath>");

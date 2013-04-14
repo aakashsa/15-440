@@ -49,6 +49,23 @@ public class Scan implements Runnable {
 						System.out.println("Quitting node...");
 						System.exit(0);
 					}
+				} else if (name.equals("killjob")) {
+					cliArgs.clear();
+					while (sc2.hasNext()) {
+						cliArgs.add(sc2.next().trim());
+					}
+					if (cliArgs.size()!=1) {
+						System.out.println("Usage: killjob <job_name>");
+					} else {
+						String [] jobName = cliArgs.get(0).split("_");
+						int id = Integer.parseInt(jobName[1]);
+						System.out.println("Quitting Job" + cliArgs.get(0));
+						JobThread killJob = HadoopMaster.jobThreadObjectMap.get(id);
+						Thread killThread = HadoopMaster.jobThreadMap.get(id);
+						killJob.jobCleanup();
+						killThread.suspend();
+						HadoopMaster.jobMap.remove(id);
+					}
 				} else {
 					if (!name.equals("runjob")){
 						System.out.println("[ERROR] Command not supported");
@@ -75,7 +92,11 @@ public class Scan implements Runnable {
 								// Performing Sanity Checks on the Job provided
 								Utils.performJobSanityChecks(job);
 								HadoopMaster.jobMap.put(HadoopMaster.jobCounter, job);
-								new Thread(new JobThread(inputFile,job)).start();
+								JobThread newJob = new JobThread(inputFile,job);
+								HadoopMaster.jobThreadObjectMap.put(HadoopMaster.jobCounter,newJob);
+								Thread new_thread = new Thread(newJob);
+								HadoopMaster.jobThreadMap.put(HadoopMaster.jobCounter, new_thread);
+								new_thread.start();
 							} catch (ClassNotFoundException e) {
 								System.out.println("[ERROR] JobSetupClass class not found. Make sure the jobConfigDir argument is correct.");
 								continue;

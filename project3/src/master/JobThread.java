@@ -22,7 +22,6 @@ import communication.WorkerInfo;
 
 public class JobThread implements Runnable {
 
-	
 	// Chunk to Worker mapping for the Job
 	private ConcurrentLinkedQueue<ChunkObject> chunkQueue;
 	private ConcurrentHashMap<ChunkObject, Integer> chunkWorkerMap;
@@ -30,6 +29,9 @@ public class JobThread implements Runnable {
 
 	// Per Job Thread
 	private ConcurrentLinkedQueue<MessageType> reduceDoneMessages;
+	
+	// Thread Queue For Kill Job 
+	private ConcurrentLinkedQueue<Thread> threadQueue;
 	
 	private long numChunks = 0;
 	
@@ -43,7 +45,6 @@ public class JobThread implements Runnable {
 	}
 	
 	public JobThread(String inputFile, Job job){
-
 		this.inputFile = inputFile;	
 		this.job = job;
 		chunkQueue = new ConcurrentLinkedQueue<ChunkObject>();
@@ -52,6 +53,31 @@ public class JobThread implements Runnable {
 		this.reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
 		System.out.println(" Reduce Worker Map in Constructor = " + reduceWorkerMap);
 		this.sharedData = new JobThreadSharedFields(chunkQueue,chunkWorkerMap,reduceWorkerMap,reduceDoneMessages);
+		this.threadQueue = new ConcurrentLinkedQueue<Thread>();
+	}
+	
+	
+	/**
+	 * Cleans up performed - Kill Service Threads and 
+	 * delete intermediate files Generated
+	 * @return 
+	 */
+	public void jobCleanup(){
+		while (!threadQueue.isEmpty()){
+			threadQueue.remove().suspend();
+		}
+		for ( int worker : chunkWorkerMap.values()){
+			if (worker>=0){
+				HadoopMaster.freeWorkers.add(worker);
+			}
+		}
+		for ( int worker : reduceWorkerMap.values()){
+			if (worker>=0){
+				HadoopMaster.freeWorkers.add(worker);
+			}	
+		}
+		Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
+		Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));
 	}
 	
 	@Override
@@ -113,9 +139,6 @@ public class JobThread implements Runnable {
 				theDir.mkdir();
 			}
 			
-			Thread[] t_array = new Thread[(int) numChunks];
-			int i = 0;
-			
 			// Mapping
 			int newWorker = 0;
 	
@@ -129,9 +152,9 @@ public class JobThread implements Runnable {
 						MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(), HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 						Message mapMessage = new Message(MessageType.START_MAP, task);
 						HadoopMaster.busyWorkerMap.put(newWorker, chunkJob);
-						t_array[i] = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this, sharedData));
-						t_array[i].start();
-						i++;
+						Thread t  = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this, sharedData));
+						threadQueue.add(t);
+						t.start();
 					}
 				}
 			}
@@ -158,7 +181,9 @@ public class JobThread implements Runnable {
 								MapTask task = new MapTask(chunk, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 								HadoopMaster.busyWorkerMap.put(newWorker, chunk);
 								Message mapMessage = new Message(MessageType.START_MAP, task);
-								new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this,sharedData)).start();
+								Thread t = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this,sharedData));
+								threadQueue.add(t);
+								t.start();
 							}
 							else
 								break;
@@ -189,7 +214,9 @@ public class JobThread implements Runnable {
 								HadoopMaster.cp.getMapperOutputSize(), j);
 						reduceWorkerMap.put(task,newReducer);
 						Message reduceMsg = new Message(MessageType.START_REDUCE, task);
-						new Thread(new ServiceReduceThread(info, reduceMsg,sharedData)).start();
+						Thread t = new Thread(new ServiceReduceThread(info, reduceMsg,sharedData));
+						threadQueue.add(t);
+						t.start();
 						j++;
 					}
 				}
@@ -223,7 +250,9 @@ public class JobThread implements Runnable {
 								System.out.println("[Info] Resending Reducer Task #" + task.reducerInputFileNumber);
 								reduceWorkerMap.put(new_task,newReducer);
 								Message reduceMsg = new Message(MessageType.START_REDUCE, new_task);
-								new Thread(new ServiceReduceThread(info, reduceMsg,sharedData)).start();					
+								Thread t = new Thread(new ServiceReduceThread(info, reduceMsg,sharedData));					
+								threadQueue.add(t);
+								t.start();
 							}
 							else{
 								//No worker Empty Try Again later
@@ -232,7 +261,6 @@ public class JobThread implements Runnable {
 						}
 					}
 				}
-				
 			}
 			Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
 			Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));				

@@ -66,7 +66,27 @@ public class ReduceTask extends Task implements Serializable {
 		this.mapperOutputSize = mapperOutputSize;
 		this.reducerInputFileNumber = reduceInputFileNumber;
 	}	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object a){
-		return this.equals(a);
+		if (!(a instanceof ReduceTask ))
+			return false;
+		if (((ReduceTask)a).reducerClass != this.reducerClass)
+			return false;
+		if (((ReduceTask)a).reducerNumber != this.reducerNumber)
+			return false;
+		if (((ReduceTask)a).reducerInputKeyClass != this.reducerInputKeyClass)
+			return false;
+		if (((ReduceTask)a).reducerInputValueClass != this.reducerInputValueClass)
+			return false;
+		if (((ReduceTask)a).outputDir != this.outputDir)
+			return false;
+		if (((ReduceTask)a).jobName != this.jobName)
+			return false;
+		if (((ReduceTask)a).mapperOutputSize != this.mapperOutputSize)
+			return false;
+		return true;
 	}
 }
