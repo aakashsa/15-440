@@ -9,19 +9,26 @@ public class Worker {
 
 	public static void main(String[] args) {
 		// Get ports to listen on from command line
-		if (args.length < 1) {
-			System.out.println("Usage: Worker <port1> <port2> ... <port n>");
+		if (args.length != 1) {
+			System.out.println("Usage: Worker <port1>,<port2>, ... ,<port n>");
 			System.exit(-1);
 		}
-		int[] ports = new int[args.length];
+		String[] portStrings = null;
+		try {
+			portStrings = args[0].split(",");
+		} catch (Exception e) {
+			System.out.println("Usage: Worker <port1>,<port2>, ... ,<port n>");
+			System.exit(-1);
+		}
+		int[] ports = new int[portStrings.length];
 		
 		int port;
-		for (int i = 0; i < args.length; i++) {
+		for (int i = 0; i < portStrings.length; i++) {
 			port = 0;
 			try {
-				port = Integer.parseInt(args[i]);
+				port = Integer.parseInt(portStrings[i]);
 			} catch (Exception e) {
-				System.out.println("Port must be an integer");
+				System.out.println("Ports must be an integer. Actual: " + portStrings[i]);
 				System.exit(-1);
 			}
 			if (port < 1024 || port > 49151) {
