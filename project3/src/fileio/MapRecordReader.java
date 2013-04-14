@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import lib.KeyValue;
 import interfaces.Writable;
 import interfaces.InputFormat;
 
@@ -41,8 +43,8 @@ public class MapRecordReader {
 	 * @throws IOException If there is an error in reading from file
 	 */
 	@SuppressWarnings("unchecked")
-	public Iterator<InputFormat<Writable<?>, Writable<?>>> readChunk(ChunkObject chunk) throws InstantiationException, IllegalAccessException, IOException {
-		ArrayList<InputFormat<Writable<?>, Writable<?>>> records = new ArrayList<InputFormat<Writable<?>, Writable<?>>>();
+	public Iterator<KeyValue<Writable<?>, Writable<?>>> readChunk(ChunkObject chunk) throws InstantiationException, IllegalAccessException, IOException {
+		ArrayList<KeyValue<Writable<?>, Writable<?>>> records = new ArrayList<KeyValue<Writable<?>, Writable<?>>>();
 		
 		rin = new RandomAccessFile(chunk.getFileName(), "r");
 		byte[] recordBytes = new byte[chunk.getRecordSize()];
@@ -58,12 +60,11 @@ public class MapRecordReader {
 			if (temp==-1)
 				break;
 
-			// Check for Encoding Characters
 			String value = new String(recordBytes);
 			
 			InputFormat<Writable<?>, Writable<?>> iFormat = (InputFormat<Writable<?>, Writable<?>>) inputFormatClass.newInstance();
 			iFormat.parse(value);
-			records.add(iFormat);
+			records.add(new KeyValue<Writable<?>, Writable<?>>(iFormat.getKey(), iFormat.getValue()));
 		}
 		
 		return records.iterator();
