@@ -59,6 +59,20 @@ public class Scan implements Runnable {
 						System.out.println("Quitting node...");
 						System.exit(0);
 					}
+				} else if (name.equals("help")) {
+					if (sc2.hasNext()) {
+						System.out.println("[ERROR] Invalid command: help does not take any arguments!");
+					} else {
+						System.out.println("Map Reduce Facility");
+						System.out.println("1. listjobs - Listing All Jobs");
+						System.out.println("\t"+"Usage: listjobs");
+						System.out.println("2. quit - quit");
+						System.out.println("\t"+"Usage:quit");
+						System.out.println("3. killjob - Kills the Job with a particular name");
+						System.out.println("\t"+"Usage: killjob <job_name>");
+						System.out.println("4. runjob - Runs a job with its configuration/ input");
+						System.out.println("\t"+"Usage: runjob <inputFilePath> <jobConfigDir>");
+					}
 				} else if (name.equals("killjob")) {
 					cliArgs.clear();
 					while (sc2.hasNext()) {
