@@ -24,22 +24,6 @@ public class ConstantsParser implements Serializable {
 	 * Map from worker number to worker info (worker numbers start at 0)
 	 */
 	private ConcurrentHashMap<Integer, WorkerInfo> allWorkers = new ConcurrentHashMap<Integer, WorkerInfo>();
-	/**
-	 * Record size in input file (in bytes)
-	 */
-	private long recordSize = -1;
-	/**
-	 * Chunk size (in bytes)
-	 */
-	private long chunkSize = -1;
-	/**
-	 * Number of reducer instances
-	 */
-	private long numReducers = -1;
-	/**
-	 * Size, in bytes, of concatenating key and value output from mapper using a delimiter
-	 */
-	private long mapperOutputSize = -1;
 
 	/**
 	 * Constructor that parses the file
@@ -55,37 +39,12 @@ public class ConstantsParser implements Serializable {
 	 * @param filePath File to parse
 	 */
 	private void parseConstants(String filePath) {
-		String[] provided = {"RECORD_SIZE", "CHUNK_SIZE", "NUMBER_REDUCERS", "MAPPER_OUTPUT_SIZE", "WORKERS"};
 		JSONParser parser = new JSONParser();
 		try {
 			JSONObject o = (JSONObject) parser.parse(new FileReader(filePath));
 
-			for (String s : provided) {
-				if (o.get(s) == null)
-					throw new IllegalArgumentException("No " + s + " provided");
-			}
-			
-			recordSize = (Long) o.get("RECORD_SIZE");
-			if (recordSize <= 0)
-				throw new IllegalArgumentException("Record size <= 0");
-
-			chunkSize = (Long) o.get("CHUNK_SIZE");
-			if (chunkSize <= 0)
-				throw new IllegalArgumentException("Chunk size <= 0");
-
-			if (chunkSize < recordSize)
-				throw new IllegalArgumentException("Chunk size must be at least the record size");
-			
-			if (chunkSize % recordSize != 0)
-				throw new IllegalArgumentException("Chunk size must be a multiple of record size");
-			
-			numReducers = (Long) o.get("NUMBER_REDUCERS");
-			if (numReducers <= 0)
-				throw new IllegalArgumentException("Number of reducers <= 0");
-
-			mapperOutputSize = (Long) o.get("MAPPER_OUTPUT_SIZE");
-			if (mapperOutputSize <= 0)
-				throw new IllegalArgumentException("Mapper output key value size <= 0");
+			if (o.get("WORKERS") == null)
+				throw new IllegalArgumentException("No WORKERS provided");
 			
 			// parse all workers
 			int workerNum = 0;
@@ -121,11 +80,7 @@ public class ConstantsParser implements Serializable {
 					allWorkers.put(workerNum, new WorkerInfo(workerNum, host, (int) port));
 					workerNum++;
 				}
-			}
-			
-			if (numReducers > allWorkers.size())
-				throw new IllegalArgumentException("Num reducers > num workers");
-			
+			}			
 		} catch (FileNotFoundException e1) {
 			System.out.println("ERROR: Couldn't find config file (" + filePath + ")");
 			e1.printStackTrace();
@@ -145,31 +100,31 @@ public class ConstantsParser implements Serializable {
 		return allWorkers;
 	}
 
-	/**
-	 * Getter for record size
-	 */
-	public long getRecordSize() {
-		return recordSize;
-	}
-
-	/**
-	 * Getter for chunk size
-	 */
-	public long getChunkSize() {
-		return chunkSize;
-	}
-
-	/**
-	 * Getter for number of reducers
-	 */
-	public long getNumReducers() {
-		return numReducers;
-	}
-	
-	/**
-	 * Getter for mapper output size
-	 */
-	public long getMapperOutputSize() {
-		return mapperOutputSize;
-	}
+//	/**
+//	 * Getter for record size
+//	 */
+//	public long getRecordSize() {
+//		return recordSize;
+//	}
+//
+//	/**
+//	 * Getter for chunk size
+//	 */
+//	public long getChunkSize() {
+//		return chunkSize;
+//	}
+//
+//	/**
+//	 * Getter for number of reducers
+//	 */
+//	public long getNumReducers() {
+//		return numReducers;
+//	}
+//	
+//	/**
+//	 * Getter for mapper output size
+//	 */
+//	public long getMapperOutputSize() {
+//		return mapperOutputSize;
+//	}
 }

@@ -35,20 +35,16 @@ public class JobThread implements Runnable {
 	
 	private long numChunks = 0;
 	
-	public Job job;
+	private Job job;
 	private String inputFile;
 	
 	private JobThreadSharedFields sharedData;
 	
-	public long getNumChunks(){
-		return numChunks;
-	}
-	
 	public JobThread(String inputFile, Job job){
 		this.inputFile = inputFile;	
 		this.job = job;
-		chunkQueue = new ConcurrentLinkedQueue<ChunkObject>();
-		chunkWorkerMap = new ConcurrentHashMap<ChunkObject, Integer>();
+		this.chunkQueue = new ConcurrentLinkedQueue<ChunkObject>();
+		this.chunkWorkerMap = new ConcurrentHashMap<ChunkObject, Integer>();
 		this.reduceWorkerMap = new ConcurrentHashMap<ReduceTask, Integer>();
 		this.reduceDoneMessages = new ConcurrentLinkedQueue<MessageType>();
 		System.out.println(" Reduce Worker Map in Constructor = " + reduceWorkerMap);
@@ -88,38 +84,38 @@ public class JobThread implements Runnable {
 		System.out.println("[INFO] Starting job " + job.getJobName());
 		
 		// Get input file name and size
-		System.out.println("  File Path = " + inputFile);
+		System.out.println("   Input file fath = " + inputFile);
 		File f = new File(inputFile);
 		if (f == null || !f.exists()) {
 			System.out.println("[ERROR] Input file not found");
 		} else {
 			int fileSize = (int) f.length();
-			System.out.println("  File Size = " + fileSize);
+			System.out.println("   Input file size = " + fileSize);
 	
-			long round = (fileSize % HadoopMaster.recordSize);
-			long numRecordsInFile = (fileSize / HadoopMaster.recordSize);
+			long round = (fileSize % this.job.getRecordSize());
+			long numRecordsInFile = (fileSize / this.job.getRecordSize());
 			if (round != 0)
 				numRecordsInFile++;
-			long numRecordsPerChunk = HadoopMaster.chunkSize / HadoopMaster.recordSize;
+			long numRecordsPerChunk = this.job.getChunkSize() / this.job.getRecordSize();
 	
-			System.out.println("  Num of Records in File = " + numRecordsInFile);
-			System.out.println("  Num of Records per Chunk = " + numRecordsPerChunk);
+			System.out.println("   Num of records in input file = " + numRecordsInFile);
+			System.out.println("   Num of records per chunk = " + numRecordsPerChunk);
 	
-			numChunks = fileSize / (numRecordsPerChunk * HadoopMaster.recordSize);
-			round = fileSize % (numRecordsPerChunk * HadoopMaster.recordSize);
+			numChunks = fileSize / (numRecordsPerChunk * this.job.getRecordSize());
+			round = fileSize % (numRecordsPerChunk * this.job.getRecordSize());
 	
 			if (round != 0)
 				numChunks++;
-			System.out.println("  Num of Chunks = " + numChunks);
+			System.out.println("   Num of chunks = " + numChunks);
 	
 			// Add all chunks to chunk queue, and assign to null workers initially
 			for (int i = 0; i < numChunks; i++) {
 				ChunkObject chunKey = new ChunkObject(i, i * numRecordsPerChunk,
-						numRecordsPerChunk, (int) HadoopMaster.recordSize, inputFile);
+						numRecordsPerChunk, this.job.getRecordSize(), inputFile);
 				chunkQueue.add(chunKey);
 				chunkWorkerMap.put(chunKey, -1);
 			}
-			System.out.println("  Job Name = " + job.getJobName());
+			System.out.println("   Job Name = " + job.getJobName());
 			
 			// Map setup. Check if the partition folder exists
 			File theDir = new File(Utils.getPartitionDirName(job.getJobName()));
@@ -149,7 +145,7 @@ public class JobThread implements Runnable {
 					if (!HadoopMaster.freeWorkers.isEmpty() && !chunkQueue.isEmpty()) {
 						ChunkObject chunkJob = chunkQueue.remove();
 						newWorker = HadoopMaster.freeWorkers.remove();
-						MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(), HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
+						MapTask task = new MapTask(chunkJob, job.getFileInputFormatClass(), job.getMapperClass(), job.getMapperOutputRecordSize(), job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 						Message mapMessage = new Message(MessageType.START_MAP, task);
 						HadoopMaster.busyWorkerMap.put(newWorker, chunkJob);
 						Thread t  = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this, sharedData));
@@ -178,7 +174,7 @@ public class JobThread implements Runnable {
 						for (ChunkObject chunk : chunkJob){
 							if (!HadoopMaster.freeWorkers.isEmpty()){
 								newWorker = HadoopMaster.freeWorkers.remove();
-								MapTask task = new MapTask(chunk, job.getFileInputFormatClass(), job.getMapperClass(),HadoopMaster.cp, job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
+								MapTask task = new MapTask(chunk, job.getFileInputFormatClass(), job.getMapperClass(),job.getMapperOutputRecordSize(), job.getJobName(), HadoopMaster.allWorkers.get(newWorker));
 								HadoopMaster.busyWorkerMap.put(newWorker, chunk);
 								Message mapMessage = new Message(MessageType.START_MAP, task);
 								Thread t = new Thread(new ServiceMapThread(mapMessage, newWorker, HadoopMaster.allWorkers.get(newWorker), this,sharedData));
@@ -194,16 +190,16 @@ public class JobThread implements Runnable {
 			
 			// Done with Maps. Start partitioning 
 			System.out.println("[INFO] Done Map. Starting data partitioning...");		
-			Partitioner.partitionMapOutputData(HadoopMaster.cp, job.getJobName());
+			Partitioner.partitionMapOutputData(this.job.getNumReducers(), job.getJobName());
 			System.out.println("[INFO] Done partitioning. Starting reduce tasks...");
 
 			// Done partitioning. Partitioner named reduce input files as reducer_i, where
 			// i increases from 0 until num_reducers - 1
 			// Start sending reduce commands			
-			System.out.println("[INFO] Sending reduce commands to " + HadoopMaster.numReducers + " reducers");
+			System.out.println("[INFO] Sending reduce commands to " + this.job.getNumReducers() + " reducers");
 			int j = 0;
 			int newReducer = 0;
-			while( j < HadoopMaster.numReducers) {
+			while( j < this.job.getNumReducers()) {
 				synchronized (HadoopMaster.QUEUE_LOCK) {
 					if (HadoopMaster.freeWorkers.size() > 0){
 						newReducer = HadoopMaster.freeWorkers.remove();	
@@ -211,7 +207,7 @@ public class JobThread implements Runnable {
 						ReduceTask task = new ReduceTask(newReducer, job.getReducerClass(), 
 								job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), 
 								Utils.getFinalAnswersDir(job.getJobName()), job.getJobName(), 
-								HadoopMaster.cp.getMapperOutputSize(), j);
+								this.job.getMapperOutputRecordSize(), j);
 						reduceWorkerMap.put(task,newReducer);
 						Message reduceMsg = new Message(MessageType.START_REDUCE, task);
 						Thread t = new Thread(new ServiceReduceThread(info, reduceMsg,sharedData));
@@ -231,11 +227,11 @@ public class JobThread implements Runnable {
 					e.printStackTrace();
 				}
 				// If all Reduces have been Done
-				if (reduceDoneMessages.size() >= HadoopMaster.numReducers) {
+				if (reduceDoneMessages.size() >= this.job.getNumReducers()) {
 					break;
 				}
 				synchronized (HadoopMaster.QUEUE_LOCK) {
-					if (!reduceWorkerMap.isEmpty() &&  !(reduceDoneMessages.size() >= HadoopMaster.numReducers)) {
+					if (!reduceWorkerMap.isEmpty() &&  !(reduceDoneMessages.size() >= this.job.getNumReducers())) {
 						Set<ReduceTask> reduceTasks = reduceWorkerMap.keySet();						
 						for (ReduceTask task : reduceTasks){
 							// Resend the reduce task that hasnt been completed in 3 minutes
@@ -246,7 +242,7 @@ public class JobThread implements Runnable {
 								ReduceTask new_task = new ReduceTask(newReducer, job.getReducerClass(), 
 										job.getMapperOutputKeyClass(), job.getMapperOutputValueClass(), 
 										Utils.getFinalAnswersDir(job.getJobName()), job.getJobName(), 
-										HadoopMaster.cp.getMapperOutputSize(), task.reducerInputFileNumber);
+										this.job.getMapperOutputRecordSize(), task.reducerInputFileNumber);
 								System.out.println("[Info] Resending Reducer Task #" + task.reducerInputFileNumber);
 								reduceWorkerMap.put(new_task,newReducer);
 								Message reduceMsg = new Message(MessageType.START_REDUCE, new_task);

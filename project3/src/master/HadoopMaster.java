@@ -49,25 +49,9 @@ public class HadoopMaster {
 	 */
 	public static ConcurrentHashMap<Integer, Job> jobMap;
 	/**
-	 * Record size (in bytes)
-	 */
-	public static long recordSize;
-	/**
-	 * Chunk size (in bytes)
-	 */
-	public static long chunkSize;
-	/**
 	 * Number of workers
 	 */
 	public static int numWorkers;
-	/**
-	 * Number of reducers
-	 */
-	public static long numReducers;
-	/**
-	 * Instance of constants parser
-	 */
-	public static ConstantsParser cp;
 
 	public static void main(String[] args) {
 		// Initialize data structures
@@ -83,18 +67,15 @@ public class HadoopMaster {
 			System.exit(-1);
 		}
 		
-		cp = new ConstantsParser(args[0]);
-		recordSize = cp.getRecordSize();
-		chunkSize = cp.getChunkSize();
+		ConstantsParser cp = new ConstantsParser(args[0]);
 		allWorkers = cp.getAllWorkers();
 		numWorkers = allWorkers.size();
-		numReducers = cp.getNumReducers();
 		
 		// Add all workers to free workers queue
 		for (int i = 0; i < HadoopMaster.numWorkers; i++) {
 			HadoopMaster.freeWorkers.add(i);
 		}
 		System.out.println("Master ready...\n");
-		new Thread(new Scan()).start();
+		new Thread(new Scan(numWorkers)).start();
 	}
 }

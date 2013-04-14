@@ -29,6 +29,11 @@ public class JobSetupClass implements JobConfiguration{
 		job.setReducerOutputKeyClass(TextWritable.class);
 		job.setReducerOutputValueClass(IntWritable.class);
 		
+		job.setRecordSize(22);
+		job.setChunkSize(2200);
+		job.setMapperOutputRecordSize(40);
+		job.setNumReducers(2);
+		
 		return job;
 	}
 	

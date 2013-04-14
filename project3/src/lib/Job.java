@@ -21,9 +21,12 @@ public class Job {
 	
 	private Class<?> fileInputFormatClass = null;
 	
-	public Job() {
-		
-	}
+	private int recordSize = -1;
+	private int chunkSize = -1;
+	private int numReducers = -1;
+	private int mapperOutputRecordSize = -1;
+	
+	public Job() {	}
 
 	/**
 	 * Getters and setters for all fields
@@ -90,5 +93,37 @@ public class Job {
 
 	public void setReducerOutputValueClass(Class<?> reducerOutputValueClass) {
 		this.reducerOutputValueClass = reducerOutputValueClass;
+	}
+
+	public int getRecordSize() {
+		return recordSize;
+	}
+
+	public void setRecordSize(int recordSize) {
+		this.recordSize = recordSize;
+	}
+
+	public int getChunkSize() {
+		return chunkSize;
+	}
+
+	public void setChunkSize(int chunkSize) {
+		this.chunkSize = chunkSize;
+	}
+
+	public int getNumReducers() {
+		return numReducers;
+	}
+
+	public void setNumReducers(int numReducers) {
+		this.numReducers = numReducers;
+	}
+
+	public int getMapperOutputRecordSize() {
+		return mapperOutputRecordSize;
+	}
+
+	public void setMapperOutputRecordSize(int mapperOutputRecordSize) {
+		this.mapperOutputRecordSize = mapperOutputRecordSize;
 	}
 }

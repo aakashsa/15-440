@@ -54,12 +54,12 @@ public class MapRecordWriter {
 		String record = kv.getKey() + kvDelimiter + kv.getValue();
 		
 		// Pad the record with a character to make the size equal to record size
-		if (record.length() < (this.task.cp.getMapperOutputSize() - 1)) {
-			long charsToPad = this.task.cp.getMapperOutputSize() - 1 - record.length(); 
+		if (record.length() < (this.task.mapperOutputRecordSize - 1)) {
+			long charsToPad = this.task.mapperOutputRecordSize - 1 - record.length(); 
 			for (int i = 0; i < charsToPad; i++) {
 				record = record + padString;
 			}
-		} else if (record.length() > (this.task.cp.getMapperOutputSize() - 1)) {
+		} else if (record.length() > (this.task.mapperOutputRecordSize - 1)) {
 			throw new IllegalArgumentException("Mapper output concatenation of key and value is bigger than mapper output record size");
 		}
 		outWriter.println(record);

@@ -15,6 +15,16 @@ import lib.Utils;
  */
 public class Scan implements Runnable {
 
+	private int numWorkers = 0;
+	
+	/**
+	 * Command line scanner constructor
+	 * @param numWorkers Number of workers in the system
+	 */
+	public Scan(int numWorkers) {
+		this.numWorkers = numWorkers;
+	}
+	
 	@Override
 	public void run() {
 
@@ -90,7 +100,7 @@ public class Scan implements Runnable {
 								JobConfiguration jConf = (JobConfiguration) jobConfClass.newInstance();
 								job = jConf.setup();
 								// Performing Sanity Checks on the Job provided
-								Utils.performJobSanityChecks(job);
+								Utils.performJobSanityChecks(job, numWorkers);
 								HadoopMaster.jobMap.put(HadoopMaster.jobCounter, job);
 								JobThread newJob = new JobThread(inputFile,job);
 								HadoopMaster.jobThreadObjectMap.put(HadoopMaster.jobCounter,newJob);

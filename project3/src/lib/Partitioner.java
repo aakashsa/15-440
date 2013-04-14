@@ -18,13 +18,12 @@ public class Partitioner {
 	/**
 	 * A function that takes output from each map worker and
 	 * hashes each key in those worker files to a particular reducer file
-	 * @param cp Constants parser object
+	 * @param numReducers Number of reducers requested by job
 	 * @param jobName Name of job running partitioning
 	 */
-	public static void partitionMapOutputData(ConstantsParser cp, String jobName) {
+	public static void partitionMapOutputData(int numReducers, String jobName) {
 		
 		// Initialize reducer input file writers
-		int numReducers = (int) cp.getNumReducers();
 		PrintWriter[] reducerWriters = new PrintWriter[numReducers];
 		
 		for (int i = 0; i < numReducers; i++) {

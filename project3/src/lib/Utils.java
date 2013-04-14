@@ -23,7 +23,7 @@ public class Utils {
 	 * @throws InstantiationException
 	 *             If there is an error in instantiating input format
 	 */
-	public static void performJobSanityChecks(Job job)
+	public static void performJobSanityChecks(Job job, int numWorkers)
 			throws InstantiationException, IllegalAccessException {
 		Job newJob = new Job();
 
@@ -73,6 +73,37 @@ public class Utils {
 		else
 			newJob.setReducerOutputValueClass(job.getReducerOutputValueClass());
 
+		if (job.getRecordSize() < 0)
+			throw new IllegalArgumentException("Record size must be > 0");
+		else
+			newJob.setRecordSize(job.getRecordSize());
+		
+		if (job.getChunkSize() < 0)
+			throw new IllegalArgumentException("Chunk size must be > 0");
+		else
+			newJob.setChunkSize(job.getChunkSize());
+		
+		if (job.getNumReducers() < 0)
+			throw new IllegalArgumentException("Number of reducers must be > 0");
+		else
+			newJob.setNumReducers(job.getNumReducers());
+		
+		if (job.getMapperOutputRecordSize() < 0)
+			throw new IllegalArgumentException("Mapper output key value record size must be > 0");
+		else
+			newJob.setMapperOutputRecordSize(job.getMapperOutputRecordSize());
+		
+		// Check if chunk size is a multiple of record size
+		if (newJob.getChunkSize() < newJob.getRecordSize())
+			throw new IllegalArgumentException("Chunk size must be at least the record size");
+		
+		if (newJob.getChunkSize() % newJob.getRecordSize() != 0)
+			throw new IllegalArgumentException("Chunk size must be a multiple of record size");
+		
+		// Num reducers must be at most the number of workers
+		if (newJob.getNumReducers() > numWorkers)
+			throw new IllegalArgumentException("Num reducers must be <= num workers");
+		
 		// Check if mapper and reducer classes are actually mapper and reducer
 		// This check also ensures that the parameterized types are Writables
 		if (!Mapper.class.isAssignableFrom(newJob.getMapperClass())) {
