@@ -74,42 +74,50 @@ public class ReduceFunction {
 		KeyValue<Writable<?>, Writable<?>> kv = null;
 		int i = 0;
 
-		while ((kv = recordReader.readRecord("\t", "~")) != null) {
-			if (i != 0) {
-				// If current key is same as prevKey; if yes accumulate value
-				if (prevKey.compareTo(kv.getKey().getValue()) == 0) {
-					l.add(kv.getValue());
-				}
-				// Came across a different key. Reduce previous key
-				else {
-					// reduce prevKey
-					valueItr = l.iterator();
-					try {
-						reducer.reduce(prevKey, valueItr, cx);
-					} catch (Exception e) {
-						out.writeObject(new Message(MessageType.EXCEPTION, e));
-						return;
+		try {
+			while ((kv = recordReader.readRecord("\t", "~")) != null) {
+				if (i != 0) {
+					// If current key is same as prevKey; if yes accumulate value
+					if (prevKey.compareTo(kv.getKey().getValue()) == 0) {
+						l.add(kv.getValue());
 					}
+					// Came across a different key. Reduce previous key
+					else {
+						// reduce prevKey
+						valueItr = l.iterator();
+						try {
+							reducer.reduce(prevKey, valueItr, cx);
+						} catch (Exception e) {
+							out.writeObject(new Message(MessageType.EXCEPTION, e));
+							return;
+						}
 
-					// Write results of reduce to file
-					ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx
-							.getAll();
-					for (KeyValue<Writable<?>, Writable<?>> keyvalue : toWrite) {
-						recordWriter.writeRecord(keyvalue, "\t");
+						// Write results of reduce to file
+						ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx
+								.getAll();
+						for (KeyValue<Writable<?>, Writable<?>> keyvalue : toWrite) {
+							recordWriter.writeRecord(keyvalue, "\t");
+						}
+
+						// Clear iterators for previous key and start fresh for new
+						// key
+						cx.clear();
+						l.clear();
+						prevKey = prevKey.parseFromString((String) kv.getKey().getValue());
+						l.add(kv.getValue());
 					}
-
-					// Clear iterators for previous key and start fresh for new
-					// key
-					cx.clear();
-					l.clear();
+				} else {
+					i = 1;
 					prevKey = prevKey.parseFromString((String) kv.getKey().getValue());
 					l.add(kv.getValue());
 				}
-			} else {
-				i = 1;
-				prevKey = prevKey.parseFromString((String) kv.getKey().getValue());
-				l.add(kv.getValue());
 			}
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		// Do the last edge case reduce and write to file

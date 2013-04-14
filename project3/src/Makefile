@@ -15,6 +15,7 @@ worker2:
 worker:
 	java -classpath .:json-simple-1.1.1.jar nodework/Worker $(PORTS)
 
-clean:
+clean_word:
 	rm -r wordcount_*/
+clean_coll:	
 	rm -r collating_*/

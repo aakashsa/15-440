@@ -30,6 +30,7 @@ public class ReduceRecordReader {
 	 * An instance of current value
 	 */
 	private Writable<?> valueInstance;
+	private ReduceTask task;
 	
 	/**
 	 * Constructor for record reader. It opens the file for reading, and initializes support
@@ -44,8 +45,8 @@ public class ReduceRecordReader {
 		FileInputStream fis;
 		fis = new FileInputStream(inputFile);
 		this.br = new BufferedReader(new InputStreamReader(fis));
-		
-		this.keyInstance = (Writable<?>) task.reducerInputKeyClass.newInstance();;
+		this.task = task;
+		this.keyInstance = (Writable<?>) task.reducerInputKeyClass.newInstance();
 		this.valueInstance = (Writable<?>) task.reducerInputValueClass.newInstance();
 	}
 	
@@ -55,8 +56,10 @@ public class ReduceRecordReader {
 	 * no more records to read.
 	 * @return Key value pair in the record
 	 * @throws IOException If there were problems in reading the record
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public KeyValue<Writable<?>, Writable<?>> readRecord(String kvDelimiter, String padString) throws IOException {
+	public KeyValue<Writable<?>, Writable<?>> readRecord(String kvDelimiter, String padString) throws IOException, InstantiationException, IllegalAccessException {
 		String line = br.readLine();
 		if (line == null) return null;
 		
@@ -71,7 +74,9 @@ public class ReduceRecordReader {
 		else
 			value = lineContents[1];
 		
-		this.keyInstance = this.keyInstance.parseFromString(key);
+		this.keyInstance = (Writable<?>) task.reducerInputKeyClass.newInstance();
+		this.valueInstance = (Writable<?>) task.reducerInputValueClass.newInstance();
+		this.keyInstance =	this.keyInstance.parseFromString(key);
 		this.valueInstance = this.valueInstance.parseFromString(value);
 		return new KeyValue<Writable<?>, Writable<?>>(keyInstance, valueInstance);
 	}
