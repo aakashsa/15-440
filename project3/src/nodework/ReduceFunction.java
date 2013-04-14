@@ -47,10 +47,13 @@ public class ReduceFunction {
 		ReduceRecordWriter recordWriter = null;
 		// Initialize Reducer instance
 		Reducer<Writable<?>, Writable<?>, Writable<?>, Writable<?>> reducer = null;
+		// Initialize prevKey instance
+		Writable<?> prevKey = null;
 		try {
 			recordReader = new ReduceRecordReader(task);
 			recordWriter = new ReduceRecordWriter(task);
 			reducer = (Reducer<Writable<?>, Writable<?>, Writable<?>, Writable<?>>) task.reducerClass.newInstance();
+			prevKey = (Writable<?>) task.reducerInputKeyClass.newInstance();
 		} catch (FileNotFoundException e2) {
 			out.writeObject(new Message(MessageType.EXCEPTION, e2));
 			return;
@@ -66,17 +69,6 @@ public class ReduceFunction {
 		Context<Writable<?>, Writable<?>> cx = new Context<Writable<?>, Writable<?>>();
 
 		// Do reduce on input file
-		Writable<?> prevKey = null;
-		try {
-			prevKey = (Writable<?>) task.reducerInputKeyClass.newInstance();
-		} catch (InstantiationException e1) {
-			out.writeObject(new Message(MessageType.EXCEPTION, e1));
-			return;
-		} catch (IllegalAccessException e1) {
-			out.writeObject(new Message(MessageType.EXCEPTION, e1));
-			return;
-		}
-
 		Iterator<Writable<?>> valueItr = null;
 		ArrayList<Writable<?>> l = new ArrayList<Writable<?>>();
 		KeyValue<Writable<?>, Writable<?>> kv = null;
@@ -92,7 +84,12 @@ public class ReduceFunction {
 				else {
 					// reduce prevKey
 					valueItr = l.iterator();
-					reducer.reduce(prevKey, valueItr, cx);
+					try {
+						reducer.reduce(prevKey, valueItr, cx);
+					} catch (Exception e) {
+						out.writeObject(new Message(MessageType.EXCEPTION, e));
+						return;
+					}
 
 					// Write results of reduce to file
 					ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx
@@ -129,6 +126,5 @@ public class ReduceFunction {
 		// Done reducing all keys. Close writers
 		System.out.println("[INFO] Finished reduce task on reducer "+ task.reducerNumber);
 		out.writeObject(new Message(MessageType.DONE_REDUCE));
-
 	}
 }

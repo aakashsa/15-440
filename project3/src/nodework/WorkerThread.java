@@ -14,13 +14,15 @@ import communication.MessageType;
 import communication.ReduceTask;
 /**
  * Main Clas begins the Execution of the Worker Class
- * @author aakashsabharwal
- *
  */
 public class WorkerThread implements Runnable {
 
 	private int port;
-	
+
+	/**
+	 * Get the port to start on, and save it
+	 * @param port Port to listen on
+	 */
 	public WorkerThread(int port) {
 		this.port = port;
 	}
@@ -31,7 +33,7 @@ public class WorkerThread implements Runnable {
 		ServerSocket server = null;
 		try {
 			server = new ServerSocket(port);
-			System.out.println("[INFO] Worker thread started. Listening for task requests");
+			System.out.println("[INFO] Worker thread started. Listening for task requests on " + port);
 			// Start listening for requests on the current port
 			while (true) {
 				Socket workerSocket = server.accept();
@@ -41,20 +43,20 @@ public class WorkerThread implements Runnable {
 				out.flush();
 				ObjectInputStream in = new ObjectInputStream(input);
 
-				Message msg = (Message) in.readObject();
+				Message requestMsg = (Message) in.readObject();
 
 				// Map request
-				if (msg.type == MessageType.START_MAP) {
-					MapTask task = (MapTask) msg.task;
-					new Thread(new WorkerFunctions(msg.type, task, out)).start();
+				if (requestMsg.type == MessageType.START_MAP) {
+					MapTask task = (MapTask) requestMsg.task;
+					new Thread(new WorkerFunctions(requestMsg.type, task, out)).start();
 				}
 				// Reduce request
-				else if (msg.type == MessageType.START_REDUCE) {
-					ReduceTask task = (ReduceTask) msg.task;
-					new Thread(new WorkerFunctions(msg.type, task, out)).start();
+				else if (requestMsg.type == MessageType.START_REDUCE) {
+					ReduceTask task = (ReduceTask) requestMsg.task;
+					new Thread(new WorkerFunctions(requestMsg.type, task, out)).start();
 				}
 				// Ping request
-				else if (msg.type == MessageType.PING_REQUEST) {
+				else if (requestMsg.type == MessageType.PING_REQUEST) {
 					out.writeObject(new Message(MessageType.PING_REPLY));
 				}
 			}

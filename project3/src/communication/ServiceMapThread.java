@@ -16,7 +16,6 @@ import nodework.*;
  * ServiceMapThread is the thread spawned by the JobThread for servicing a particular map task.
  * Sends a Chunk to the worker and waits for an ack.
  * Upon getting the Ack it updates the mapsDone Counter for the Job Thread.
- *
  */
 
 public class ServiceMapThread implements Runnable {

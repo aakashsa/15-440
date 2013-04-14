@@ -44,10 +44,12 @@ public class MapFunction {
 			itr = recordReader.readChunk(task.chunk);
 			mapper = (Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>>) task.mapperClass.newInstance();
 		} catch (InstantiationException e2) {
-			out.writeObject(new Message(MessageType.EXCEPTION,e2));		
+			out.writeObject(new Message(MessageType.EXCEPTION,e2));
+			out.flush();
 			return;
 		} catch (IllegalAccessException e2) {
-			out.writeObject(new Message(MessageType.EXCEPTION,e2));	
+			out.writeObject(new Message(MessageType.EXCEPTION,e2));
+			out.flush();
 			return;
 		}
 		
@@ -58,7 +60,8 @@ public class MapFunction {
 		try {
 			recordWriter = new MapRecordWriter(task);
 		} catch (FileNotFoundException e1) {
-			out.writeObject(new Message(MessageType.EXCEPTION,e1));	
+			out.writeObject(new Message(MessageType.EXCEPTION,e1));
+			out.flush();
 			return;
 		}
 		
@@ -68,17 +71,25 @@ public class MapFunction {
 		// Map each line; write it to worker output file
 		while (itr.hasNext()) {
 			InputFormat<?, ?> iformat = itr.next();
-			mapper.map(iformat.getKey(), iformat.getValue(), cx);
+			try {
+				mapper.map(iformat.getKey(), iformat.getValue(), cx);
+			} catch (Exception e) {
+				out.writeObject(new Message(MessageType.EXCEPTION, e));
+				out.flush();
+				return;
+			}
 			ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
 			
 			for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
 				try {
 					recordWriter.writeRecord(kv, "\t", "~");
 				} catch (IllegalArgumentException e) {
-					out.writeObject(new Message(MessageType.EXCEPTION,e));	
+					out.writeObject(new Message(MessageType.EXCEPTION,e));
+					out.flush();
 					return;
 				} catch (UnsupportedEncodingException e) {
 					out.writeObject(new Message(MessageType.EXCEPTION,e));
+					out.flush();
 					return;
 				}
 			}
