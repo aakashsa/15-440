@@ -20,8 +20,11 @@ public class CollatingReducer implements
 	public void reduce(TextWritable key, Iterator<TextWritable> values,
 			Context<TextWritable, TextWritable> context) {
 		String sum = "";
+		if (values.hasNext())
+			sum += values.next().getValue();
+		
 		while (values.hasNext()) {
-			sum = sum + ", " + values.next().getValue();
+			sum = sum + "," + values.next().getValue();
 		}
 		context.write(key, new TextWritable(sum));
 	}
