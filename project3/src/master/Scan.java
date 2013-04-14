@@ -69,7 +69,7 @@ public class Scan implements Runnable {
 					} else {
 						String [] jobName = cliArgs.get(0).split("_");
 						int id = Integer.parseInt(jobName[1]);
-						System.out.println("Quitting Job" + cliArgs.get(0));
+						System.out.println("Quitting Job " + cliArgs.get(0));
 						JobThread killJob = HadoopMaster.jobThreadObjectMap.get(id);
 						Thread killThread = HadoopMaster.jobThreadMap.get(id);
 						killJob.jobCleanup();

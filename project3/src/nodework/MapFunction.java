@@ -37,7 +37,7 @@ public class MapFunction {
 		
 		// Use file input format to read records from file
 		MapRecordReader recordReader = new MapRecordReader(task.fileInputFormat);
-		Iterator<InputFormat<Writable<?>, Writable<?>>> itr = null;
+		Iterator<KeyValue<Writable<?>, Writable<?>>> itr = null;
 		// Initialize Mapper instance
 		Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>> mapper = null;
 		try {
@@ -70,9 +70,9 @@ public class MapFunction {
 		
 		// Map each line; write it to worker output file
 		while (itr.hasNext()) {
-			InputFormat<?, ?> iformat = itr.next();
+			KeyValue<Writable<?>, Writable<?>> kv = itr.next();
 			try {
-				mapper.map(iformat.getKey(), iformat.getValue(), cx);
+				mapper.map(kv.getKey(), kv.getValue(), cx);
 			} catch (Exception e) {
 				out.writeObject(new Message(MessageType.EXCEPTION, e));
 				out.flush();
@@ -80,9 +80,9 @@ public class MapFunction {
 			}
 			ArrayList<KeyValue<Writable<?>, Writable<?>>> toWrite = cx.getAll();
 			
-			for (KeyValue<Writable<?>, Writable<?>> kv : toWrite) {
+			for (KeyValue<Writable<?>, Writable<?>> kv1 : toWrite) {
 				try {
-					recordWriter.writeRecord(kv, "\t", "~");
+					recordWriter.writeRecord(kv1, "\t", "~");
 				} catch (IllegalArgumentException e) {
 					out.writeObject(new Message(MessageType.EXCEPTION,e));
 					out.flush();
