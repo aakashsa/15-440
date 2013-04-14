@@ -11,9 +11,6 @@ import java.net.UnknownHostException;
 import nodework.JobThreadSharedFields;
 
 import master.HadoopMaster;
-import master.JobThread;
-
-
 
 /**
  * ServiceReduceThread is the thread spawned by the JobThread for servicing a particular Reduce task.

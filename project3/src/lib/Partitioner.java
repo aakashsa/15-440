@@ -31,8 +31,7 @@ public class Partitioner {
 			OutputStream file;
 			try {
 				file = new FileOutputStream(Utils.getReduceInputFileName(i, jobName), true);
-				PrintWriter out = new PrintWriter(file, true);
-				reducerWriters[i] = out;
+				reducerWriters[i] = new PrintWriter(file, true);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -43,9 +42,10 @@ public class Partitioner {
 		File[] workerFiles = workerFilesDir.listFiles();
 		
 		for (File f : workerFiles) {
+			BufferedReader br;
 			try {
 				FileInputStream fis = new FileInputStream(f);
-				BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+				br = new BufferedReader(new InputStreamReader(fis));
 				
 				String line;
 				while ((line = br.readLine()) != null) {

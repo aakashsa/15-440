@@ -56,7 +56,6 @@ public class ServiceMapThread implements Runnable {
 					HadoopMaster.busyWorkerMap.remove(workerNumber);					
 					synchronized (sharedData.getMapCounterLock()) {
 						sharedData.incrementMapCounter();
-						//System.out.println(" Counter in " +  jb.job.getJobName() + " = " + sharedData.getMapCounter());
 					}
 				}
 			} else if (msg.type == MessageType.EXCEPTION) {
