@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import lib.Utils;
 import master.HadoopMaster;
 import master.JobThread;
 import nodework.*;
@@ -24,21 +25,20 @@ public class ServiceMapThread implements Runnable {
 	private int port;
 	private int workerNumber;
 	private Message msg;
-	private JobThread jb;
 	private JobThreadSharedFields sharedData;
 
-	public ServiceMapThread(Message msg, int workerNumber, WorkerInfo wi, JobThread jb, JobThreadSharedFields sharedData) {
+	public ServiceMapThread(Message msg, int workerNumber, WorkerInfo wi, JobThreadSharedFields sharedData) {
 		this.host = wi.getHost();
 		this.port = wi.getPort();
 		this.workerNumber = workerNumber;
 		this.msg = msg;
-		this.jb = jb;
 		this.sharedData = sharedData;
 	}
 
 	@Override
 	public void run() {
 		Socket mapSocket;
+		MapTask t = (MapTask) msg.task;
 		// Opening a Socket and sending a request to map a chunk
 		try {
 			mapSocket = new Socket(host, port);
@@ -64,7 +64,7 @@ public class ServiceMapThread implements Runnable {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(Utils.logError(t.jobName, "There was a problem connecting to worker on " + host + ":" + port + " - " + e.getMessage()));
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

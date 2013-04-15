@@ -55,10 +55,6 @@ public class WorkerThread implements Runnable {
 					ReduceTask task = (ReduceTask) requestMsg.task;
 					new Thread(new WorkerFunctions(requestMsg.type, task, out)).start();
 				}
-				// Ping request
-				else if (requestMsg.type == MessageType.PING_REQUEST) {
-					out.writeObject(new Message(MessageType.PING_REPLY));
-				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

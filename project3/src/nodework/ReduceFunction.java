@@ -35,12 +35,12 @@ public class ReduceFunction {
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public static void doReduce(ReduceTask task, ObjectOutputStream out) throws IOException {
-		System.out.println("[INFO] Received reduce task on reducer "+ task.reducerNumber);
-		System.out.println("[INFO] Starting sort on reducer "+ task.reducerNumber);
+		System.out.println(Utils.logInfo(task.jobName, "Received reduce task on reducer "+ task.reducerNumber));
+		System.out.println(Utils.logInfo(task.jobName, "Starting sort on reducer "+ task.reducerNumber));
 		// Sort the reducer input file
 		InsertionSortRecords sorter = new InsertionSortRecords(task.reducerInputKeyClass, (int) task.mapperOutputSize, "\t",Utils.getReduceInputFileName(task.reducerInputFileNumber,task.jobName));
 		sorter.sort();
-		System.out.println("[INFO] Done sorting on reducer "+ task.reducerNumber);
+		System.out.println(Utils.logInfo(task.jobName, "Done sorting on reducer "+ task.reducerNumber));
 
 		// Initialize record reader and writer
 		ReduceRecordReader recordReader = null;
@@ -132,7 +132,7 @@ public class ReduceFunction {
 		l.clear();
 
 		// Done reducing all keys. Close writers
-		System.out.println("[INFO] Finished reduce task on reducer "+ task.reducerNumber);
+		System.out.println(Utils.logInfo(task.jobName, "Finished reduce task on reducer "+ task.reducerNumber));
 		out.writeObject(new Message(MessageType.DONE_REDUCE));
 	}
 }

@@ -42,11 +42,7 @@ File writes:
 * Reducer reads its file and writes to final_answers/part_i.txt
 
 If we call quit on worker, and worker exits, how is that taken care of in the master?
-Should list jobs show previous jobs too?
-Encoding issue in map record reader?
-Host javadocs online somewhere and add link to it in our report. Similarly for input data.
 Handout says, we should be able to restart processes if they fail
 Improve management tools (job time started, ended, list of working workers, etc.)
-Add links to input data in README
 Check if we are still using PING messages
-Add help command to scanner
+If the workers are not online, the chunk maps aren't cleaned up. Should clean those up.

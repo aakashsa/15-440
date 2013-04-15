@@ -65,13 +65,13 @@ public class Scan implements Runnable {
 					} else {
 						System.out.println("Map Reduce Facility");
 						System.out.println("1. listjobs - Listing All Jobs");
-						System.out.println("\t"+"Usage: listjobs");
-						System.out.println("2. quit - quit");
-						System.out.println("\t"+"Usage:quit");
-						System.out.println("3. killjob - Kills the Job with a particular name");
-						System.out.println("\t"+"Usage: killjob <job_name>");
-						System.out.println("4. runjob - Runs a job with its configuration/ input");
-						System.out.println("\t"+"Usage: runjob <inputFilePath> <jobConfigDir>");
+						System.out.println("\tUsage: listjobs");
+						System.out.println("2. quit - Quit this node");
+						System.out.println("\tUsage: quit");
+						System.out.println("3. killjob - Kills a job");
+						System.out.println("\tUsage: killjob <job_name>");
+						System.out.println("4. runjob - Runs a job with its configuration files and input file");
+						System.out.println("\tUsage: runjob <inputFilePath> <jobConfigDir>");
 					}
 				} else if (name.equals("killjob")) {
 					cliArgs.clear();

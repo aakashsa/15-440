@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 
 import nodework.JobThreadSharedFields;
 
+import lib.Utils;
 import master.HadoopMaster;
 
 /**
@@ -23,7 +24,7 @@ public class ServiceReduceThread implements Runnable {
 	private WorkerInfo wi;
 	private JobThreadSharedFields sharedData;
 
-	public ServiceReduceThread(WorkerInfo wi, Message msg,JobThreadSharedFields sharedData) {
+	public ServiceReduceThread(WorkerInfo wi, Message msg, JobThreadSharedFields sharedData) {
 		this.msg = msg;
 		this.wi = wi;
 		this.sharedData = sharedData;
@@ -32,6 +33,7 @@ public class ServiceReduceThread implements Runnable {
 	@Override
 	public void run() {
 		Socket reduceSocket;
+		ReduceTask t = (ReduceTask) msg.task;
 		try {
 			reduceSocket = new Socket(wi.getHost(), wi.getPort());
 			OutputStream output = reduceSocket.getOutputStream();
@@ -42,7 +44,7 @@ public class ServiceReduceThread implements Runnable {
 			ObjectInputStream in = new ObjectInputStream(input);
 			Message msg1 = (Message) in.readObject();
 			if (msg1.type == MessageType.DONE_REDUCE) {
-				System.out.println("[INFO] Done Reduce by worker " + wi.getWorkerNum());
+				System.out.println(Utils.logInfo(t.jobName, "Done Reduce by worker " + wi.getWorkerNum()));
 				// Reduce Done Add the Ack for it 
 				sharedData.getReduceDoneMap().add(msg1.type);
 				synchronized (HadoopMaster.QUEUE_LOCK) {
@@ -57,6 +59,7 @@ public class ServiceReduceThread implements Runnable {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println(Utils.logError(t.jobName, "There was a problem connecting to worker on " + wi.getHost() + ":" + wi.getPort()));
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();

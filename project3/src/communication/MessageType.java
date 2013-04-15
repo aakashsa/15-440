@@ -24,13 +24,5 @@ public enum MessageType {
 	/**
 	 * Type to indicate an exception
 	 */
-	EXCEPTION,
-	/**
-	 * Type to indicate a ping request from master to worker
-	 */
-	PING_REQUEST,
-	/**
-	 * Type to indicate a ping reply from worker to master
-	 */
-	PING_REPLY;
+	EXCEPTION;
 }

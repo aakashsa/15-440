@@ -2,7 +2,6 @@ package nodework;
 
 import fileio.MapRecordReader;
 import fileio.MapRecordWriter;
-import interfaces.InputFormat;
 import interfaces.Mapper;
 import interfaces.Writable;
 
@@ -15,6 +14,7 @@ import java.util.Iterator;
 
 import lib.Context;
 import lib.KeyValue;
+import lib.Utils;
 
 import communication.MapTask;
 import communication.Message;
@@ -33,10 +33,10 @@ public class MapFunction {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void doMap(MapTask task, ObjectOutputStream out) throws IOException {
-		System.out.println("[INFO] Received map task on " + task.wi.getWorkerNum());
+		System.out.println(Utils.logInfo(task.jobName, "Received map task on " + task.wi.getWorkerNum()));
 		
 		// Use file input format to read records from file
-		MapRecordReader recordReader = new MapRecordReader(task.fileInputFormat);
+		MapRecordReader recordReader = new MapRecordReader(task.fileInputFormat, task.jobName);
 		Iterator<KeyValue<Writable<?>, Writable<?>>> itr = null;
 		// Initialize Mapper instance
 		Mapper<Writable<?>, Writable<?>, Writable<?>, Writable<?>> mapper = null;
@@ -95,7 +95,7 @@ public class MapFunction {
 			}
 			cx.clear();
 		}
-		System.out.println("[INFO] Finished map task on mapper " + task.wi.getWorkerNum());
+		System.out.println(Utils.logInfo(task.jobName, "Finished map task on mapper " + task.wi.getWorkerNum()));
 		out.writeObject(new Message(MessageType.DONE_MAP));
 		out.flush();
 	}

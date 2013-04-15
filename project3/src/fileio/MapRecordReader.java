@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import lib.KeyValue;
+import lib.Utils;
 import interfaces.Writable;
 import interfaces.InputFormat;
 
@@ -25,13 +26,16 @@ public class MapRecordReader {
 	 * File input format type
 	 */
 	private Class<?> inputFormatClass;
+	private String jobName;
 	
 	/**
 	 * Map records need to be formatted according to input format
 	 * @param fileInputFormat Formatting for map input records
+	 * @param jobName Job name
 	 */
-	public MapRecordReader(Class<?> fileInputFormat) {
+	public MapRecordReader(Class<?> fileInputFormat, String jobName) {
 		this.inputFormatClass = fileInputFormat;
+		this.jobName = jobName;
 	}
 	
 	/**
@@ -48,7 +52,7 @@ public class MapRecordReader {
 		
 		rin = new RandomAccessFile(chunk.getFileName(), "r");
 		byte[] recordBytes = new byte[chunk.getRecordSize()];
-		System.out.println("[INFO] Reading Map chunk Number " + chunk.getChunkNumber());
+		System.out.println(Utils.logInfo(jobName, "Reading Map chunk Number " + chunk.getChunkNumber()));
 
 		int temp = 0;
 		for (int i = 0; i < chunk.getNumRecordsChunk(); i++) {

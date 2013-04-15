@@ -33,6 +33,8 @@ public class JobSetupClass implements JobConfiguration{
 		job.setChunkSize(2200);
 		job.setMapperOutputRecordSize(40);
 		job.setNumReducers(2);
+		job.setMapTimeout(5000);
+		job.setReduceTimeout(150000);
 		
 		return job;
 	}

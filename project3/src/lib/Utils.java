@@ -93,6 +93,16 @@ public class Utils {
 		else
 			newJob.setMapperOutputRecordSize(job.getMapperOutputRecordSize());
 		
+		if (job.getMapTimeout() < 0)
+			throw new IllegalArgumentException("Map time out time must be > 0");
+		else
+			newJob.setMapTimeout(job.getMapTimeout());
+		
+		if (job.getReduceTimeout() < 0)
+			throw new IllegalArgumentException("Reduce time out time must be > 0");
+		else
+			newJob.setMapTimeout(job.getReduceTimeout());
+		
 		// Check if chunk size is a multiple of record size
 		if (newJob.getChunkSize() < newJob.getRecordSize())
 			throw new IllegalArgumentException("Chunk size must be at least the record size");
@@ -293,5 +303,25 @@ public class Utils {
 	public static String getWorkerOutputFileName(int workerNum, String jobName) {
 		return getWorkerOutputFilesDirName(jobName) + "/worker" + workerNum
 				+ ".txt";
+	}
+	
+	/**
+	 * Return an info message string
+	 * @param jobName Job name
+	 * @param msg Message to print
+	 * @return
+	 */
+	public static String logInfo(String jobName, String msg) {
+		return "[INFO " + jobName + "] " + msg;
+	}
+	
+	/**
+	 * Return an error message string
+	 * @param jobName Job name
+	 * @param msg Error message
+	 * @return
+	 */
+	public static String logError(String jobName, String msg) {
+		return "[ERROR " + jobName + "] " + msg;
 	}
 }

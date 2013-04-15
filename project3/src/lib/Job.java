@@ -26,6 +26,9 @@ public class Job {
 	private int numReducers = -1;
 	private int mapperOutputRecordSize = -1;
 	
+	private int mapTimeout = -1;
+	private int reduceTimeout = -1;
+	
 	public Job() {	}
 
 	/**
@@ -125,5 +128,21 @@ public class Job {
 
 	public void setMapperOutputRecordSize(int mapperOutputRecordSize) {
 		this.mapperOutputRecordSize = mapperOutputRecordSize;
+	}
+
+	public int getMapTimeout() {
+		return mapTimeout;
+	}
+
+	public void setMapTimeout(int mapTimeout) {
+		this.mapTimeout = mapTimeout;
+	}
+
+	public int getReduceTimeout() {
+		return reduceTimeout;
+	}
+
+	public void setReduceTimeout(int reduceTimeout) {
+		this.reduceTimeout = reduceTimeout;
 	}
 }
