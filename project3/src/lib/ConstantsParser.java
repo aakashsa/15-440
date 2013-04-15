@@ -102,7 +102,7 @@ public class ConstantsParser implements Serializable {
 			if (port < 1024 || port > 49151) {
 				throw new IllegalArgumentException("Port number must be >= 1024 and <= 49151 (Registered port numbers range)");
 			}
-			String masterHost = (String) o.get("host");
+			String masterHost = (String) masterInfo.get("host");
 			master = new WorkerInfo(-1, masterHost, (int) port);
 			
 		} catch (FileNotFoundException e1) {

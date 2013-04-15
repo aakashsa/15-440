@@ -51,5 +51,4 @@ Worker starts up, scans the config file, gets address of master, starts a thread
 writes all except quit to master in a Message.
 Master starts up a scanner, and another thread to read messages from workers.
 When receives a message, it starts a job, or responds accordingly.
-
-
+If call quit on worker, master should be notified, and should remove that worker

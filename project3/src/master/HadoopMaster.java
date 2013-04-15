@@ -78,6 +78,6 @@ public class HadoopMaster {
 		System.out.println("Master ready...\n");
 		new Thread(new Scan(numWorkers)).start();
 		
-		new Thread(new WorkerScannerListener(numWorkers, cp.getMaster().getPort())).start();
+		new Thread(new WorkerScannerListener(cp.getMaster().getPort(), numWorkers)).start();
 	}
 }
