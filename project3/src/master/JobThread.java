@@ -55,8 +55,8 @@ public class JobThread implements Runnable {
 	/**
 	 * Clean up performed - Kill Service Threads and 
 	 * delete intermediate files Generated
-	 * @return 
 	 */
+	@SuppressWarnings("deprecation")
 	public void jobCleanup(){
 		while (!threadQueue.isEmpty()){
 			threadQueue.remove().suspend();

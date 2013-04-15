@@ -37,17 +37,13 @@ public class ReduceRecordReader {
 	 * key and value instances
 	 * @param task The reduce task this reader concerns
 	 * @throws FileNotFoundException If input file is not found
-	 * @throws InstantiationException If there is an error in initializing support key,value
-	 * @throws IllegalAccessException If there is an error in initializing support key,value
 	 */
-	public ReduceRecordReader(ReduceTask task) throws FileNotFoundException, InstantiationException, IllegalAccessException {		
+	public ReduceRecordReader(ReduceTask task) throws FileNotFoundException {		
 		File inputFile = new File(Utils.getReduceInputFileName(task.reducerInputFileNumber, task.jobName));
 		FileInputStream fis;
 		fis = new FileInputStream(inputFile);
 		this.br = new BufferedReader(new InputStreamReader(fis));
 		this.task = task;
-		this.keyInstance = (Writable<?>) task.reducerInputKeyClass.newInstance();
-		this.valueInstance = (Writable<?>) task.reducerInputValueClass.newInstance();
 	}
 	
 	/**
@@ -56,8 +52,8 @@ public class ReduceRecordReader {
 	 * no more records to read.
 	 * @return Key value pair in the record
 	 * @throws IOException If there were problems in reading the record
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
+	 * @throws IllegalAccessException If there is an error in initializing support key,value
+	 * @throws InstantiationException If there is an error in initializing support key,value
 	 */
 	public KeyValue<Writable<?>, Writable<?>> readRecord(String kvDelimiter, String padString) throws IOException, InstantiationException, IllegalAccessException {
 		String line = br.readLine();

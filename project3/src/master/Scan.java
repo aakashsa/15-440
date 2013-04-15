@@ -25,6 +25,7 @@ public class Scan implements Runnable {
 		this.numWorkers = numWorkers;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
 

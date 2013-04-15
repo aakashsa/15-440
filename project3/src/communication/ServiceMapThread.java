@@ -10,7 +10,6 @@ import java.net.UnknownHostException;
 
 import lib.Utils;
 import master.HadoopMaster;
-import master.JobThread;
 import nodework.*;
 
 /**

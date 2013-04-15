@@ -6,7 +6,7 @@ import lib.KeyValueInputFormat;
 import lib.TextWritable;
 
 /**
- * Collating Job. Maps words to the Documents it belongs.
+ * Collating Job. Maps documents to words in the document.
  */
 public class JobSetupClass implements JobConfiguration{
 

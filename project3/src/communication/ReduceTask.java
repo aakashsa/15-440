@@ -71,6 +71,8 @@ public class ReduceTask extends Task implements Serializable {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object a){
+		if (a == null)
+			throw new IllegalArgumentException("Can't compare a null ReduceTask");
 		if (!(a instanceof ReduceTask ))
 			return false;
 		if (((ReduceTask)a).reducerClass != this.reducerClass)
@@ -81,9 +83,9 @@ public class ReduceTask extends Task implements Serializable {
 			return false;
 		if (((ReduceTask)a).reducerInputValueClass != this.reducerInputValueClass)
 			return false;
-		if (((ReduceTask)a).outputDir != this.outputDir)
+		if (((ReduceTask)a).outputDir.equals(this.outputDir))
 			return false;
-		if (((ReduceTask)a).jobName != this.jobName)
+		if (((ReduceTask)a).jobName.equals(this.jobName))
 			return false;
 		if (((ReduceTask)a).mapperOutputSize != this.mapperOutputSize)
 			return false;

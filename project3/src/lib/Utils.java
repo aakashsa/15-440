@@ -309,7 +309,7 @@ public class Utils {
 	 * Return an info message string
 	 * @param jobName Job name
 	 * @param msg Message to print
-	 * @return
+	 * @return Info message string
 	 */
 	public static String logInfo(String jobName, String msg) {
 		return "[INFO " + jobName + "] " + msg;
@@ -319,7 +319,7 @@ public class Utils {
 	 * Return an error message string
 	 * @param jobName Job name
 	 * @param msg Error message
-	 * @return
+	 * @return Error message string
 	 */
 	public static String logError(String jobName, String msg) {
 		return "[ERROR " + jobName + "] " + msg;

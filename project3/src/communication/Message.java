@@ -27,7 +27,7 @@ public class Message implements Serializable {
 	
 	/**
 	 * Constructor for only a message type
-	 * @param type - Message type
+	 * @param type Message type
 	 */
 	public Message(MessageType type) {
 		this.type = type;
@@ -35,8 +35,8 @@ public class Message implements Serializable {
 	
 	/**
 	 * Constructor for a message that contains a task
-	 * @param type - Message type
-	 * @param task - Task in message
+	 * @param type Message type
+	 * @param task Task in message
 	 */
 	public Message(MessageType type, Task task) {
 		this.type = type;
@@ -45,8 +45,8 @@ public class Message implements Serializable {
 	
 	/**
 	 * Constructor for a message that contains an exception
-	 * @param type - Message type
-	 * @param e - Exception in message
+	 * @param type Message type
+	 * @param e Exception in message
 	 */
 	public Message(MessageType type, Exception e) {
 		this.type = type;

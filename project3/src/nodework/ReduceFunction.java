@@ -31,7 +31,7 @@ public class ReduceFunction {
 	 *            The reduce task
 	 * @param out
 	 *            Output stream to write acknowledgement to
-	 * @throws IOException
+	 * @throws IOException If there is an error in writing results back to socket
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public static void doReduce(ReduceTask task, ObjectOutputStream out) throws IOException {
@@ -113,11 +113,11 @@ public class ReduceFunction {
 				}
 			}
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			out.writeObject(new Message(MessageType.EXCEPTION, e));
+			return;
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			out.writeObject(new Message(MessageType.EXCEPTION, e));
+			return;
 		}
 
 		// Do the last edge case reduce and write to file
