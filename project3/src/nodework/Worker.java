@@ -1,5 +1,9 @@
 package nodework;
 
+import communication.WorkerInfo;
+
+import lib.ConstantsParser;
+
 /**
  * Gets in the port it should listen on from args, and starts listening for task
  * requests on that port. When a request comes in, it checks if it's a map
@@ -9,8 +13,8 @@ public class Worker {
 
 	public static void main(String[] args) {
 		// Get ports to listen on from command line
-		if (args.length != 1) {
-			System.out.println("Usage: Worker <port1>,<port2>, ... ,<port n>");
+		if (args.length != 2) {
+			System.out.println("Usage: Worker <port1>,<port2>, ... ,<port n> <configFilePath>");
 			System.exit(-1);
 		}
 		String[] portStrings = null;
@@ -20,6 +24,11 @@ public class Worker {
 			System.out.println("Usage: Worker <port1>,<port2>, ... ,<port n>");
 			System.exit(-1);
 		}
+		
+		// Get directory of job config files
+		ConstantsParser cp = new ConstantsParser(args[1]);
+		WorkerInfo master = cp.getMaster();
+		
 		int[] ports = new int[portStrings.length];
 		
 		int port;
@@ -40,7 +49,7 @@ public class Worker {
 		
 		// Spawn a thread to listen for requests on each port
 		for (int p : ports) {
-			new Thread(new WorkerThread(p)).start();
+			new Thread(new WorkerThread(p, master)).start();
 		}
 	}
 }

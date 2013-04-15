@@ -24,6 +24,18 @@ public class Message implements Serializable {
 	 * Exception in this message, if any
 	 */
 	public Exception e = null;
+	/**
+	 * Input file path
+	 */
+	public String inputFilePath = null;
+	/**
+	 * Job config files dir
+	 */
+	public String configFilesDir = null;
+	/**
+	 * Job name
+	 */
+	public String jobName = null;
 	
 	/**
 	 * Constructor for only a message type
@@ -51,5 +63,27 @@ public class Message implements Serializable {
 	public Message(MessageType type, Exception e) {
 		this.type = type;
 		this.e = e;
+	}
+	
+	/**
+	 * A message constructor for runjob commands
+	 * @param type Message type
+	 * @param inputFilePath Path to input file
+	 * @param configFilesDir Path to job config files
+	 */
+	public Message(MessageType type, String inputFilePath, String configFilesDir) {
+		this.type = type;
+		this.inputFilePath = inputFilePath;
+		this.configFilesDir = configFilesDir;
+	}
+	
+	/**
+	 * Constructor for kill job commands
+	 * @param type Message type
+	 * @param jobName Job name
+	 */
+	public Message(MessageType type, String jobName) {
+		this.type = type;
+		this.jobName = jobName;
 	}
 }

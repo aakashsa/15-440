@@ -24,5 +24,17 @@ public enum MessageType {
 	/**
 	 * Type to indicate an exception
 	 */
-	EXCEPTION;
+	EXCEPTION,
+	/**
+	 * List jobs request from worker
+	 */
+	LISTJOBS,
+	/**
+	 * Kill job request from worker
+	 */
+	KILLJOB,
+	/**
+	 * Run job request from worker
+	 */
+	RUNJOB;
 }

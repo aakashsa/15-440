@@ -12,6 +12,7 @@ import communication.MapTask;
 import communication.Message;
 import communication.MessageType;
 import communication.ReduceTask;
+import communication.WorkerInfo;
 /**
  * Main Clas begins the Execution of the Worker Class
  */
@@ -23,8 +24,11 @@ public class WorkerThread implements Runnable {
 	 * Get the port to start on, and save it
 	 * @param port Port to listen on
 	 */
-	public WorkerThread(int port) {
+	public WorkerThread(int port, WorkerInfo master) {
 		this.port = port;
+		
+		// Spawn a scanner thread to listen for requests from command line
+		new Thread(new WorkerScanner(master)).start();
 	}
 	
 	@Override

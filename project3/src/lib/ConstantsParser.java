@@ -24,7 +24,11 @@ public class ConstantsParser implements Serializable {
 	 * Map from worker number to worker info (worker numbers start at 0)
 	 */
 	private ConcurrentHashMap<Integer, WorkerInfo> allWorkers = new ConcurrentHashMap<Integer, WorkerInfo>();
-
+	/**
+	 * Master node info
+	 */
+	private WorkerInfo master;
+	
 	/**
 	 * Constructor that parses the file
 	 * @param filePath File to parse
@@ -45,6 +49,9 @@ public class ConstantsParser implements Serializable {
 
 			if (o.get("WORKERS") == null)
 				throw new IllegalArgumentException("No WORKERS provided");
+			
+			if (o.get("MASTER") == null)
+				throw new IllegalArgumentException("No MASTER provided");
 			
 			// parse all workers
 			int workerNum = 0;
@@ -80,7 +87,24 @@ public class ConstantsParser implements Serializable {
 					allWorkers.put(workerNum, new WorkerInfo(workerNum, host, (int) port));
 					workerNum++;
 				}
-			}			
+			}
+			
+			// Parse master node
+			JSONObject masterInfo = (JSONObject) o.get("MASTER");
+			
+			if (masterInfo.get("port") == null)
+				throw new IllegalArgumentException("No port provided for master");
+			
+			if (masterInfo.get("host") == null)
+				throw new IllegalArgumentException("No host provided for master");
+			
+			long port = (Long) masterInfo.get("port");
+			if (port < 1024 || port > 49151) {
+				throw new IllegalArgumentException("Port number must be >= 1024 and <= 49151 (Registered port numbers range)");
+			}
+			String masterHost = (String) o.get("host");
+			master = new WorkerInfo(-1, masterHost, (int) port);
+			
 		} catch (FileNotFoundException e1) {
 			System.out.println("ERROR: Couldn't find config file (" + filePath + ")");
 			e1.printStackTrace();
@@ -100,31 +124,10 @@ public class ConstantsParser implements Serializable {
 		return allWorkers;
 	}
 
-//	/**
-//	 * Getter for record size
-//	 */
-//	public long getRecordSize() {
-//		return recordSize;
-//	}
-//
-//	/**
-//	 * Getter for chunk size
-//	 */
-//	public long getChunkSize() {
-//		return chunkSize;
-//	}
-//
-//	/**
-//	 * Getter for number of reducers
-//	 */
-//	public long getNumReducers() {
-//		return numReducers;
-//	}
-//	
-//	/**
-//	 * Getter for mapper output size
-//	 */
-//	public long getMapperOutputSize() {
-//		return mapperOutputSize;
-//	}
+	/**
+	 * Getter for master node
+	 */
+	public WorkerInfo getMaster() {
+		return this.master;
+	}
 }

@@ -9,5 +9,9 @@
 		"host":"localhost",
 		"ports":[9055, 9056],
 		"numcores":2
-	}]
+	}],
+	"MASTER":{
+		"host":"localhost",
+		"port":15222
+	}
 }
