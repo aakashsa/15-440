@@ -18,115 +18,88 @@ public class Utils {
 	 * 
 	 * @param job
 	 *            Job to check
-	 * @throws IllegalAccessException
-	 *             If there is an error in instantiating input format
-	 * @throws InstantiationException
-	 *             If there is an error in instantiating input format
 	 */
-	public static void performJobSanityChecks(Job job, int numWorkers)
-			throws InstantiationException, IllegalAccessException {
-		Job newJob = new Job();
-
+	public static void performBasicJobSanityChecks(Job job, int numWorkers) {
 		// Check if all needed things are provided
 		if (job.getJobName() == null)
 			throw new IllegalArgumentException("No job name provided");
-		else
-			newJob.setJobName(job.getJobName());
 
-		if (job.getMapperClass() == null)
-			throw new IllegalArgumentException("No mapper class provided");
-		else
-			newJob.setMapperClass(job.getMapperClass());
+		if (job.getMapperClassName() == null)
+			throw new IllegalArgumentException("No mapper class name provided");
 
-		if (job.getReducerClass() == null)
-			throw new IllegalArgumentException("No reducer class provided");
-		else
-			newJob.setReducerClass(job.getReducerClass());
+		if (job.getReducerClassName() == null)
+			throw new IllegalArgumentException("No reducer class name provided");
 
 		if (job.getFileInputFormatClass() == null)
 			throw new IllegalArgumentException(
 					"No file input format class provided");
-		else
-			newJob.setFileInputFormatClass(job.getFileInputFormatClass());
 
 		if (job.getMapperOutputKeyClass() == null)
 			throw new IllegalArgumentException(
 					"No mapper output key class provided");
-		else
-			newJob.setMapperOutputKeyClass(job.getMapperOutputKeyClass());
 
 		if (job.getMapperOutputValueClass() == null)
 			throw new IllegalArgumentException(
 					"No mapper output value class provided");
-		else
-			newJob.setMapperOutputValueClass(job.getMapperOutputValueClass());
 
 		if (job.getReducerOutputKeyClass() == null)
 			throw new IllegalArgumentException(
 					"No reducer output key class provided");
-		else
-			newJob.setReducerOutputKeyClass(job.getReducerOutputKeyClass());
 
 		if (job.getReducerOutputValueClass() == null)
 			throw new IllegalArgumentException(
 					"No reducer output value class provided");
-		else
-			newJob.setReducerOutputValueClass(job.getReducerOutputValueClass());
 
 		if (job.getRecordSize() < 0)
 			throw new IllegalArgumentException("Record size must be > 0");
-		else
-			newJob.setRecordSize(job.getRecordSize());
 		
 		if (job.getChunkSize() < 0)
 			throw new IllegalArgumentException("Chunk size must be > 0");
-		else
-			newJob.setChunkSize(job.getChunkSize());
 		
 		if (job.getNumReducers() < 0)
 			throw new IllegalArgumentException("Number of reducers must be > 0");
-		else
-			newJob.setNumReducers(job.getNumReducers());
 		
 		if (job.getMapperOutputRecordSize() < 0)
 			throw new IllegalArgumentException("Mapper output key value record size must be > 0");
-		else
-			newJob.setMapperOutputRecordSize(job.getMapperOutputRecordSize());
 		
 		if (job.getMapTimeout() < 0)
 			throw new IllegalArgumentException("Map time out time must be > 0");
-		else
-			newJob.setMapTimeout(job.getMapTimeout());
 		
 		if (job.getReduceTimeout() < 0)
 			throw new IllegalArgumentException("Reduce time out time must be > 0");
-		else
-			newJob.setMapTimeout(job.getReduceTimeout());
 		
 		// Check if chunk size is a multiple of record size
-		if (newJob.getChunkSize() < newJob.getRecordSize())
+		if (job.getChunkSize() < job.getRecordSize())
 			throw new IllegalArgumentException("Chunk size must be at least the record size");
 		
-		if (newJob.getChunkSize() % newJob.getRecordSize() != 0)
+		if (job.getChunkSize() % job.getRecordSize() != 0)
 			throw new IllegalArgumentException("Chunk size must be a multiple of record size");
 		
 		// Num reducers must be at most the number of workers
-		if (newJob.getNumReducers() > numWorkers)
+		if (job.getNumReducers() > numWorkers)
 			throw new IllegalArgumentException("Num reducers must be <= num workers");
-		
+	}
+
+	/**
+	 * Perform advanced sanity checks on job configuration, using mapper and reducer classes
+	 * @param job Job to check
+	 * @throws InstantiationException If there is an error in instantiating Input format
+	 * @throws IllegalAccessException If there is an error in instantiating input format
+	 */
+	public static void performAdvancedJobSanityChecks(Job job) throws InstantiationException, IllegalAccessException {
 		// Check if mapper and reducer classes are actually mapper and reducer
 		// This check also ensures that the parameterized types are Writables
-		if (!Mapper.class.isAssignableFrom(newJob.getMapperClass())) {
+		if (!Mapper.class.isAssignableFrom(job.getMapperClass())) {
 			throw new IllegalArgumentException(
 					"Mapper class provided does not implement mapper interface");
 		}
-		if (!Reducer.class.isAssignableFrom(newJob.getReducerClass())) {
+		if (!Reducer.class.isAssignableFrom(job.getReducerClass())) {
 			throw new IllegalArgumentException(
 					"Reducer class provided does not implement reducer interface");
 		}
 
 		// Get types of actual Mapper and Reducer
-		ParameterizedType pt = (ParameterizedType) newJob.getMapperClass()
+		ParameterizedType pt = (ParameterizedType) job.getMapperClass()
 				.getGenericInterfaces()[0];
 
 		String mapK1 = ((Class<?>) pt.getActualTypeArguments()[0]).getName();
@@ -134,7 +107,7 @@ public class Utils {
 		String mapK2 = ((Class<?>) pt.getActualTypeArguments()[2]).getName();
 		String mapV2 = ((Class<?>) pt.getActualTypeArguments()[3]).getName();
 
-		pt = (ParameterizedType) newJob.getReducerClass()
+		pt = (ParameterizedType) job.getReducerClass()
 				.getGenericInterfaces()[0];
 
 		String reducerK1 = ((Class<?>) pt.getActualTypeArguments()[0])
@@ -159,22 +132,22 @@ public class Utils {
 		}
 		// Check if the types user specified are the same as the actual mapper
 		// and reducer
-		if (!(mapK2.equals(newJob.getMapperOutputKeyClass().getName()))) {
+		if (!(mapK2.equals(job.getMapperOutputKeyClass().getName()))) {
 			throw new IllegalArgumentException(
 					"Actual Mapper output key type and that provided in configuration don't match. Expected: "
 							+ mapK2
 							+ "; Actual: lib."
-							+ newJob.getMapperOutputKeyClass().getName());
+							+ job.getMapperOutputKeyClass().getName());
 		}
-		if (!(mapV2.equals(newJob.getMapperOutputValueClass().getName()))) {
+		if (!(mapV2.equals(job.getMapperOutputValueClass().getName()))) {
 			throw new IllegalArgumentException(
 					"Actual Mapper output value type and that provided in configuration don't match");
 		}
-		if (!(reducerK2.equals(newJob.getReducerOutputKeyClass().getName()))) {
+		if (!(reducerK2.equals(job.getReducerOutputKeyClass().getName()))) {
 			throw new IllegalArgumentException(
 					"Actual Reducer output key type and that provided in configuration don't match");
 		}
-		if (!(reducerV2.equals(newJob.getReducerOutputValueClass().getName()))) {
+		if (!(reducerV2.equals(job.getReducerOutputValueClass().getName()))) {
 			throw new IllegalArgumentException(
 					"Actual Reducer output value type and that provided in configuration don't match");
 		}
@@ -198,7 +171,7 @@ public class Utils {
 					"Input/output key/value types (except Mapper input key type) cannot be NullWritable");
 		}
 	}
-
+	
 	/**
 	 * A function to remove a directory and files in it.
 	 * 

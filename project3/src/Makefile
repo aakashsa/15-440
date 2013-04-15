@@ -2,8 +2,8 @@ all:
 	javac -cp json-simple-1.1.1.jar ./*/*.java
 
 masterNode:
-	#runjob shakespeare.txt.conv test
-	#runjob coll.txt /Users/nikhiltibrewal/Downloads/test2/
+	#runjob words1.txt /afs/andrew.cmu.edu/...
+	#runjob coll.txt /afs/andrew.cmu.edu/...
 	java -classpath .:json-simple-1.1.1.jar master/HadoopMaster Constants.json
 
 worker1:

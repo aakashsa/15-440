@@ -20,8 +20,8 @@ public class JobSetupClass implements JobConfiguration{
 
 		job.setFileInputFormatClass(KeyValueInputFormat.class);
 
-		job.setMapperClass(CollatingMapper.class);
-		job.setReducerClass(CollatingReducer.class);
+		job.setMapperClassName("CollatingMapper");
+		job.setReducerClassName("CollatingReducer");
 
 		job.setMapperOutputKeyClass(TextWritable.class);
 		job.setMapperOutputValueClass(TextWritable.class);

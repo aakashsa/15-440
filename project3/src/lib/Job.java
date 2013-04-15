@@ -10,6 +10,9 @@ public class Job {
 
 	private String jobName = null;
 	
+	private String mapperClassName = null;
+	private String reducerClassName = null;
+	
 	private Class<?> mapperClass = null;
 	private Class<?> reducerClass = null;
 	
@@ -144,5 +147,21 @@ public class Job {
 
 	public void setReduceTimeout(int reduceTimeout) {
 		this.reduceTimeout = reduceTimeout;
+	}
+
+	public String getMapperClassName() {
+		return mapperClassName;
+	}
+
+	public void setMapperClassName(String mapperClassName) {
+		this.mapperClassName = mapperClassName;
+	}
+
+	public String getReducerClassName() {
+		return reducerClassName;
+	}
+
+	public void setReducerClassName(String reducerClassName) {
+		this.reducerClassName = reducerClassName;
 	}
 }

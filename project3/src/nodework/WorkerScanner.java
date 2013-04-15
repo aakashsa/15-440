@@ -40,7 +40,8 @@ public class WorkerScanner implements Runnable {
 
 			while (sc.hasNextLine()) {
 
-				Scanner sc2 = new Scanner(sc.nextLine());
+				String scanned = sc.nextLine();
+				Scanner sc2 = new Scanner(scanned);
 
 				// Scan the first word for process name or a different command
 				if (sc2.hasNext()) {
@@ -52,6 +53,7 @@ public class WorkerScanner implements Runnable {
 							System.out.println("[ERROR] Invalid command: listjobs does not take any arguments!");
 						}
 						else {
+							System.out.println("[INFO] Forwarding request to master...");
 							out.writeObject(new Message(MessageType.LISTJOBS));
 							out.flush();
 						}
@@ -84,6 +86,7 @@ public class WorkerScanner implements Runnable {
 						if (cliArgs.size()!=1) {
 							System.out.println("Usage: killjob <job_name>");
 						} else {
+							System.out.println("[INFO] Forwarding request to master...");
 							out.writeObject(new Message(MessageType.KILLJOB, cliArgs.get(0)));
 							out.flush();
 						}
@@ -101,6 +104,7 @@ public class WorkerScanner implements Runnable {
 							if (cliArgs.size() != 2) {
 								System.out.println("Usage: runjob <inputFilePath> <jobConfigDir>");
 							} else {
+								System.out.println("[INFO] Forwarding request to master...");
 								out.writeObject(new Message(MessageType.RUNJOB, cliArgs.get(0), cliArgs.get(1)));
 								out.flush();
 							}

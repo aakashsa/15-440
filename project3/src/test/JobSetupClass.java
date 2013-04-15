@@ -21,8 +21,8 @@ public class JobSetupClass implements JobConfiguration{
 		
 		job.setFileInputFormatClass(TextInputFormat.class);
 		
-		job.setMapperClass(WordCountMapper.class);
-		job.setReducerClass(WordCountReducer.class);
+		job.setMapperClassName("WordCountMapper");
+		job.setReducerClassName("WordCountReducer");
 		
 		job.setMapperOutputKeyClass(TextWritable.class);
 		job.setMapperOutputValueClass(IntWritable.class);

@@ -116,8 +116,19 @@ public class Scan implements Runnable {
 								Class<?> jobConfClass = jcl.getClass(jobConfigDir, "JobSetupClass");
 								JobConfiguration jConf = (JobConfiguration) jobConfClass.newInstance();
 								job = jConf.setup();
+								
 								// Performing Sanity Checks on the Job provided
-								Utils.performJobSanityChecks(job, numWorkers);
+								Utils.performBasicJobSanityChecks(job, numWorkers);
+								
+								// Get classes of mapper and reducer too
+								Class<?> mapperClass = jcl.getClass(jobConfigDir, job.getMapperClassName());
+								job.setMapperClass(mapperClass);
+								Class<?> reducerClass = jcl.getClass(jobConfigDir, job.getReducerClassName());
+								job.setReducerClass(reducerClass);
+								
+								// Perform advanced sanity checks
+								Utils.performAdvancedJobSanityChecks(job);
+								
 								HadoopMaster.jobCounter++;
 								HadoopMaster.jobMap.put(HadoopMaster.jobCounter, job);
 								JobThread newJob = new JobThread(inputFile,job);
