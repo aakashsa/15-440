@@ -2,10 +2,13 @@ package fileio;
 
 import interfaces.Writable;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 
 import lib.KeyValue;
@@ -26,7 +29,9 @@ public class MapRecordWriter {
 	 * Output writer pointer
 	 */
 	private PrintWriter outWriter;
-
+ 
+	private RandomAccessFile raf;
+	private File f;
 	/**
 	 * A constructor that initializes the output file to write records to
 	 * @param task Task that this map operation is concerned with
@@ -34,8 +39,11 @@ public class MapRecordWriter {
 	 */
 	public MapRecordWriter(MapTask task) throws FileNotFoundException {
 		this.task = task;
-		OutputStream outputFile = new FileOutputStream(Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName), true);
-		this.outWriter = new PrintWriter(outputFile, true);
+		raf = new RandomAccessFile(Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName), "rws");
+		f = new File(Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName));
+		
+//		OutputStream outputFile = new FileOutputStream(Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName), true);
+//		this.outWriter = new PrintWriter(outputFile, true);
 	}
 	
 	/**
@@ -45,9 +53,9 @@ public class MapRecordWriter {
 	 * @param kvDelimiter Delimiter for the provided key and value
 	 * @param padString String of size 1 byte to pad any left over bytes of the record with
 	 * @throws IllegalArgumentException If the record size is too small for key and value when concatenated with the delimiter
-	 * @throws UnsupportedEncodingException If there is an error in calculating the byte length of pad string
+	 * @throws IOException 
 	 */
-	public void writeRecord(KeyValue<Writable<?>, Writable<?>> kv, String kvDelimiter, String padString) throws IllegalArgumentException, UnsupportedEncodingException {
+	public void writeRecord(KeyValue<Writable<?>, Writable<?>> kv, String kvDelimiter, String padString) throws IllegalArgumentException, IOException{
 		if (padString.getBytes("UTF-8").length != 1)
 			throw new IllegalArgumentException("Pad string length is not 1 byte");
 		
@@ -62,8 +70,17 @@ public class MapRecordWriter {
 		} else if (record.length() > (this.task.mapperOutputRecordSize - 1)) {
 			throw new IllegalArgumentException("Mapper output concatenation of key and value is bigger than mapper output record size");
 		}
-		outWriter.println(record);
-		outWriter.flush();
+		//System.out.println(" Record being Written = " + record + " To = " +  Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName));
+		//File f = new File("lala.txt");
+		long fileLength = f.length();
+	    //System.out.println(" size = " + fileLength);
+	    //rout = new RandomAccessFile(f, "rws");
+	    raf.seek(fileLength);
+//	    raf.writeByte(record+"\r\n");
+	    raf.writeBytes(record+"\r\n");
+		
+		//outWriter.println(record);
+		//outWriter.flush();
 	}
 	
 }

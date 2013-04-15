@@ -44,11 +44,28 @@ File writes:
 If we call quit on worker, and worker exits, how is that taken care of in the master?
 Handout says, we should be able to restart processes if they fail
 Improve management tools (job time started, ended, list of working workers, etc.)
-Starting processes on workers
+Check if we are still using PING messages
+If the workers are not online, the chunk maps aren't cleaned up. Should clean those up.
 
 
-Worker starts up, scans the config file, gets address of master, starts a thread to scan for incoming requests, and 
-writes all except quit to master in a Message.
-Master starts up a scanner, and another thread to read messages from workers.
-When receives a message, it starts a job, or responds accordingly.
-If call quit on worker, master should be notified, and should remove that worker
+
+
+
+Fault Tolerance 
+
+We provide for the fault tolerance of the workers dying while doing either a map or a reduce task.
+With a configurable mapper timeout ( which the user can change as per his convenience ) we make 
+the master job thread resend the chunk to the worker. We can do this because we have the 
+worker -> chunk and chunk -> worker mapping which allows us to re send a map chunk that has
+exceeded the known timeout limit. 
+
+Similarly when the workers are in the middle of reduce phase if a worker dies then we take
+his reduce task and give it to another worker if the time has exceeded the reducer timeout limit.
+ 
+ 
+
+
+
+
+
+

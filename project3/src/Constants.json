@@ -12,6 +12,6 @@
 	}],
 	"MASTER":{
 		"host":"localhost",
-		"port":15222
+		"port":8081
 	}
 }
