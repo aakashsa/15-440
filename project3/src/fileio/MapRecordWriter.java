@@ -4,12 +4,8 @@ import interfaces.Writable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 
 import lib.KeyValue;
 import lib.Utils;
@@ -25,10 +21,6 @@ public class MapRecordWriter {
 	 * Map task dealing with
 	 */
 	private MapTask task;
-	/**
-	 * Output writer pointer
-	 */
-	private PrintWriter outWriter;
  
 	private RandomAccessFile raf;
 	private File f;
@@ -41,9 +33,6 @@ public class MapRecordWriter {
 		this.task = task;
 		raf = new RandomAccessFile(Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName), "rws");
 		f = new File(Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName));
-		
-//		OutputStream outputFile = new FileOutputStream(Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName), true);
-//		this.outWriter = new PrintWriter(outputFile, true);
 	}
 	
 	/**
@@ -53,7 +42,7 @@ public class MapRecordWriter {
 	 * @param kvDelimiter Delimiter for the provided key and value
 	 * @param padString String of size 1 byte to pad any left over bytes of the record with
 	 * @throws IllegalArgumentException If the record size is too small for key and value when concatenated with the delimiter
-	 * @throws IOException 
+	 * @throws IOException If there is an error in writing to file
 	 */
 	public void writeRecord(KeyValue<Writable<?>, Writable<?>> kv, String kvDelimiter, String padString) throws IllegalArgumentException, IOException{
 		if (padString.getBytes("UTF-8").length != 1)
@@ -70,17 +59,8 @@ public class MapRecordWriter {
 		} else if (record.length() > (this.task.mapperOutputRecordSize - 1)) {
 			throw new IllegalArgumentException("Mapper output concatenation of key and value is bigger than mapper output record size");
 		}
-		//System.out.println(" Record being Written = " + record + " To = " +  Utils.getWorkerOutputFileName(task.wi.getWorkerNum(), task.jobName));
-		//File f = new File("lala.txt");
 		long fileLength = f.length();
-	    //System.out.println(" size = " + fileLength);
-	    //rout = new RandomAccessFile(f, "rws");
 	    raf.seek(fileLength);
-//	    raf.writeByte(record+"\r\n");
 	    raf.writeBytes(record+"\r\n");
-		
-		//outWriter.println(record);
-		//outWriter.flush();
 	}
-	
 }

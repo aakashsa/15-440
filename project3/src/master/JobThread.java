@@ -255,8 +255,12 @@ public class JobThread implements Runnable {
 					}
 				}
 			}
-			Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())));
-			Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())));				
+			if (!Utils.removeDirectory(new File(Utils.getPartitionDirName(job.getJobName())))){
+				System.out.println(Utils.logInfo(job.getJobName(), "Couldn't delete partition dir " + Utils.getPartitionDirName(job.getJobName())));
+			}
+			if (!Utils.removeDirectory(new File(Utils.getWorkerOutputFilesDirName(job.getJobName())))) {
+				System.out.println(Utils.logInfo(job.getJobName(), "Couldn't delete worker files dir " + Utils.getWorkerOutputFilesDirName(job.getJobName())));
+			}
 			System.out.println(Utils.logInfo(job.getJobName(), "Done " + job.getJobName() + " job"));
 			int id = Integer.parseInt((job.getJobName().split("_"))[1]);
 			HadoopMaster.jobMap.remove(id);

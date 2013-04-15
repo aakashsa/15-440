@@ -53,6 +53,7 @@ public class WorkerScanner implements Runnable {
 						}
 						else {
 							out.writeObject(new Message(MessageType.LISTJOBS));
+							out.flush();
 						}
 					} else if (name.equals("quit")) {
 						if (sc2.hasNext()) {
@@ -84,6 +85,7 @@ public class WorkerScanner implements Runnable {
 							System.out.println("Usage: killjob <job_name>");
 						} else {
 							out.writeObject(new Message(MessageType.KILLJOB, cliArgs.get(0)));
+							out.flush();
 						}
 					} else {
 						if (!name.equals("runjob")){
@@ -100,6 +102,7 @@ public class WorkerScanner implements Runnable {
 								System.out.println("Usage: runjob <inputFilePath> <jobConfigDir>");
 							} else {
 								out.writeObject(new Message(MessageType.RUNJOB, cliArgs.get(0), cliArgs.get(1)));
+								out.flush();
 							}
 						}
 					}

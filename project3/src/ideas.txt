@@ -46,7 +46,7 @@ Handout says, we should be able to restart processes if they fail
 Improve management tools (job time started, ended, list of working workers, etc.)
 Check if we are still using PING messages
 If the workers are not online, the chunk maps aren't cleaned up. Should clean those up.
-
+Class loader shit. And forcing the name of job config class. Check this.
 
 
 

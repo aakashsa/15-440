@@ -3,7 +3,7 @@ all:
 
 masterNode:
 	#runjob shakespeare.txt.conv test
-	#runjob coll.txt test2
+	#runjob coll.txt /Users/nikhiltibrewal/Downloads/test2/
 	java -classpath .:json-simple-1.1.1.jar master/HadoopMaster Constants.json
 
 worker1:

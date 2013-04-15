@@ -2,11 +2,13 @@ package master;
 
 import interfaces.JobConfiguration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
 import lib.Job;
+import lib.JobConfigurationLoader;
 import lib.Utils;
 
 /**
@@ -106,25 +108,23 @@ public class Scan implements Runnable {
 							System.out.println("Usage: runjob <inputFilePath> <jobConfigDir>");
 						} else {
 							// Initialize the Job Object
-							HadoopMaster.jobCounter++;
 							String inputFile = cliArgs.get(0);
 							String jobConfigDir = cliArgs.get(1);
 							Job job = null;
 							try {
-								Class<?> jobConfClass = Class.forName(jobConfigDir + ".JobSetupClass");
+								JobConfigurationLoader jcl = new JobConfigurationLoader();
+								Class<?> jobConfClass = jcl.getClass(jobConfigDir, "JobSetupClass");
 								JobConfiguration jConf = (JobConfiguration) jobConfClass.newInstance();
 								job = jConf.setup();
 								// Performing Sanity Checks on the Job provided
 								Utils.performJobSanityChecks(job, numWorkers);
+								HadoopMaster.jobCounter++;
 								HadoopMaster.jobMap.put(HadoopMaster.jobCounter, job);
 								JobThread newJob = new JobThread(inputFile,job);
 								HadoopMaster.jobThreadObjectMap.put(HadoopMaster.jobCounter,newJob);
 								Thread new_thread = new Thread(newJob);
 								HadoopMaster.jobThreadMap.put(HadoopMaster.jobCounter, new_thread);
 								new_thread.start();
-							} catch (ClassNotFoundException e) {
-								System.out.println("[ERROR] JobSetupClass class not found. Make sure the jobConfigDir argument is correct.");
-								continue;
 							} catch (InstantiationException e) {
 								System.out.println("[ERROR] Job configuration instantiation error");
 								continue;
@@ -132,6 +132,9 @@ public class Scan implements Runnable {
 								System.out.println("[ERROR] Job configuration instantiation error");
 								continue;
 							} catch (IllegalArgumentException e) {
+								System.out.println("[ERROR] " + e.getMessage());
+								continue;
+							} catch (IOException e) {
 								System.out.println("[ERROR] " + e.getMessage());
 								continue;
 							}

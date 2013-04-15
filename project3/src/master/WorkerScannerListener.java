@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.util.Map.Entry;
 
 import lib.Job;
+import lib.JobConfigurationLoader;
 import lib.Utils;
 
 import communication.Message;
@@ -77,25 +78,23 @@ public class WorkerScannerListener implements Runnable {
 				// Run job
 				else if (requestMsg.type == MessageType.RUNJOB) {
 					// Initialize the Job Object
-					HadoopMaster.jobCounter++;
 					String inputFile = requestMsg.inputFilePath;
 					String jobConfigDir = requestMsg.configFilesDir;
 					Job job = null;
 					try {
-						Class<?> jobConfClass = Class.forName(jobConfigDir + ".JobSetupClass");
+						JobConfigurationLoader jcl = new JobConfigurationLoader();
+						Class<?> jobConfClass = jcl.getClass(jobConfigDir, "JobSetupClass");
 						JobConfiguration jConf = (JobConfiguration) jobConfClass.newInstance();
 						job = jConf.setup();
 						// Performing Sanity Checks on the Job provided
 						Utils.performJobSanityChecks(job, numWorkers);
+						HadoopMaster.jobCounter++;
 						HadoopMaster.jobMap.put(HadoopMaster.jobCounter, job);
 						JobThread newJob = new JobThread(inputFile,job);
 						HadoopMaster.jobThreadObjectMap.put(HadoopMaster.jobCounter,newJob);
 						Thread new_thread = new Thread(newJob);
 						HadoopMaster.jobThreadMap.put(HadoopMaster.jobCounter, new_thread);
 						new_thread.start();
-					} catch (ClassNotFoundException e) {
-						System.out.println("[ERROR] JobSetupClass class not found. Make sure the jobConfigDir argument is correct.");
-						continue;
 					} catch (InstantiationException e) {
 						System.out.println("[ERROR] Job configuration instantiation error");
 						continue;
@@ -105,6 +104,8 @@ public class WorkerScannerListener implements Runnable {
 					} catch (IllegalArgumentException e) {
 						System.out.println("[ERROR] " + e.getMessage());
 						continue;
+					} catch (IOException e) {
+						System.out.println("[ERROR] " + e.getMessage());
 					}
 				}
 			}
