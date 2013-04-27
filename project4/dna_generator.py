@@ -1,4 +1,5 @@
 ## this file generates random DNA strands data and writes it to a file
+## currently we don't check if we are generating a new point or not
 
 import sys
 import random
