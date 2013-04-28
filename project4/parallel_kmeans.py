@@ -2,6 +2,7 @@ from mpi4py import *
 import random
 import sys
 import copy
+import operator
 
 '''
 	This Function Computes the distance between two point1 , point2
@@ -61,10 +62,10 @@ def find_closest_point(point,points):
 	Given a set of points partition them into a set of n subset lists
 '''
 def partition_points(points,n):
-	partition =  [ [] for i in range(n) ]
+	answer =  [ [] for i in range(n) ]
 	for i in range(0,len(points)):
 		answer[(i%n)].append(points[i])
-
+	return answer 	
 
 '''
 	New Main Average Points of the given points
@@ -81,7 +82,8 @@ def mean_average(points):
 				temp+= point[i]
 			answer = answer + (temp/len(points),)	
 		return answer	
-
+# Test
+#print "Mean Average = ",mean_average([(1,2),(8,2),(7,2),(4,2),,(3,2)])	
 
 '''
 	Given a List of Points it returns k lists where each list is the 
@@ -101,45 +103,69 @@ def assign_cluster(points,centroids,k):
 	 Multiply Vector by Factor 
 '''
 def multiply_factor(point,factor):
-	for i in range(point):
-		point[i] = point[i]*factor	
-	return point
-
+	if (point ==None):
+			return None
+	answer = [ 0 for i in range(len(point))]
+	print " Point = ",point, " factor = ",factor	
+	for i in range(len(point)):	
+		answer[i] = point[i]*factor	
+	return tuple(answer)
+#Tested
 
 '''
 	Adding two Points as it is
 '''
-def add_points (points):
-	answer = ()
-	temp = 0
-	for i in range(len(point[0])):
-		for point in points:
-			temp+= point[i] 
-		answer = answer + (temp/len(points),)	
-	return answer
-
+def add_points (point1, point2):	
+	if point1==None:
+		print "Point 1 is None"
+		return point2
+	if point2==None:
+		print "Point 2 is None"
+		return point1	
+	return tuple(map(operator.add, point1, point2))
 
 '''
 	Centroids from all n-1 processess - centroid_local
 	population from all n-1 processess - population_local
 '''
 def recalculate_centroid(centroid_local,population_local,k):
-	total_size = [ 0 for i in range(K)]
-	temp = 0
+	print "Centroid_local ", centroid_local
+	print "Population_local ", population_local
+
+	total_size = [ 0 for i in range(k)]
+	temp = 0 
 	# Total Size of Each Cluster
-	for i in range(k):
+	for i in range(0,k):
 		for node in population_local:
 			temp+= node[i]
 		total_size[i] = temp
 		temp = 0	
+	# Total Size has total size of each of the k clusters
 	# Initialize the Answer with the Weighed Centroids we got from Slave one
 	answer =  []
 	for i in range(0,k):
-		answer.append(multiply_factor(centroid_local[0][i],(float(population_local[0][i])/float(total_size[i]))))  
+		print "Total_size[i]  = ",total_size[0]
+		print "Float Total_size[i]  = ",float(total_size[0])
+		if total_size[i]!=0:
+			factored = multiply_factor(centroid_local[0][i],(float(population_local[0][i])/float(total_size[i])))
+			print "Centroid Local[0][i] = ",centroid_local[0][i]
+			print "Multiplied Point = ",factored
+			answer.append(factored)
+		else: 
+			answer.append(centroid_local[0][i])
+
 	# For Each Slaves Centroid List we have to weigh it with the population size in that cluster	
 	for i in range(0,k):
 		for j in range(1,len(centroid_local)):
-			answer[i] = add_points(answer[i],multiply_factor(centroid_local[j][i],float(population_local[j][i])/float(total_size[i])))
+			print "Total_size[i]  = ",total_size[i]
+			print "Float Total_size[i]  = ",float(total_size[i])
+			
+			if (total_size[i]!=0):
+				factored = multiply_factor(centroid_local[j][i],(float(population_local[j][i])/float(total_size[i])))
+				print "Centroid Local[0][i] = ",centroid_local[0][i]
+				print "Multiplied Point = ",factored
+				answer[i] = add_points(answer[i],factored)
+			print " Recalculate answer ",answer	
 	return answer		
 
 '''
@@ -147,7 +173,8 @@ def recalculate_centroid(centroid_local,population_local,k):
 '''
 def master_function(points,k):
 	# Initial Centroids
-	centroids = init_centroids(points,k)
+	#centroids = init_centroids(points,k)
+	centroids = [(3,3),(-3,3),(-3,-3),(3,-3)]
 	comm = MPI.COMM_WORLD
 	#Rank of This Processor
 	rank = comm.Get_rank()
@@ -157,21 +184,24 @@ def master_function(points,k):
 	# Partition The points for the slaves
 	partition = partition_points(points,size-1)
 
-
-	centroid_slave =  [ [] for i in range(size) ]
-	population_slave =   [ [] for i in range(size) ]
+	centroid_slave =  [ [] for i in range(size-1) ]
+	population_slave =   [ [] for i in range(size-1) ]
 	count = 0
 	for i in range (1,size):
 		# Send the Data Points to the Slaves
-	   comm.send(partition[i-1], dest=i)
-	while (True  or count <50): 
+	   comm.send(partition[i-1], dest = i)
+	while (True  or count <50):
 		# Send the Initial Centroids
-		comm.bcast(centroids,root=0)   		
+		comm.bcast(centroids)   		
 		for i in range (1,size):
 			# Receive their centroids and population count for ( EACH cluster of centroid )
-	   		(centroid_slave[i],population_slave[i]) = comm.recv(source = i)
+	   		(centroid_slave[i-1],population_slave[i-1]) = comm.recv(source = i)
+
 		# Recalculating the New Centroids Based on the Global FeedBack
 		new_centroids = recalculate_centroid(centroid_slave,population_slave,k)
+		print " Old Centroids =",centroids
+		print " New Centroids =",new_centroids
+
 		# If Centroids Haven't Changed then We are done and we send empty list to slaves to signal end
 		if (set(centroids) == set(new_centroids)):
 	   		comm.bcast([],root=0)
@@ -180,6 +210,8 @@ def master_function(points,k):
 		centroids = copy.deepcopy(new_centroids)
 		new_centroids = []
 		count+=1
+		print "\n Count Updated \n"
+	return centroids	
 
 '''
 	Slave Functionality Main K_means Code
@@ -192,13 +224,16 @@ def slave_function(k):
 		return 	
 	# Get Data Points	
 	data_points = comm.recv(source = 0)
+	print " Received Points = ",data_points
 	# New Centroid List
 	new_centroid =  [ [] for i in range(k) ]
 	# Population List have size of each cluster
 	population_slave = [ [] for i in range(k) ]
+	centroids = []
 	while (True):
 		# Receiving the Centroids
-		centroids = comm.recv(source = 0)
+		centroids = comm.bcast(centroids,root=0) 
+		print"Received Centroids ",centroids
 		if len(centroids) == 0:
 			return 
 		# Assign Points to the clusters 
@@ -211,19 +246,42 @@ def slave_function(k):
 	   	comm.send((new_centroid,population_slave), dest=0)
 
 
-def main():
+if __name__ == "__main__":
+	if (len(sys.argv) != 3):
+    		print "Usage: python parallel_kmeans.py <pointsFile> <k>"
+    		sys.exit(0)
+
+	k = int(sys.argv[2])
+
+
+	if (k <= 0):
+		print "k must be at least 1"
+		sys.exit(0)
+
+	f = open(sys.argv[1])
+	strPoints = [line.strip() for line in open(sys.argv[1])]
+	points = []
+	for pt in strPoints:
+		list_strings = pt.split(',')
+		list_int = [int(elem) for elem in list_strings]    
+		points.append(tuple(list_int))
+
+	if (k > len(points)):
+		print "k must be at most the number of data points"
+		sys.exit(0)
+
+        # Start k means algorithm
+#    print k_means(points, k)
 	comm = MPI.COMM_WORLD
 	rank = comm.Get_rank()
+	print " Rank = ",rank
+	print " Points = ",points
+	#points = [(100,100),(-100,-100),(100,-100),(-100,100),(9,900),(-900,900),(700,-900),(-900,-900),(10,10),(-10,10),(10,-10),(-10,-10)]
 	if rank == 0:
-		master_function(points,k)
+		answer = master_function(points,k)
+		print " Fina Answer = ",answer
 	else:
 		slave_function(k)	
-
-
-
-
-
-
 
 
 
