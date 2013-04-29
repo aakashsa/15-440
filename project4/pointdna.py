@@ -1,5 +1,6 @@
 from exceptions import NotImplementedError
 from collections import defaultdict
+import sys
 
 class PointDNA:
 	dna = []
@@ -37,6 +38,18 @@ class PointDNA:
 			if (self[i] != other[i]):
 				sim-= 1
 		return sim
+
+	def find_closest_point(self, points):
+		if (len(points) == 0):
+			return None
+		max_dist = -sys.maxint - 1
+		cur_centroid = 0
+		for i in xrange(len(points)):
+			icentroid_dist = self.distance(points[i])
+			if (icentroid_dist > max_dist):
+				max_dist = icentroid_dist
+				cur_centroid = i
+		return cur_centroid
 
 	@staticmethod
 	def stringify(points):

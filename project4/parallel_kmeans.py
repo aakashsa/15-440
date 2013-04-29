@@ -10,9 +10,6 @@ import utils
 	population from all n-1 processess - population_local = 2D list. List i contains population for centroids from node i
 '''
 def recalculate_centroids(centroid_local, population_local, k):
-	print "Centroid_local ", centroid_local
-	print "Population_local ", population_local
-
 	# Total size of each cluster
 	total_size = [ 0.0 for i in range(k)]
 	for i in range(0, k):
@@ -36,9 +33,6 @@ def recalculate_centroids(centroid_local, population_local, k):
 	k = number of clusters
 '''
 def master_function(points, k, centroids):
-	if (len(centroids) != k):
-		print "k must be equal to number of centroids"
-		sys.exit(0)
 	comm = MPI.COMM_WORLD
 
 	num_nodes = comm.Get_size()
@@ -65,8 +59,8 @@ def master_function(points, k, centroids):
 
 		# Recalculating the New Centroids Based on the Global FeedBack
 		new_centroids = recalculate_centroids(centroid_slave, population_slave, k)
-		print " Old Centroids = ", Point2D.stringify(centroids)
-		print " New Centroids = ", Point2D.stringify(new_centroids)
+		#print " Old Centroids = ", Point2D.stringify(centroids)
+		#print " New Centroids = ", Point2D.stringify(new_centroids)
 
 		# If Centroids Haven't Changed then We are done and we send empty list to slaves to signal end
 		if (set(centroids) == set(new_centroids)):
@@ -93,7 +87,7 @@ def slave_function():
 
 	# Get Data Points	
 	data_points = comm.recv(source = 0)
-	print " Received Points = ", Point2D.stringify(data_points), " on node ", rank
+	#print " Received Points = ", Point2D.stringify(data_points), " on node ", rank
 
 	# New Centroid List
 	new_centroids =  [ [] for i in range(k) ]
@@ -103,7 +97,7 @@ def slave_function():
 	while (True):
 		# Receive centroids from master
 		centroids = comm.bcast(centroids,root=0) 
-		print "Received Centroids ", Point2D.stringify(centroids)
+		#print "Received Centroids ", Point2D.stringify(centroids)
 		
 		# check if done signal is received
 		if len(centroids) == 0:
@@ -141,7 +135,10 @@ if __name__ == "__main__":
 		
 		# Get centroids
 		centroids = utils.read_2D_points(sys.argv[3])
-		#centroids = [Point2D(3,3), Point2D(-3,3), Point2D(0.5,0.5), Point2D(-3,-3), Point2D(3,-3), Point2D(0,0)]
+
+		if (len(centroids) != k):
+			print "k must be equal to number of centroids"
+			sys.exit(0)
 
 		# Run K means in parallel and get result
 		result = master_function(points, k, centroids)

@@ -62,9 +62,6 @@ def get_dimension_wise_stats(clusterPoints, dimension):
 	k = number of clusters
 '''
 def master_function(points, k, centroids):
-	if (len(centroids) != k):
-		print "k must be equal to number of centroids"
-		sys.exit(0)
 	comm = MPI.COMM_WORLD
 
 	num_nodes = comm.Get_size()
@@ -92,8 +89,8 @@ def master_function(points, k, centroids):
 
 		# Recalculating the New Centroids Based on the Global FeedBack
 		new_centroids = recalculate_centroids(dimension_stats_all_nodes, k, dimension)
-		print " Old Centroids = ", PointDNA.stringify(centroids)
-		print " New Centroids = ", PointDNA.stringify(new_centroids)
+		#print " Old Centroids = ", PointDNA.stringify(centroids)
+		#print " New Centroids = ", PointDNA.stringify(new_centroids)
 
 		# If Centroids Haven't Changed then We are done and we send empty list to slaves to signal end
 		if (set(centroids) == set(new_centroids)):
@@ -120,7 +117,7 @@ def slave_function():
 
 	# Get Data Points	
 	data_points = comm.recv(source = 0)
-	print " Received Points = ", PointDNA.stringify(data_points), " on node ", rank
+	#print " Received Points = ", PointDNA.stringify(data_points), " on node ", rank
 
 	# Dimension
 	dimension = len(data_points[0])
@@ -132,7 +129,7 @@ def slave_function():
 	while (True):
 		# Receive centroids from master
 		centroids = comm.bcast(centroids,root=0) 
-		print "Received Centroids ", PointDNA.stringify(centroids)
+		#print "Received Centroids ", PointDNA.stringify(centroids)
 		
 		# check if done signal is received
 		if len(centroids) == 0:
@@ -169,6 +166,10 @@ if __name__ == "__main__":
 		
 		# Get initial centroids
 		centroids = utils.read_DNA_points(sys.argv[3])
+
+		if (len(centroids) != k):
+			print "k must be equal to number of centroids"
+			sys.exit(0)
 
 		# Run K means in parallel and get result
 		result = master_function(points, k, centroids)

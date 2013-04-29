@@ -1,4 +1,5 @@
 import math
+import sys
 from exceptions import NotImplementedError
 
 '''
@@ -31,6 +32,15 @@ class Point2D:
 	def __hash__(self):
 		return hash((self.x, self.y))
 
+	def __len__(self):
+		return 2
+
+	def __getitem__(self, i):
+		if (i == 0):
+			return self.x
+		if (i == 1):
+			return self.y
+
 	'''
 		Function to compute euclidean distance bewteen two 2D points
 	'''
@@ -43,6 +53,18 @@ class Point2D:
 
 	def scalarMultiply(self, scalar):
 		return Point2D(self.x * scalar, self.y * scalar)
+
+	def find_closest_point(self, points):
+		if (len(points) == 0):
+			return None
+		min_dist = sys.maxint
+		cur_centroid = 0
+		for i in xrange(len(points)):
+			icentroid_dist = self.distance(points[i])
+			if (icentroid_dist <= min_dist):
+				min_dist = icentroid_dist
+				cur_centroid = i
+		return cur_centroid
 
 	@staticmethod
 	def getAverage(points):

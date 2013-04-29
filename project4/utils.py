@@ -13,27 +13,13 @@ def partition_points(points, n):
 	return answer
 
 '''
-	Find the closest centroid index to a given point from a given list of centroids
-	return: index of centroid to which this point is closest to
-'''
-def find_closest_centroid(point, centroids):
-	min_dist = sys.maxint
-	cur_centroid = 0
-	for i in xrange(0, len(centroids)):
-		icentroid_dist = point.distance(centroids[i])
-		if (icentroid_dist <= min_dist):
-			min_dist = icentroid_dist
-			cur_centroid = i
-	return cur_centroid
-
-'''
 	Given a List of Points it returns k lists where each list is the 
 	bunch of points corresponding to a 
 '''	
 def assign_cluster(points, centroids, k):
 	assignments =  [ [] for i in range(k) ]
 	for point in points:
-		new_assignment = find_closest_centroid(point, centroids)
+		new_assignment = point.find_closest_point(centroids)
 		assignments[new_assignment].append(point)	
 	return assignments
 
