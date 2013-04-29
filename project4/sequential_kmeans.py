@@ -3,6 +3,7 @@ import sys
 import copy
 import utils
 from point2d import Point2D
+import time
 
 '''
 	Actual K Means Main Code 
@@ -56,5 +57,8 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	# Run sequential K means
+	start_time = time.time()
 	result = k_means(points, k, centroids)
+	end_time = time.time()
 	print "Final centroids = " + Point2D.stringify(result)
+	print "Sequential Kmeans on 2D data set took " + str(end_time - start_time) + " second(s)"

@@ -4,6 +4,7 @@ import copy
 import operator
 from point2d import Point2D
 import utils
+import time
 
 '''
 	Centroids from all n-1 processess - centroid_local = 2D list. List i is centroids from node i
@@ -141,7 +142,10 @@ if __name__ == "__main__":
 			sys.exit(0)
 
 		# Run K means in parallel and get result
+		start_time = time.time()
 		result = master_function(points, k, centroids)
+		end_time = time.time()
 		print "Final centroids = " + Point2D.stringify(result)
+		print "Parallel Kmeans on 2D data set took " + str(end_time - start_time) + " second(s)"
 	else:
 		slave_function()	

@@ -5,6 +5,7 @@ import copy
 import operator
 from pointdna import PointDNA
 import utils
+import time
 
 '''
 	dimension_stats_all_nodes = 3D list of dimension stats; for each node, for each cluster, for each dimension
@@ -172,7 +173,10 @@ if __name__ == "__main__":
 			sys.exit(0)
 
 		# Run K means in parallel and get result
+		start_time = time.time()
 		result = master_function(points, k, centroids)
+		end_time = time.time()
 		print "Final centroids = " + PointDNA.stringify(result)
+		print "Parallel Kmeans on DNA data set took " + str(end_time - start_time) + " second(s)"
 	else:
 		slave_function()	

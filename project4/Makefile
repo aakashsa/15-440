@@ -2,7 +2,7 @@
 # second argument = dimension of each point
 # third argument = output file
 dna_data:
-	python dna_generator.py 500 5 text.txt
+	python dna_generator.py 200000 10 text.txt
 
 # first arg = points file
 # second arg = number of centroids to pick

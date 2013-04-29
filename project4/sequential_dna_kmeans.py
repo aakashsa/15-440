@@ -3,6 +3,7 @@ import sys
 import copy
 import utils
 from pointdna import PointDNA
+import time
 
 '''
 	Compute the new centroid for a given list of points.
@@ -73,5 +74,8 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	# Start k means algorithm
+	start_time = time.time()
 	result = k_means(points, k, centroids)
+	end_time = time.time()
 	print "Final centroids = " + PointDNA.stringify(result)
+	print "Sequential Kmeans on DNA data set took " + str(end_time - start_time) + " second(s)"
