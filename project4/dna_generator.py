@@ -34,4 +34,5 @@ def generateData():
         outputFile.write(','.join(point) + "\n")
     return
 
-generateData()
+if __name__ == "__main__":
+    generateData()

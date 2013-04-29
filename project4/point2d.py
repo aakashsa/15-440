@@ -34,7 +34,7 @@ class Point2D:
 	'''
 		Function to compute euclidean distance bewteen two 2D points
 	'''
-	def euclideanDist(self, other):
+	def distance(self, other):
 		if not isinstance(other, Point2D):
 			return NotImplementedError
 		dx = math.fabs(self.x - other.x)
