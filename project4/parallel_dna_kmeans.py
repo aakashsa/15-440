@@ -3,7 +3,7 @@ import random
 import sys
 import copy
 import operator
-from point2d import Point2D
+from pointdna import PointDNA
 
 '''
 	Given a List of Points it picks a bunch of k unique random centroids
@@ -28,7 +28,7 @@ def find_closest_centroid(point, centroids):
 	min_dist = sys.maxint
 	cur_centroid = 0
 	for i in xrange(0, len(centroids)):
-		icentroid_dist = point.euclideanDist(centroids[i])
+		icentroid_dist = point.distance(centroids[i])
 		if (icentroid_dist <= min_dist):
 			min_dist = icentroid_dist
 			cur_centroid = i
@@ -41,7 +41,7 @@ def partition_points(points, n):
 	answer =  [ [] for i in range(n) ]
 	for i in range(0,len(points)):
 		answer[(i%n)].append(points[i])
-	return answer 	
+	return answer
 
 '''
 	Given a List of Points it returns k lists where each list is the 
@@ -55,29 +55,54 @@ def assign_cluster(points, centroids, k):
 	return assignments
 
 '''
-	Centroids from all n-1 processess - centroid_local = 2D list. List i is centroids from node i
-	population from all n-1 processess - population_local = 2D list. List i contains population for centroids from node i
+	dimension_stats_all_nodes = 3D list of dimension stats; for each node, for each cluster, for each dimension
+	k = number of clusters
+	dimension = dimension of a DNA strand
 '''
-def recalculate_centroids(centroid_local, population_local, k):
-	print "Centroid_local ", centroid_local
-	print "Population_local ", population_local
+def recalculate_centroids(dimension_stats_all_nodes, k, dimension):
+	# initialize the new centroids
+	new_centroids = [[] for i in xrange(k)]
 
-	# Total size of each cluster
-	total_size = [ 0.0 for i in range(k)]
-	for i in range(0, k):
-		for node in population_local:
-			total_size[i] += node[i]
+	# for each cluster make a list of all the dictionary lists
+	for i in xrange(k):
+		# 2D list of dicts; n x dimension
+		cluster_dicts = [node_stats[i] for node_stats in dimension_stats_all_nodes]
+		# compute new centroid for cluster i
+		for j in xrange(dimension):
+			dictionary = {'a': 0, 'c':0, 'g':0, 't':0} 
+			for cluster_dict in cluster_dicts:
+				d = cluster_dict[j] # dictionary for j-th dimension in i-th cluster
+				keys = d.keys()
+				# update the values for all the keys
+				for k in keys:
+					dictionary[k] += d[k]
+			# append the most frequent letter for that base to the
+			# new centroid
+			max_char = 'a'
+			max_count = dictionary[max_char]
+			for ch in dictionary.keys():
+				if (dictionary[ch] >= max_count):
+					max_char = ch
+					max_count = dictionary[ch]
+			new_centroids[i].append(max_char)
+		new_centroids[i] = PointDNA(new_centroids[i])
+	return new_centroids
 
-	# Initialize the Answer with the Weighed Centroids we got from Slave one
-	new_centroids = [ None for i in range(k) ]
+'''
+	This function gets the total counts of each of the four characters in each dimension
+	return: a list of length dimension of dictionaries; dict i contains counts for each character at dimension i
+'''
+def getDimensionWiseStats(clusterPoints, dimension):
+	dicts = [{'a': 0, 'c':0, 'g':0, 't':0} for i in xrange(dimension)]
 
-	# For Each Slaves Centroid List we have to weigh it with the population size in that cluster	
-	for i in range(0, k):
-		for j in range(0, len(centroid_local)):
-			if (total_size[i] != 0 and centroid_local[j][i] is not None): # if this cluster is non empty
-				factored = centroid_local[j][i].scalarMultiply(population_local[j][i]/total_size[i])
-				new_centroids[i] = factored + new_centroids[i] # add points
-	return new_centroids		
+	# if there are no points in this cluster, all counts are 0
+	if (len(clusterPoints) == 0):
+		return dicts
+
+	for i in xrange(dimension):
+		for point in clusterPoints:
+			dicts[i][point[i]] += 1
+	return dicts
 
 '''
 	Master Functionality Main K_means Code
@@ -98,9 +123,10 @@ def master_function(points, k):
 	# Partition The points for the slaves
 	partition = partition_points(points, num_nodes - 1)
 
-	centroid_slave =  [ [] for i in xrange(num_nodes - 1) ]
-	population_slave =   [ [] for i in xrange(num_nodes - 1) ]
+	# 3D list of dictionaries: for each node, for each cluster, for each dimension (n x k x dimension)
+	dimension_stats_all_nodes =  [ [] for i in xrange(num_nodes - 1) ]
 	iteration = 0
+	dimension = len(points[0])
 	
 	# Send k and the Data Points to the Slaves
 	for i in xrange (1, num_nodes):
@@ -113,12 +139,12 @@ def master_function(points, k):
 
 		# Receive centroids and population count for EACH centroid from slaves
 		for i in xrange (1, num_nodes):
-	   		(centroid_slave[i-1], population_slave[i-1]) = comm.recv(source = i)
+	   		dimension_stats_all_nodes[i-1] = comm.recv(source = i)
 
 		# Recalculating the New Centroids Based on the Global FeedBack
-		new_centroids = recalculate_centroids(centroid_slave, population_slave, k)
-		print " Old Centroids = ", Point2D.stringify(centroids)
-		print " New Centroids = ", Point2D.stringify(new_centroids)
+		new_centroids = recalculate_centroids(dimension_stats_all_nodes, k, dimension)
+		print " Old Centroids = ", PointDNA.stringify(centroids)
+		print " New Centroids = ", PointDNA.stringify(new_centroids)
 
 		# If Centroids Haven't Changed then We are done and we send empty list to slaves to signal end
 		if (set(centroids) == set(new_centroids)):
@@ -145,17 +171,19 @@ def slave_function():
 
 	# Get Data Points	
 	data_points = comm.recv(source = 0)
-	print " Received Points = ", Point2D.stringify(data_points), " on node ", rank
+	print " Received Points = ", PointDNA.stringify(data_points), " on node ", rank
 
-	# New Centroid List
-	new_centroids =  [ [] for i in range(k) ]
-	# Population List have size of each cluster
-	population_slave = [ [] for i in range(k) ]
+	# Dimension
+	dimension = len(data_points[0])
+
+	# Dimension stats for all clusters
+	dimension_stats_all_clusters = []
+
 	centroids = []
 	while (True):
 		# Receive centroids from master
 		centroids = comm.bcast(centroids,root=0) 
-		print "Received Centroids ", Point2D.stringify(centroids)
+		print "Received Centroids ", PointDNA.stringify(centroids)
 		
 		# check if done signal is received
 		if len(centroids) == 0:
@@ -163,12 +191,11 @@ def slave_function():
 		# Assign points to clusters (2D list of points)
 		assigned_points = assign_cluster(data_points, centroids, k)
 		for i in range (0, k):
-			# new_centroids: list of points
-			new_centroids[i] = Point2D.getAverage(assigned_points[i])
-			# population_slave: list of numbers; i-th number is no. of points in cluster i
-			population_slave[i] =  len(assigned_points[i])
-		# Send the new centroids and the population count of each cluster	
-	   	comm.send((new_centroids, population_slave), dest=0)
+			# dimension stats is a list of dictionaries
+			dimension_stats_cluster_i = getDimensionWiseStats(assigned_points[i], dimension)
+			dimension_stats_all_clusters.append(dimension_stats_cluster_i)
+		# Send the dimension stats for all clusters to master node
+	   	comm.send(dimension_stats_all_clusters, dest=0)
 
 
 if __name__ == "__main__":
@@ -177,21 +204,20 @@ if __name__ == "__main__":
 
 	if rank == 0:
 		if (len(sys.argv) != 3):
-			print "Usage: python parallel_kmeans.py <pointsFile> <k>"
+			print "Usage: python parallel_dna_kmeans.py <pointsFile> <k>"
 			sys.exit(0)
 		k = int(sys.argv[2])
 		if (k <= 0):
 			print "k must be at least 1"
 			sys.exit(0)
 		f = open(sys.argv[1])
-		strPoints = [line.strip() for line in open(sys.argv[1])]
-		if (len(strPoints) == 0):
+		strDNAPoints = [line.strip() for line in open(sys.argv[1])]
+		if (len(strDNAPoints) == 0):
 			print "Points file is empty"
 			sys.exit(0)
 		points = []
-		for pt in strPoints:
-			list_strings = pt.split(',')
-			points.append(Point2D(int(list_strings[0]), int(list_strings[1])))
+		for pt in strDNAPoints:
+			points.append(PointDNA(pt.split(',')))
 
 		if (k > len(points)):
 			print "k must be at most the number of data points"
@@ -199,6 +225,6 @@ if __name__ == "__main__":
 		
 		# Run K means in parallel and get result
 		centroids = master_function(points,k)
-		print "Final centroids = " + Point2D.stringify(centroids)
+		print "Final centroids = " + PointDNA.stringify(centroids)
 	else:
 		slave_function()	
