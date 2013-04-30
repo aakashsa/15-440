@@ -30,21 +30,27 @@ def find_new_centroid(points):
 	return PointDNA(answer)
 	
 '''
-	Actual K Means Main Code 
+	Actual K Means code 
 '''
 def k_means (points, k, centroids):
 	iteration = 0
 	while (True):
 		new_centroid_list = []
+
+		# Assign data points to clusters
 		cluster_lists = utils.assign_cluster(points, centroids, k)
+
+		# find new centroids as average of points in each cluster
 		for list_item in cluster_lists:
 			new_centroid_list.append(find_new_centroid(list_item))
-		#print "\n Old Centroids = ", PointDNA.stringify(centroids)
-		#print "\n New Centroids = ", PointDNA.stringify(new_centroid_list)
+
+		# check for convergence
 		if (set(centroids) == set(new_centroid_list)):
 			iteration += 1
 			print "Took " + str(iteration) + " iteration(s)"
 			return centroids
+
+		# If not converged, go into another iteration
 		centroids = copy.deepcopy(new_centroid_list)
 		iteration += 1
 	print "Took " + str(iteration) + " iteration(s)"

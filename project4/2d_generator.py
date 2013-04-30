@@ -4,7 +4,6 @@
 import sys
 import random
 
-
 def getRandomFloatRange(size):
     num = random.randint(0, size)
     decimal = float(num)/size
@@ -12,7 +11,6 @@ def getRandomFloatRange(size):
     if sign !=0:
         return num + decimal
     answer = -(num+decimal)    
-    #print answer
     return answer
 
 
@@ -21,6 +19,9 @@ def generateData():
         print "Usage: python 2d_generator.py <numPoints> <ptDimension> <outputFile> <range>"
         sys.exit(0)
     size = int(sys.argv[4])    
+    if (size < 0):
+        print "ERROR: Range must be at least 0"
+        sys.exit(0)
 
     numPoints = int(sys.argv[1])
     if (numPoints <= 0):
@@ -38,7 +39,8 @@ def generateData():
         point = []
         for i in xrange(ptDimension):
             point.append(getRandomFloatRange(size))
-        outputFile.write(str(tuple(point)) + "\n")
+        outputFile.write(str(point[0]) + "," + str(point[1]) + "\n")
     return
 
-generateData()
+if __name__ == "__main__":
+    generateData()

@@ -34,7 +34,7 @@ def read_2D_points(pointsFile):
 	points = []
 	for s in strPoints:
 		list_str = s.split(',')
-		points.append(Point2D(int(list_str[0]), int(list_str[1])))
+		points.append(Point2D(float(list_str[0]), float(list_str[1])))
 	return points
 
 '''

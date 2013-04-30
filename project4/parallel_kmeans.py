@@ -7,8 +7,12 @@ import utils
 import time
 
 '''
-	Centroids from all n-1 processess - centroid_local = 2D list. List i is centroids from node i
-	population from all n-1 processess - population_local = 2D list. List i contains population for centroids from node i
+	Centroids from all n-1 processess - centroid_local = 2D list. List i is 
+	   centroids from node i
+	population from all n-1 processess - population_local = 2D list. List i 
+	   contains population for centroids from node i
+	k = number of clusters
+	return: new averaged centroids
 '''
 def recalculate_centroids(centroid_local, population_local, k):
 	# Total size of each cluster
@@ -29,9 +33,11 @@ def recalculate_centroids(centroid_local, population_local, k):
 	return new_centroids		
 
 '''
-	Master Functionality Main K_means Code
-	points = list of tuples
+	Master functionality K_means code
+	points = list of initial data points
 	k = number of clusters
+	centroids = initial list of centroids
+	return: list of final centroids
 '''
 def master_function(points, k, centroids):
 	comm = MPI.COMM_WORLD
@@ -60,8 +66,6 @@ def master_function(points, k, centroids):
 
 		# Recalculating the New Centroids Based on the Global FeedBack
 		new_centroids = recalculate_centroids(centroid_slave, population_slave, k)
-		#print " Old Centroids = ", Point2D.stringify(centroids)
-		#print " New Centroids = ", Point2D.stringify(new_centroids)
 
 		# If Centroids Haven't Changed then We are done and we send empty list to slaves to signal end
 		if (set(centroids) == set(new_centroids)):
@@ -77,7 +81,7 @@ def master_function(points, k, centroids):
 	return centroids
 
 '''
-	Slave Functionality Main K_means Code
+	Slave functionality K_means code
 '''
 def slave_function():
 	# Get communication instance
@@ -88,7 +92,6 @@ def slave_function():
 
 	# Get Data Points	
 	data_points = comm.recv(source = 0)
-	#print " Received Points = ", Point2D.stringify(data_points), " on node ", rank
 
 	# New Centroid List
 	new_centroids =  [ [] for i in range(k) ]
@@ -98,7 +101,6 @@ def slave_function():
 	while (True):
 		# Receive centroids from master
 		centroids = comm.bcast(centroids,root=0) 
-		#print "Received Centroids ", Point2D.stringify(centroids)
 		
 		# check if done signal is received
 		if len(centroids) == 0:

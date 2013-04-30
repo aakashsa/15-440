@@ -8,7 +8,10 @@ import utils
 import time
 
 '''
-	dimension_stats_all_nodes = 3D list of dimension stats; for each node, for each cluster, for each dimension
+	This function calculates new centroids based on the dimension statistics 
+	received from all the nodes.
+	dimension_stats_all_nodes = 3D list of dimension stats; for each node, for 
+	each cluster, for each dimension
 	k = number of clusters
 	dimension = dimension of a DNA strand
 '''
@@ -24,7 +27,8 @@ def recalculate_centroids(dimension_stats_all_nodes, k, dimension):
 		for j in xrange(dimension):
 			dictionary = {'a': 0, 'c':0, 'g':0, 't':0} 
 			for cluster_dict in cluster_dicts:
-				d = cluster_dict[j] # dictionary for j-th dimension in i-th cluster
+				# dictionary for j-th dimension in i-th cluster
+				d = cluster_dict[j]
 				keys = d.keys()
 				# update the values for all the keys
 				for k in keys:
@@ -42,8 +46,12 @@ def recalculate_centroids(dimension_stats_all_nodes, k, dimension):
 	return new_centroids
 
 '''
-	This function gets the total counts of each of the four characters in each dimension
-	return: a list of length dimension of dictionaries; dict i contains counts for each character at dimension i
+	This function gets the total counts of each of the four characters in 
+	each dimension
+	culsterPoints = list of points belonging to a particular cluster
+	dimension = dimension of DNA strand
+	return: a list of length dimension of dictionaries; dict i contains 
+	counts for each character at dimension i
 '''
 def get_dimension_wise_stats(clusterPoints, dimension):
 	dicts = [{'a': 0, 'c':0, 'g':0, 't':0} for i in xrange(dimension)]
@@ -58,9 +66,11 @@ def get_dimension_wise_stats(clusterPoints, dimension):
 	return dicts
 
 '''
-	Master Functionality Main K_means Code
-	points = list of tuples
+	Master functionality for K_means code
+	points = list of data points
 	k = number of clusters
+	centroids = list of initial centroids
+	return: list of final centroids
 '''
 def master_function(points, k, centroids):
 	comm = MPI.COMM_WORLD
@@ -90,8 +100,6 @@ def master_function(points, k, centroids):
 
 		# Recalculating the New Centroids Based on the Global FeedBack
 		new_centroids = recalculate_centroids(dimension_stats_all_nodes, k, dimension)
-		#print " Old Centroids = ", PointDNA.stringify(centroids)
-		#print " New Centroids = ", PointDNA.stringify(new_centroids)
 
 		# If Centroids Haven't Changed then We are done and we send empty list to slaves to signal end
 		if (set(centroids) == set(new_centroids)):
@@ -107,7 +115,7 @@ def master_function(points, k, centroids):
 	return centroids
 
 '''
-	Slave Functionality Main K_means Code
+	Slave functionality K_means code
 '''
 def slave_function():
 	# Get communication instance
@@ -118,7 +126,6 @@ def slave_function():
 
 	# Get Data Points	
 	data_points = comm.recv(source = 0)
-	#print " Received Points = ", PointDNA.stringify(data_points), " on node ", rank
 
 	# Dimension
 	dimension = len(data_points[0])
@@ -130,7 +137,6 @@ def slave_function():
 	while (True):
 		# Receive centroids from master
 		centroids = comm.bcast(centroids,root=0) 
-		#print "Received Centroids ", PointDNA.stringify(centroids)
 		
 		# check if done signal is received
 		if len(centroids) == 0:

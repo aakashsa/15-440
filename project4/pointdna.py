@@ -2,6 +2,9 @@ from exceptions import NotImplementedError
 from collections import defaultdict
 import sys
 
+'''
+	Class that represents a DNA point
+'''
 class PointDNA:
 	dna = []
 
@@ -28,6 +31,10 @@ class PointDNA:
 			b = b and cmp(self[i], other[i])
 		return b
 
+	'''
+		Function to compute the distance between this point and other point
+		return: distance (similarity measure)
+	'''
 	def distance(self, other):
 		if not isinstance(other, PointDNA):
 			return NotImplementedError
@@ -39,6 +46,11 @@ class PointDNA:
 				sim-= 1
 		return sim
 
+	'''
+		Function to find closest point to this point from list of points
+		points = list of points to consider
+		return: index of point in points that is closest to this point
+	'''
 	def find_closest_point(self, points):
 		if (len(points) == 0):
 			return None
@@ -51,6 +63,10 @@ class PointDNA:
 				cur_centroid = i
 		return cur_centroid
 
+	'''
+		Function to convert a list of DNa points to string
+		return: string of list of DNA points
+	'''
 	@staticmethod
 	def stringify(points):
 		strList = [str(pt) for pt in points]
@@ -63,3 +79,4 @@ if __name__ == "__main__":
 	assert(dna1.distance(dna2) == 4)
 	dna3 = PointDNA(['a','c','g','g'])
 	assert(dna1.distance(dna3) == 3)
+	assert(dna1.find_closest_point([dna2, dna3]) == 0)

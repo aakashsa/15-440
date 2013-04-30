@@ -43,6 +43,7 @@ class Point2D:
 
 	'''
 		Function to compute euclidean distance bewteen two 2D points
+		return: float value representing distance
 	'''
 	def distance(self, other):
 		if not isinstance(other, Point2D):
@@ -51,9 +52,19 @@ class Point2D:
 		dy = math.fabs(self.y - other.y)
 		return math.sqrt(dx * dx + dy * dy)
 
+	'''
+		Function that multiplies components of this point by a scalar
+		return: new point with components multiplied by scalar
+	'''
 	def scalarMultiply(self, scalar):
 		return Point2D(self.x * scalar, self.y * scalar)
 
+	'''
+		Function that finds the closest point in a given list of points to
+		this point
+		points = list of points to find in
+		return: index of point that is closes to this point
+	'''
 	def find_closest_point(self, points):
 		if (len(points) == 0):
 			return None
@@ -66,6 +77,10 @@ class Point2D:
 				cur_centroid = i
 		return cur_centroid
 
+	'''
+		Function to get the average of a given list of points
+		return: average point
+	'''
 	@staticmethod
 	def getAverage(points):
 		if (len(points) == 0):
@@ -77,6 +92,10 @@ class Point2D:
 			sumy += point.y
 		return Point2D(float(sumx)/len(points), float(sumy)/len(points))
 
+	'''
+		Function to convert a list of 2D points into a string
+		return: string representing list of 2D points
+	'''
 	@staticmethod
 	def stringify(points):
 		strList = [str(pt) for pt in points]
@@ -92,5 +111,6 @@ if __name__ == "__main__":
 	assert(Point2D.getAverage([p1, p2, p3, p4]) == Point2D(3.5, 3.5))
 	print Point2D.stringify([p1, p2, p3, p4])
 	assert(p1.scalarMultiply(1.5) == Point2D(4.5, 4.5))
-	assert(p1.euclideanDist(p4) == math.sqrt(2))
+	assert(p1.distance(p4) == math.sqrt(2))
 	assert(p1 + p2 == Point2D(6,7))
+	assert(p1.find_closest_point([p2,p4]) == 0)

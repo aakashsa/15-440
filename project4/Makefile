@@ -1,8 +1,10 @@
+
+
 # first argument = number of points to generate
 # second argument = dimension of each point
 # third argument = output file
 dna_data:
-	python dna_generator.py 200000 10 text.txt
+	python dna_generator.py 200000 10 dna_data.txt
 
 # First Argyment = number of points to generate
 # Second Argument = dimension of each file
@@ -17,14 +19,34 @@ dna_data:
 # second arg = number of centroids to pick
 # third arg = output file
 dna_centroids:
-	python centroid_picker.py text.txt 10 dnacentroids.txt
+	python centroid_picker.py dna_data.txt 10 dnacentroids.txt
 
-# generate 2D centroids
-centroids:
-	python centroid_picker.py seq_kmeans_data1.txt 4 2dcentroids.txt
+# first arg = points file
+# second arg = number of centroids to pick
+# third arg = output file
+2d_centroids:
+	python centroid_picker.py 2d_data.txt 4 2dcentroids.txt
 
-# first argument = input dna data file
-# second argument = k
-seq_DNAkmeans:
-	python sequentialDNA_kmeans.py text.txt 5
+seq_2d_kmeans:
+	python sequential_kmeans.py 2d_data.txt 4 2dcentroids.txt
 
+seq_dna_kmeans:
+	python sequential_dna_kmeans.py dna_data.txt 10 dnacentroids.txt
+
+par_2d_kmeans:
+	mpirun -n $(N) -machinefile machines_ghc.txt python parallel_kmeans.py 2d_data.txt 4 2dcentroids.txt
+
+par_dna_kmeans:
+	mpirun -n $(N) -machinefile machines_ghc.txt python parallel_dna_kmeans.py dna_data.txt 10 dnacentroids.txt
+
+dna:
+	make dna_data
+	make dna_centroids
+	make seq_dna_kmeans
+	make par_dna_kmeans
+
+2d:
+	make 2d_data
+	make 2d_centroids
+	make seq_2d_kmeans
+	make par_2d_kmeans

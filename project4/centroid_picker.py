@@ -3,7 +3,7 @@ import sys
 
 '''
 	Functionality to pick centroids from an input file
-	Picks k random centroids from point file, and writes them output file
+	Picks k random centroids from point file, and writes them to given output file
 '''
 def pickCentroids(k, pointsFile, outputFile):
 	output = open(outputFile, 'w')

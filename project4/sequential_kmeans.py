@@ -6,7 +6,7 @@ from point2d import Point2D
 import time
 
 '''
-	Actual K Means Main Code 
+	Actual K Means code 
 '''	
 def k_means (points, k, centroids):
 	iteration = 0
@@ -18,8 +18,6 @@ def k_means (points, k, centroids):
 		# compute new centroids as average of points in each cluster
 		for list_item in cluster_lists:
 			new_centroids.append(Point2D.getAverage(list_item))
-		#print "\n Old Centroids ", Point2D.stringify(centroids)
-		#print "\n New Centroids ", Point2D.stringify(new_centroids)
 
 		# Check for convergence
 		if (set(centroids) == set(new_centroids)):
