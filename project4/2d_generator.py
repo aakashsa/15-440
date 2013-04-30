@@ -1,12 +1,11 @@
-## this file generates random DNA strands data and writes it to a file
+## this file generates random 2D Points data and writes it to a file
 ## currently we don't check if we are generating a new point or not
 
 import sys
 import random
 
-size = 1000.0
 
-def getRandomFloatRange():
+def getRandomFloatRange(size):
     num = random.randint(0, size)
     decimal = float(num)/size
     sign = num % 2
@@ -21,8 +20,8 @@ def generateData():
     if (len(sys.argv) != 5):
         print "Usage: python 2d_generator.py <numPoints> <ptDimension> <outputFile> <range>"
         sys.exit(0)
+    size = int(sys.argv[4])    
 
-    size = sys.argv[4]    
     numPoints = int(sys.argv[1])
     if (numPoints <= 0):
         print "ERROR: Num points must be at least 1"
@@ -38,7 +37,7 @@ def generateData():
     for pt in xrange(numPoints):
         point = []
         for i in xrange(ptDimension):
-            point.append(getRandomFloatRange())
+            point.append(getRandomFloatRange(size))
         outputFile.write(str(tuple(point)) + "\n")
     return
 
