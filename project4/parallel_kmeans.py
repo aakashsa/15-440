@@ -150,4 +150,7 @@ if __name__ == "__main__":
 		print "Final centroids = " + Point2D.stringify(result)
 		print "Parallel Kmeans on 2D data set took " + str(end_time - start_time) + " second(s)"
 	else:
-		slave_function()	
+		start_time = time.time()
+		slave_function()
+		end_time = time.time()
+		print "Node " + str(rank) + " took " + str(end_time - start_time) + " second(s)"

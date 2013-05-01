@@ -94,7 +94,7 @@ def master_function(points, k, centroids):
 		# Send the Initial Centroids
 		comm.bcast(centroids)
 
-		# Receive centroids and population count for EACH centroid from slaves
+		# Receive statistics on each dimension of each dna for each centroid
 		for i in xrange (1, num_nodes):
 	   		dimension_stats_all_nodes[i-1] = comm.recv(source = i)
 
@@ -185,4 +185,7 @@ if __name__ == "__main__":
 		print "Final centroids = " + PointDNA.stringify(result)
 		print "Parallel Kmeans on DNA data set took " + str(end_time - start_time) + " second(s)"
 	else:
-		slave_function()	
+		start_time = time.time()
+		slave_function()
+		end_time = time.time()
+		print "Node " + str(rank) + " took " + str(end_time - start_time) + " second(s)"
