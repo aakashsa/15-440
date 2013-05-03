@@ -7,15 +7,15 @@ from pointdna import PointDNA
 import utils
 import time
 
-'''
+def recalculate_centroids(dimension_stats_all_nodes, k, dimension):
+	'''
 	This function calculates new centroids based on the dimension statistics 
 	received from all the nodes.
 	dimension_stats_all_nodes = 3D list of dimension stats; for each node, for 
 	each cluster, for each dimension
 	k = number of clusters
 	dimension = dimension of a DNA strand
-'''
-def recalculate_centroids(dimension_stats_all_nodes, k, dimension):
+	'''
 	# initialize the new centroids
 	new_centroids = [[] for i in xrange(k)]
 
@@ -45,15 +45,15 @@ def recalculate_centroids(dimension_stats_all_nodes, k, dimension):
 		new_centroids[i] = PointDNA(new_centroids[i])
 	return new_centroids
 
-'''
+def get_dimension_wise_stats(clusterPoints, dimension):
+	'''
 	This function gets the total counts of each of the four characters in 
 	each dimension
 	culsterPoints = list of points belonging to a particular cluster
 	dimension = dimension of DNA strand
 	return: a list of length dimension of dictionaries; dict i contains 
 	counts for each character at dimension i
-'''
-def get_dimension_wise_stats(clusterPoints, dimension):
+	'''
 	dicts = [{'a': 0, 'c':0, 'g':0, 't':0} for i in xrange(dimension)]
 
 	# if there are no points in this cluster, all counts are 0
@@ -65,17 +65,21 @@ def get_dimension_wise_stats(clusterPoints, dimension):
 			dicts[i][point[i]] += 1
 	return dicts
 
-'''
+def master_function(points, k, centroids):
+	'''
 	Master functionality for K_means code
 	points = list of data points
 	k = number of clusters
 	centroids = list of initial centroids
 	return: list of final centroids
-'''
-def master_function(points, k, centroids):
+	'''
 	comm = MPI.COMM_WORLD
 
 	num_nodes = comm.Get_size()
+
+	if (num_nodes - 1 == 0):
+		print "ERROR: No slave nodes. Check number of processes requested"
+		sys.exit(0)
 
 	# Partition The points for the slaves
 	partition = utils.partition_points(points, num_nodes - 1)
@@ -114,10 +118,10 @@ def master_function(points, k, centroids):
 	print "Took " + str(iteration) + " iteration(s)"
 	return centroids
 
-'''
-	Slave functionality K_means code
-'''
 def slave_function():
+	'''
+	Slave functionality K_means code
+	'''
 	# Get communication instance
 	comm = MPI.COMM_WORLD
 
@@ -149,7 +153,6 @@ def slave_function():
 			dimension_stats_all_clusters.append(dimension_stats_cluster_i)
 		# Send the dimension stats for all clusters to master node
 	   	comm.send(dimension_stats_all_clusters, dest=0)
-
 
 if __name__ == "__main__":
 	comm = MPI.COMM_WORLD

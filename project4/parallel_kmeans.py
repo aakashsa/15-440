@@ -6,15 +6,15 @@ from point2d import Point2D
 import utils
 import time
 
-'''
+def recalculate_centroids(centroid_local, population_local, k):
+	'''
 	Centroids from all n-1 processess - centroid_local = 2D list. List i is 
 	   centroids from node i
 	population from all n-1 processess - population_local = 2D list. List i 
 	   contains population for centroids from node i
 	k = number of clusters
 	return: new averaged centroids
-'''
-def recalculate_centroids(centroid_local, population_local, k):
+	'''
 	# Total size of each cluster
 	total_size = [ 0.0 for i in range(k)]
 	for i in range(0, k):
@@ -32,17 +32,21 @@ def recalculate_centroids(centroid_local, population_local, k):
 				new_centroids[i] = factored + new_centroids[i] # add points
 	return new_centroids		
 
-'''
+def master_function(points, k, centroids):
+	'''
 	Master functionality K_means code
 	points = list of initial data points
 	k = number of clusters
 	centroids = initial list of centroids
 	return: list of final centroids
-'''
-def master_function(points, k, centroids):
+	'''
 	comm = MPI.COMM_WORLD
 
 	num_nodes = comm.Get_size()
+
+	if (num_nodes - 1 == 0):
+		print "ERROR: No slave nodes. Check number of processes requested"
+		sys.exit(0)
 
 	# Partition The points for the slaves
 	partition = utils.partition_points(points, num_nodes - 1)
@@ -80,10 +84,10 @@ def master_function(points, k, centroids):
 	print "Took " + str(iteration) + " iteration(s)"
 	return centroids
 
-'''
-	Slave functionality K_means code
-'''
 def slave_function():
+	'''
+	Slave functionality K_means code
+	'''
 	# Get communication instance
 	comm = MPI.COMM_WORLD
 

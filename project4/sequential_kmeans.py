@@ -5,10 +5,10 @@ import utils
 from point2d import Point2D
 import time
 
-'''
-	Actual K Means code 
-'''	
 def k_means (points, k, centroids):
+	'''
+	Actual K Means code 
+	'''	
 	iteration = 0
 	while (True):
 		new_centroids = []

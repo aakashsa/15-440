@@ -39,7 +39,7 @@ seq_dna_kmeans:
 	python sequential_dna_kmeans.py dna_data.txt $(DNA_K) dnacentroids.txt
 
 par_2d_kmeans:
-	mpirun -n $(N) -machinefile machines_ghc.txt python parallel_kmeans.py 2d_data.txt $(2D_K) 2dcentroids.txt
+	mpirun -np $(N) -hostfile machines_ghc.txt python parallel_kmeans.py 2d_data.txt $(2D_K) 2dcentroids.txt
 
 par_dna_kmeans:
-	mpirun -n $(N) -machinefile machines_ghc.txt python parallel_dna_kmeans.py dna_data.txt $(DNA_K) dnacentroids.txt
+	mpirun -np $(N) -hostfile machines_ghc.txt python parallel_dna_kmeans.py dna_data.txt $(DNA_K) dnacentroids.txt

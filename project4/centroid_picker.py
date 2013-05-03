@@ -1,11 +1,12 @@
 import random
 import sys
 
-'''
-	Functionality to pick centroids from an input file
-	Picks k random centroids from point file, and writes them to given output file
-'''
 def pickCentroids(k, pointsFile, outputFile):
+	'''
+	Functionality to pick centroids from an input file
+	Picks k random centroids from point file, and writes them to given output 
+	file
+	'''
 	output = open(outputFile, 'w')
 	inputPoints = [line for line in open(pointsFile)]
 	centroids = random.sample(inputPoints, k)

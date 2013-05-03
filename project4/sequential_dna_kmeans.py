@@ -5,12 +5,12 @@ import utils
 from pointdna import PointDNA
 import time
 
-'''
+def find_new_centroid(points):
+	'''
 	Compute the new centroid for a given list of points.
 	For each dimension of the centroid, pick the DNA component
 	that is most frequent in the given list of points
-'''
-def find_new_centroid(points):
+	'''
 	if (len(points)==0):
 		return
 	dimension = len(points[0])
@@ -29,10 +29,10 @@ def find_new_centroid(points):
 		answer.append(max_char)
 	return PointDNA(answer)
 	
-'''
-	Actual K Means code 
-'''
 def k_means (points, k, centroids):
+	'''
+	Actual K Means code 
+	'''
 	iteration = 0
 	while (True):
 		new_centroid_list = []

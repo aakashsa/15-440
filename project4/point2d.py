@@ -2,10 +2,10 @@ import math
 import sys
 from exceptions import NotImplementedError
 
-'''
-	Class that represents a 2D point
-'''
 class Point2D:
+	'''
+	Class that represents a 2D point
+	'''
 
 	x = 0
 	y = 0
@@ -41,31 +41,31 @@ class Point2D:
 		if (i == 1):
 			return self.y
 
-	'''
+	def distance(self, other):
+		'''
 		Function to compute euclidean distance bewteen two 2D points
 		return: float value representing distance
-	'''
-	def distance(self, other):
+		'''
 		if not isinstance(other, Point2D):
 			return NotImplementedError
 		dx = math.fabs(self.x - other.x)
 		dy = math.fabs(self.y - other.y)
 		return math.sqrt(dx * dx + dy * dy)
 
-	'''
+	def scalarMultiply(self, scalar):
+		'''
 		Function that multiplies components of this point by a scalar
 		return: new point with components multiplied by scalar
-	'''
-	def scalarMultiply(self, scalar):
+		'''
 		return Point2D(self.x * scalar, self.y * scalar)
 
-	'''
+	def find_closest_point(self, points):
+		'''
 		Function that finds the closest point in a given list of points to
 		this point
 		points = list of points to find in
 		return: index of point that is closes to this point
-	'''
-	def find_closest_point(self, points):
+		'''
 		if (len(points) == 0):
 			return None
 		min_dist = sys.maxint
@@ -77,12 +77,12 @@ class Point2D:
 				cur_centroid = i
 		return cur_centroid
 
-	'''
-		Function to get the average of a given list of points
-		return: average point
-	'''
 	@staticmethod
 	def getAverage(points):
+		'''
+		Function to get the average of a given list of points
+		return: average point
+		'''
 		if (len(points) == 0):
 			return None
 		sumx = 0
@@ -92,12 +92,12 @@ class Point2D:
 			sumy += point.y
 		return Point2D(float(sumx)/len(points), float(sumy)/len(points))
 
-	'''
-		Function to convert a list of 2D points into a string
-		return: string representing list of 2D points
-	'''
 	@staticmethod
 	def stringify(points):
+		'''
+		Function to convert a list of 2D points into a string
+		return: string representing list of 2D points
+		'''
 		strList = [str(pt) for pt in points]
 		return '[' + ', '.join(strList) + ']'
 
