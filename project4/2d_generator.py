@@ -1,46 +1,59 @@
-## this file generates random 2D Points data and writes it to a file
-## currently we don't check if we are generating a new point or not
-
-import sys
+import utils
 import random
+import numpy
+import sys
+from point2d import Point2D
 
-def getRandomFloatRange(size):
-    num = random.randint(0, size-1)
-    decimal = random.random()
-    sign = num % 2
-    if sign !=0:
-        return num + decimal
-    answer = -(num+decimal)    
-    return answer
+def generate_clusters(k, clusterOutput, maxValue):
+	'''
+	Generate random k cluster centroids within radius maxValue and write to
+	clusterOutput file
+	'''
+	output = open(clusterOutput, 'w')
+	centroids = []
+	for i in xrange(k):
+		l = list(numpy.random.uniform(0, maxValue, 2))
+		centroid = Point2D(l[0], l[1])
+		# is it far enough from the others?
+		while (centroid in centroids):
+			l = list(numpy.random.uniform(0, maxValue, 2))
+			centroid = Point2D(l[0], l[1])
+		centroids.append(centroid)
+		output.write(str(centroid.x) + "," + str(centroid.y) + "\n")
+	return centroids
 
-
-def generateData():
-    if (len(sys.argv) != 5):
-        print "Usage: python 2d_generator.py <numPoints> <ptDimension> <outputFile> <range>"
-        sys.exit(0)
-    size = int(sys.argv[4])    
-    if (size <= 0):
-        print "ERROR: Range must be at least 1"
-        sys.exit(0)
-
-    numPoints = int(sys.argv[1])
-    if (numPoints <= 0):
-        print "ERROR: Num points must be at least 1"
-        sys.exit(0)
-    ptDimension = int(sys.argv[2])
-    if (ptDimension <= 0):
-        print "ERROR: Point dimension must be at least 1"
-        sys.exit(0)
-
-    outputFile = open(sys.argv[3], 'w')
-
-    # generate points
-    for pt in xrange(numPoints):
-        point = []
-        for i in xrange(ptDimension):
-            point.append(getRandomFloatRange(size))
-        outputFile.write(str(point[0]) + "," + str(point[1]) + "\n")
-    return
+def generate_points(clusters, maxValue, ptsPerCluster, outputFile):
+	'''
+	Given a list of centroids, generate ptsPerCluster many points for each
+	cluster within radius of maxValue and write to outputFile
+	'''
+	output = open(outputFile, 'w')
+	minClusterVar = 0
+	maxClusterVar = 0.5
+	for cluster in clusters:
+		variance = numpy.random.uniform(minClusterVar, maxClusterVar)
+		for i in xrange(ptsPerCluster):
+			(x,y) = numpy.random.normal((cluster.x, cluster.y), variance)
+			output.write(str(x) + "," + str(y) + "\n")
 
 if __name__ == "__main__":
-    generateData()
+	if (len(sys.argv) != 6):
+		print "Usage: python 2d_generator_2.py <numPointsPerCluster> " + \
+			"<maxValue> <k> <clusterOutput> <pointsOutput>"
+		sys.exit(0)
+
+	ptsPerCluster = int(sys.argv[1])
+	if (ptsPerCluster <= 0):
+		print "ERROR: Points per cluster must be at least 1"
+		sys.exit(0)
+	maxValue = int(sys.argv[2])    
+	if (maxValue < 0):
+		print "ERROR: Max value must be at least 0"
+		sys.exit(0)
+	k = int(sys.argv[3])
+	if (k <= 0):
+		print "ERROR: k must be at least 1"
+		sys.exit(0)
+
+	clusters = generate_clusters(k, sys.argv[4], maxValue)
+	generate_points(clusters, maxValue, ptsPerCluster, sys.argv[5])
