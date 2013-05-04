@@ -62,21 +62,21 @@ if __name__ == "__main__":
 		sys.exit(0)
 	k = int(sys.argv[2])
 	if (k <= 0):
-		print "k must be at least 1"
+		print "ERROR: k must be at least 1"
 		sys.exit(0)
 
 	# Read data points
 	points = utils.read_DNA_points(sys.argv[1])
 
 	if (k > len(points)):
-		print "k must be at most the number of data points"
+		print "ERROR: k must be at most the number of data points"
 		sys.exit(0)
 
 	# Read centroids from file
 	centroids = utils.read_DNA_points(sys.argv[3])
 
 	if (len(centroids) != k):
-		print "k must be equal to number of centroids"
+		print "ERROR: k must be equal to number of centroids"
 		sys.exit(0)
 
 	# Start k means algorithm
